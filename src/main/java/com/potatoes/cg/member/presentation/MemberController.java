@@ -1,22 +1,30 @@
-//package com.potatoes.cg.member.presentation;
-//
+package com.potatoes.cg.member.presentation;
+
 //import com.ohgiraffers.comprehensive.member.dto.request.MemberSignupRequest;
 //import com.ohgiraffers.comprehensive.member.dto.response.ProfileResponse;
 //import com.ohgiraffers.comprehensive.member.service.MemberService;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.security.core.annotation.AuthenticationPrincipal;
-//import org.springframework.security.core.userdetails.User;
-//import org.springframework.web.bind.annotation.*;
-//
-//import javax.validation.Valid;
-//
-//@RestController
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+
+@RestController
 //@RequestMapping({"/member", "/api/v1/member"})
-//@RequiredArgsConstructor
-//public class MemberController {
-//
+@RequiredArgsConstructor
+public class MemberController {
+
+    // 임시 확인 테스트용 메소드
+    // 상단 어노테이션 주석도 풀어야함
+    @GetMapping("/")
+    public String test() {
+
+        return "test";
+    }
+
 //    private final MemberService memberService;
 //
 //    /* 1. 회원 가입 */
@@ -38,6 +46,6 @@
 //
 //        return ResponseEntity.ok( profileResponse );
 //    }
-//
-//
-//}
+
+
+}
