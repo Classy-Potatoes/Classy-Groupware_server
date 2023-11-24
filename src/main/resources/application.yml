@@ -2,9 +2,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://localhost:3306/comprehensive
-#    username: ohgiraffers
-#    password: ohgiraffers
+    url: jdbc:mysql://localhost:3306/classy
+    username: classy
+    password: classy##
 
 
   # jpa config
@@ -23,7 +23,7 @@ spring:
 
 # server port
 server:
-  port: 8001
+  port: 8002
 
 # image file
 image:
@@ -36,7 +36,7 @@ image:
 # secret? ???? ???? ??
 # ???? ?? ????? 1??(604800000?)
 jwt:
-  secret: asdfjp298pafo1320efqw0udvnh0er0h412r08byfdq9dsvh02143908hfeqwn80fdqs0nfdqs0n412013rq0nqefn08dfas0das730732g86923
+  secret: 6Ihu7rKPxL8Gl9lWDJyLYkTIraYFCjDIjO27z497/EZY8+QOOtYe50R7gM8KWluw/VFX/38fBp3nUPf3p589mKUz5/wtwq8UA9sgx/lfqPi/wEyuGTSfIC0eEqVd2eLRw9rQq7Mtbb9F9cTMVU2vxEvZHdfH22oR7Elkak3Xo7kO8iVmrxnq8ou7FsTHwox74x3nWV3wyF9ikJdKxGUQ+0uc4mdccGCew9wo9Q==
   access:
     expiration: 3600000
   #    expiration: 1000
