@@ -23,6 +23,7 @@ public class NoteController {
 
     private final NoteService noteService;
 
+
     /********************************************* 보낸 쪽지함 *********************************************/
 
     //전체 조회
@@ -131,6 +132,59 @@ public class NoteController {
     }
 
 
+    /********************************************* 중요 쪽지함 *********************************************/
+
+    //전체 조회
+    @GetMapping("/important")
+    public ResponseEntity<PagingResponse> getImportantNotes(
+            @RequestParam(defaultValue = "1") final Integer page,
+            @RequestParam final Long memberCode
+    ) {
+
+        LocalDateTime noteDate = LocalDateTime.now();
+
+        final Page<NotesResponse> notes = noteService.getImportantNotes(page, memberCode, noteDate);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
+        final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
+
+    }
+
+    //상세 조회
+    @GetMapping("/important/{noteCode}")
+    public ResponseEntity<NoteResponse> getImportantNote(@PathVariable final Long noteCode) {
+
+        final NoteResponse noteResponse = noteService.getImportantNote(noteCode);
+
+        return ResponseEntity.ok(noteResponse);
+
+    }
+
+    //삭제
+    @DeleteMapping("/important/{noteCode}")
+    public ResponseEntity<Void> deleteImportantNote(@PathVariable final Long noteCode) {
+
+        noteService.deleteImportantNote(noteCode);
+
+        return ResponseEntity.noContent().build();
+
+    }
+
+    //검색 조회
+    @GetMapping("/important/search")
+    public ResponseEntity<PagingResponse> getImportantNoteBySearch(
+            @RequestParam(defaultValue = "1") final Integer page, @RequestParam String searchCondition, @RequestParam String searchValue) {
+
+        final Page<NotesResponse> notes = noteService.getImportantNoteByMemberOrNoteBody(page, searchCondition, searchValue);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
+        final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
+
+    }
+
+
     /***************************************************************************************************************/
 
     //쪽지 이동
@@ -142,6 +196,5 @@ public class NoteController {
         return ResponseEntity.status(HttpStatus.CREATED).build(); //201 응답
 
     }
-
 
 }

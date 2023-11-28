@@ -138,6 +138,60 @@ public class NoteService {
     }
 
 
+    /********************************************* 중요 쪽지함 *********************************************/
+
+    //전체 조회
+    @Transactional(readOnly = true)
+    public Page<NotesResponse> getImportantNotes(final int page, final Long memberCode, LocalDateTime noteSentDate) {
+
+        Page<Note> notes = noteRepository.findByAllMemberCodeAndNoteDateAndAllNoteStatus(getPageable(page), memberCode, noteSentDate, IMPORTANT);
+
+        return notes.map(note -> NotesResponse.from(note));
+
+    }
+
+    //상세 조회
+    @Transactional(readOnly = true)
+    public NoteResponse getImportantNote(final Long noteCode) {
+
+        Note note = noteRepository.findById(noteCode)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_NOTE_CODE));
+
+
+        return NoteResponse.from(note);
+
+    }
+
+    //삭제
+    public void deleteImportantNote(final Long noteCode) {
+
+        noteRepository.deleteById(noteCode);
+
+    }
+
+    //검색 조회
+    public Page<NotesResponse> getImportantNoteByMemberOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
+
+        Page<Note> notes = null;
+
+        if (searchCondition.equals("all")) {
+            notes = noteRepository.findByImportantNoteSearchAll(
+                    getPageable(page), searchValue, searchValue, searchValue, IMPORTANT, IMPORTANT);
+        } else if (searchCondition.equals("noteSender")) {
+            notes = noteRepository.findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(getPageable(page), searchValue, IMPORTANT);
+        } else if (searchCondition.equals("noteReceiver")) {
+            notes = noteRepository.findByNoteReceiverMemberInfoInfoNameContainsAndNoteReceiverStatus(getPageable(page), searchValue, IMPORTANT);
+        } else if (searchCondition.equals("noteBody")) {
+            notes = noteRepository.findByNoteBodyContainsAndNoteStatus(getPageable(page), searchValue, IMPORTANT);
+        } else {
+            new NotFoundException(NOT_FOUND_NOTE);
+        }
+
+        return notes.map(note -> NotesResponse.from(note));
+
+    }
+
+
     /***************************************************************************************************************/
 
     //이동
@@ -186,7 +240,5 @@ public class NoteService {
     }
 
     /***************************************************************************************************************/
-
-
 
 }
