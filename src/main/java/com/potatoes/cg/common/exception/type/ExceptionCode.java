@@ -23,7 +23,9 @@ public enum ExceptionCode {
 //    NOT_ENOUGH_STOCK(5000, "재고 부족으로 주문 불가합니다."),
 //    NOT_FOUND_VALID_ORDER(5001, "유효한 주문 건이 없습니다."),
 //    NOT_FOUND_REVIEW_CODE(6000, "리뷰 코드에 해당하는 리뷰가 존재하지 않습니다."),
-    ALREADY_EXIST_REVIEW(6001, "이미 리뷰가 작성되어 작성할 수 없습니다.");
+    ALREADY_EXIST_REVIEW(6001, "이미 리뷰가 작성되어 작성할 수 없습니다."),
+
+    NOT_FOUND_NOTE_CODE(3000, "쪽지 코드에 해당하는 쪽지가 없습니다.");
 
 
     /* enum 쪽에서 필드를 생성이 가능하고, 기본 생성자와 getter를 생성했기 때문에
