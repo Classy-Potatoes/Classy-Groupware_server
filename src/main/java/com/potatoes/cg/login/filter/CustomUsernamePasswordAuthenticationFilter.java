@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.StreamUtils;
@@ -19,8 +20,9 @@ import java.util.Map;
 /* 스프링 시큐리티의 기존 UsernamePasswordAuthenticationFilter를 대처할 Custom Filter 작성 */
 public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
+    // POST방식으로 /member/login 요청으로 왔을때 이 필터가 동작
     private static final String HTTP_MEHOD = "POST";
-    private static final String LOGIN_REQUEST_URL = "/member/login";
+    private static final String LOGIN_REQUEST_URL = "/cg/login";
     private static final String CONTENT_TYPE = "application/json";
 
     private static final String USERNAME = "memberId";
@@ -42,6 +44,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenti
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
 
+        // 요청 컨텐츠 타입이 알맞은지 확인
         // Request Content Type "application/json" 확인
         if ( request.getContentType() == null || !request.getContentType().equals( CONTENT_TYPE ) ) {
 
@@ -54,6 +57,8 @@ public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenti
 
 
         // JSON 문자열을 Java Map 타입으로 변환
+        // body를 읽어와서 map.class 타입으로 변환하겠다.
+        // username, password 타입으로 있을것
         Map<String, String> bodyMap = objectMapper.readValue(body, Map.class);
 
 
@@ -61,13 +66,14 @@ public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenti
         String memberId = bodyMap.get( USERNAME );
         String memberPassword = bodyMap.get( PASSWORD );
 
+
         // 인증 토큰에 세팅
         UsernamePasswordAuthenticationToken authenticationToken
-                = new UsernamePasswordAuthenticationToken(memberId, memberPassword);
+                = new UsernamePasswordAuthenticationToken( memberId, memberPassword );
 
 
         // 인증 매니저에게 인증 토큰 전달
-        return this.getAuthenticationManager().authenticate(authenticationToken);
+        return this.getAuthenticationManager().authenticate( authenticationToken );
 
     }
 

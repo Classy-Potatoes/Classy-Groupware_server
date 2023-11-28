@@ -1,28 +1,25 @@
-//package com.potatoes.cg.member.service;
-//
-//import com.ohgiraffers.comprehensive.common.exception.NotFoundException;
-//import com.ohgiraffers.comprehensive.member.domain.Member;
-//import com.ohgiraffers.comprehensive.member.domain.repository.MemberRepository;
-//import com.ohgiraffers.comprehensive.member.dto.request.MemberSignupRequest;
-//import com.ohgiraffers.comprehensive.member.dto.response.ProfileResponse;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import static com.ohgiraffers.comprehensive.common.exception.type.ExceptionCode.NOT_FOUND_MEMBER_ID;
-//
-//@Service
-//@RequiredArgsConstructor
-//@Transactional
-//public class MemberService {
-//
-//    private final MemberRepository memberRepository;
-//    private final PasswordEncoder passwordEncoder;
-//
-//    /* 1. 회원 가입 */
-//    public void signup(final MemberSignupRequest memberRequest) {
-//
+package com.potatoes.cg.member.service;
+
+import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.repository.MemberRepository;
+import com.potatoes.cg.member.dto.request.MemberSignupRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    /* 1. 회원 가입 */
+    public void regist(final MemberSignupRequest memberRequest) {
+
 //        final Member newMember = Member.of(
 //                memberRequest.getMemberId(),
 //                // 암호화 인코딩
@@ -30,11 +27,12 @@
 //                memberRequest.getMemberName(),
 //                memberRequest.getMemberEmail()
 //        );
-//
+
 //        memberRepository.save( newMember );
-//    }
-//
-//
+
+    }
+
+
 //    @Transactional(readOnly = true)     // 조회문이기 때문에
 //    public ProfileResponse getProfile( String memberId ) {
 //
@@ -44,6 +42,6 @@
 //        return ProfileResponse.from( member );
 //
 //    }
-//
-//
-//}
+
+
+}
