@@ -88,14 +88,14 @@ public class SecurityConfig {
 //                .exceptionHandling()
 //                .authenticationEntryPoint( jwtAuthenticationEntryPoint() )
 //                .accessDeniedHandler( jwtAccessDeniedHandler() )
-//                .and()
+                .and()
                 // 필터 순서
                 // jwtAuthenticationFilter -> CustomUsernamePasswordAuthenticationFilter
                 //      -> UsernamePasswordAuthenticationFilter
                 // ------------------------
 
                 // 교차 출처 자원 공유 설정 (밑에 설정해둔 corsConfigurationSource 로 처리됨)
-//                .cors()
+                .cors()
                 .and()
                 .build();
     }
