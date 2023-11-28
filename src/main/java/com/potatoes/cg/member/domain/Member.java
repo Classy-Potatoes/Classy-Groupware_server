@@ -64,6 +64,7 @@ public class Member {
         this.memberInfo = memberInfo;
     }
 
+    // 넘어온 값으로 새로운 엔티티를 만들어서 반환해라
     public static Member of( String memberId, String memberPassword, MemberInfo memberInfo ) {
 
         return new Member(

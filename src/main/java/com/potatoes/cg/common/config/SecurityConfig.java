@@ -1,7 +1,16 @@
 package com.potatoes.cg.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.potatoes.cg.jwt.filter.JwtAuthenticationFilter;
+import com.potatoes.cg.jwt.handler.JwtAccessDeniedHandler;
+import com.potatoes.cg.jwt.handler.JwtAuthenticationEntryPoint;
+import com.potatoes.cg.jwt.service.JwtService;
+import com.potatoes.cg.login.filter.CustomUsernamePasswordAuthenticationFilter;
+import com.potatoes.cg.login.handler.LoginFailureHandler;
+import com.potatoes.cg.login.handler.LoginSuccessHandler;
+import com.potatoes.cg.login.service.LoginService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +28,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-
+@Slf4j
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -27,26 +36,9 @@ public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
 
-//    private final LoginService loginService;
-//
-//    private final JwtService jwtService;
+    private final LoginService loginService;
 
-
-    /* 테스트
-    * 1. Token 값이 없거나 잘못 작성 된 경우
-         GET http://localhost:8001/member/hello  로 token 없이 → 인증되지 않은 요청
-      2. AccessToken 유효한 경우
-        GET http://localhost:8001/member/hello 로 token 가지고 → 인증 되어 404
-      3. AccessToken 유효하지 않고 RefreshToken 유효한 경우
-        accessToken 시간 설정 짧게
-        현재 refreshToken 확인 후 업데이트 되는지
-        GET http://localhost:8001/member/hello 로 access token 가지고 → 인증되지 않은 요청
-        GET http://localhost:8001/member/hello 로 refresh token 가지고 → 헤더 응답으로 새로운 access token, refresh token 발급
-        GET http://localhost:8001/member/hello 로 재발급 받은 access token 가지고 요청하면 된다 (시간이 짧게 설정 되어서 다시 만료로 뜨지만)
-    4. AccessToken 유효하지만 권한이 없는 경우
-        GET http://localhost:8001/api/v1/products-management?page=1 로 일반 유저 로그인 후 발급 받은 accessToken 가지고 → 허가 되지 않은 요청
-        GET http://localhost:8001/api/v1/products-management?page=1 로 관리자 유저 로그인 후 발급 받은  accessToken 가지고 → 조회 완료
-    */
+    private final JwtService jwtService;
 
 
     @Bean
@@ -68,26 +60,31 @@ public class SecurityConfig {
                 // 이 때 OPTIONS 메서드를 서버에 사전 요청을 보내 권한을 확인함
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // 이미지 허가
-//                .antMatchers(HttpMethod.GET, "/productimgs/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/imgs/**").permitAll()
+
+
                 // 이런 경로의 요청은 다 허락하겠다. 비로그인 상태에서도 볼수 있다.
-                .antMatchers(HttpMethod.GET, "/cg-api/v1/**").permitAll()
-                .antMatchers("/**").permitAll()       // 임시 작동
-//                .antMatchers("/member/signup").permitAll()       // 회원가입도 비로그인 상태에서 가능
+                .antMatchers(HttpMethod.GET, "/cg-api/v1/cg/login/**").permitAll()
+//                .antMatchers("/**").permitAll()       // 임시 작동
+
+
+                .antMatchers("/member/regist").permitAll()       // 회원가입도 비로그인 상태에서 가능
                 // 이런 패턴들은 관리자 권한이 있는 사람만 가능하다(인증, 인가 둘다 가능해야 수행할수 있다.)
-//                .antMatchers("/api/v1/products-management/**", "/api/v1/products/**").hasRole("ADMIN")
+                .antMatchers("/cg-api/v1/notice/**", "/cg-api/v1/ad/**").hasRole("ADMIN")
                 // 여기에 선언된 요청 외에는 모든것은 인증되어야만 한다.
-//                .anyRequest().authenticated()
-//                .and()
+                .anyRequest().authenticated()
+                .and()
                 // 로그인 필터 설정
-                // (커스텀한 customUsernamePasswordAuthenticationFilter 필터를
-                // 원래 있던 UsernamePasswordAuthenticationFilter 필터 앞에 끼워 넣겠다.)
-//                .addFilterBefore( customUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class )
+                // (커스텀한 customUsernamePasswordAuthenticationFilter 필터를 원래 있던 UsernamePasswordAuthenticationFilter 필터 앞에 끼워 넣겠다.)
+                .addFilterBefore( customUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class )
                 // JWT Token 인증 필터 설정 (로그인 필터 앞에 설정)
-//                .addFilterBefore( jwtAuthenticationFilter(), CustomUsernamePasswordAuthenticationFilter.class )
+                .addFilterBefore( jwtAuthenticationFilter(), CustomUsernamePasswordAuthenticationFilter.class )
                 // exception handling 설정
-//                .exceptionHandling()
-//                .authenticationEntryPoint( jwtAuthenticationEntryPoint() )
-//                .accessDeniedHandler( jwtAccessDeniedHandler() )
+                .exceptionHandling()
+                // 인증실패
+                .authenticationEntryPoint( jwtAuthenticationEntryPoint() )
+                // 인가실패
+                .accessDeniedHandler( jwtAccessDeniedHandler() )
                 .and()
                 // 필터 순서
                 // jwtAuthenticationFilter -> CustomUsernamePasswordAuthenticationFilter
@@ -138,79 +135,84 @@ public class SecurityConfig {
     }
 
 
-    /* 인증 매니저 빈 등록 => 로그인 시 사용할 password encode 설정, 로그인 시 유저 조회하는 메소드를
-    * 가진 Service 클래스 설정
-    * --------------------------------
+    /* 인증 매니저 빈 등록 => 로그인 시 사용할 password encode 설정,
+    * 로그인 시 유저 조회하는 메소드를 가진 Service 클래스 설정
+    * ----------------------------------------------
     * 밑에 필터가 사용할 인증 매니저 (아이디와 비밀번호 체킹을 여기서 한다)
     * */
-//    @Bean
-//    public AuthenticationManager authenticationManager() {
-//
-//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//        provider.setPasswordEncoder(passwordEncoder());
-//        provider.setUserDetailsService( loginService );
-//
-//        return new ProviderManager( provider );
-//
-//    }
-//
+    @Bean
+    public AuthenticationManager authenticationManager() {
 
-//    /* 로그인 실패 핸들러 빈 등록 */
-//    @Bean
-//    public LoginFailureHandler loginFailureHandler() {
-//        return new LoginFailureHandler( objectMapper );
-//    }
-//
-//
-//    /* 로그인 성공 핸들러 빈 등록 */
-//    @Bean
-//    public LoginSuccessHandler loginSuccessHandler() {
-//        return new LoginSuccessHandler( jwtService );
-//    }
-//
-//
-//    /* 로그인 필터 빈 등록 */
-//    @Bean
-//    public CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter() {
-//
-//        CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter
-//                = new CustomUsernamePasswordAuthenticationFilter( objectMapper );
-//
-//        /* 사용할 인증 매니저 설정 (상단 매니저 적용) */
-//        customUsernamePasswordAuthenticationFilter.setAuthenticationManager( authenticationManager() );
-//
-//        /* 로그인 실패 핸들링 */
-//        customUsernamePasswordAuthenticationFilter.setAuthenticationFailureHandler( loginFailureHandler() );
-//
-//        /* 로그인 성공 핸들링 */
-//        customUsernamePasswordAuthenticationFilter.setAuthenticationSuccessHandler( loginSuccessHandler() );
-//
-//        return customUsernamePasswordAuthenticationFilter;
-//
-//    }
-//
-//
-//    /* JWT 인증 필터 */
-//    // 만든 필터를 빈으로 등록
-//    @Bean
-//    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-//        return new JwtAuthenticationFilter( jwtService );
-//    }
-//
-//
-//    /* 인증 실패 핸들러 */
-//    @Bean
-//    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint () {
-//
-//        return new JwtAuthenticationEntryPoint( objectMapper );
-//    }
-//
-//    /* 인가 실패 핸들러 */
-//    @Bean
-//    public JwtAccessDeniedHandler jwtAccessDeniedHandler() {
-//
-//        return new JwtAccessDeniedHandler( objectMapper );
-//    }
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder( passwordEncoder() );       // 비밀번호 맞는지 체크 (인코더 사용해서)
+        provider.setUserDetailsService( loginService );         // DB에서 아이디가 맞는지 조회해오는 서비스를 하나만들어서
+
+        return new ProviderManager( provider );
+
+    }
+
+
+    /* 로그인 실패 핸들러 빈 등록 */
+    @Bean
+    public LoginFailureHandler loginFailureHandler() {
+        return new LoginFailureHandler( objectMapper );
+    }
+
+
+    /* 로그인 성공 핸들러 빈 등록
+    * 토큰 생성을 위해서 jwtService를 넘겨줘야한다. */
+    @Bean
+    public LoginSuccessHandler loginSuccessHandler() {
+        return new LoginSuccessHandler( jwtService );
+    }
+
+
+    /* 로그인 필터 빈 등록 */
+    /* CustomUsernamePasswordAuthenticationFilter 만든것을 빈 등록
+    * 위쪽의 authenticationManager로 이동 */
+    @Bean
+    public CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter() {
+
+        CustomUsernamePasswordAuthenticationFilter customUsernamePasswordAuthenticationFilter
+                = new CustomUsernamePasswordAuthenticationFilter( objectMapper );
+
+        /* 사용할 인증 매니저 설정 (상단 매니저 적용) */
+        customUsernamePasswordAuthenticationFilter.setAuthenticationManager( authenticationManager() );
+
+        /* 로그인 실패 핸들링 */
+        customUsernamePasswordAuthenticationFilter.setAuthenticationFailureHandler( loginFailureHandler() );
+
+        /* 로그인 성공 핸들링
+        * 성공시 성공핸들링에서 액세스토큰, 리프레쉬 토큰 생성, DB에 저장 동작함.
+        * */
+        customUsernamePasswordAuthenticationFilter.setAuthenticationSuccessHandler( loginSuccessHandler() );
+
+        return customUsernamePasswordAuthenticationFilter;
+
+    }
+
+
+    /* JWT 인증 필터 */
+    // 만든 필터를 빈으로 등록
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter( jwtService );
+    }
+
+
+    /* 인증 실패 핸들러 */
+    @Bean
+    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint () {
+
+        return new JwtAuthenticationEntryPoint( objectMapper );
+    }
+
+    /* 인가 실패 핸들러 */
+    @Bean
+    public JwtAccessDeniedHandler jwtAccessDeniedHandler() {
+
+        return new JwtAccessDeniedHandler( objectMapper );
+    }
 
 
 }
