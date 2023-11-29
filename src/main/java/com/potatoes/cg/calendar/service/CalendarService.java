@@ -1,12 +1,12 @@
 package com.potatoes.cg.calendar.service;
 
-import com.potatoes.cg.calendar.common.exception.NotFoundException;
 import com.potatoes.cg.calendar.domain.Calendar;
 import com.potatoes.cg.calendar.domain.repository.CalendarRepository;
 import com.potatoes.cg.calendar.dto.request.CalendarCreateRequest;
 import com.potatoes.cg.calendar.dto.request.CalendarUpdateRequest;
 import com.potatoes.cg.calendar.dto.response.ScheduleResponse;
 import com.potatoes.cg.calendar.dto.response.ScheduleDetailResponse;
+import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.projectSchedule.domain.ProjectSchedule;
 import com.potatoes.cg.projectSchedule.domain.repository.ProjectScheduleRepository;
 
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.potatoes.cg.calendar.common.exception.type.ExceptionCode.*;
 import static com.potatoes.cg.calendar.domain.type.StatusType.DELETED;
+import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
 
 @Service
 @Transactional
@@ -54,7 +54,9 @@ public class CalendarService {
 
         List<ScheduleResponse> scheduleResponseList = calendarList.stream()
                 .map(calendar -> ScheduleResponse.from(
+                        calendar.getCalendarCode(),
                         calendar.getCalendarTitle(),
+                        calendar.getCalendarContent(),
                         calendar.getCalendarStartedDate(),
                         calendar.getCalendarEndDate(),
                         calendar.getStatus(),
@@ -73,7 +75,9 @@ public class CalendarService {
 
         List<ScheduleResponse> scheduleResponseList = calendarList.stream()
                 .map(calendar -> ScheduleResponse.from(
+                        calendar.getScheduleCode(),
                         calendar.getScheduleTitle(),
+                        calendar.getScheduleBody(),
                         calendar.getScheduleStartDate(),
                         calendar.getScheduleEndDate(),
                         calendar.getScheduleStatus(),
