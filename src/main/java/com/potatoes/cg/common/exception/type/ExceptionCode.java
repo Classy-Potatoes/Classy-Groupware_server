@@ -7,12 +7,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum ExceptionCode {
 
+    /* common */
     FAIL_TO_UPLOAD_FILE(9001, "파일 저장에 실패하였습니다."),
     FAIL_TO_DELETE_FILE(9002, "파일 삭제에 실패하였습니다."),
-    NOT_FOUND_CATEGORY_CODE(2000, "카테고리 코드에 해당하는 카테고리가 존재하지 않습니다."),
-    NOT_FOUND_PRODUCT_CODE(3000, "상품 코드에 해당하는 상품이 존재하지 않습니다."),
 
-    /* 로그인 실패에 대한 코드 */
+    /* HS */
     FAIL_LOGIN(1400, "로그인에 실패하였습니다."),
     UNAUTHORIZED(1401, "인증 되지 않은 요청입니다."),
     NOT_FOUND_MEMBER_ID(1402, "아이디에 해당하는 유저가 없습니다."),
@@ -20,26 +19,28 @@ public enum ExceptionCode {
     NOT_FOUND_JOB_CODE(1404, "직급 코드에 해당하는 직급이 존재하지 않습니다."),
     NOT_FOUND_DEPT_CODE(1405, "부서 코드에 해당하는 부서가 존재하지 않습니다."),
 
-    /* 멤버 조회 실패 코드 */
+
+    /* JH(준) */
 
 
-    //    NOT_FOUND_MEMBER_CODE(4004, "멤버 코드에 해당하는 유저가 없습니다."),
-//    NOT_ENOUGH_STOCK(5000, "재고 부족으로 주문 불가합니다."),
-//    NOT_FOUND_VALID_ORDER(5001, "유효한 주문 건이 없습니다."),
-//    NOT_FOUND_REVIEW_CODE(6000, "리뷰 코드에 해당하는 리뷰가 존재하지 않습니다."),
+    /* IS */
+
+
+    /* JH(주) */
+
+
+    /* WS */
+
+
+
+
     ALREADY_EXIST_REVIEW(6001, "이미 리뷰가 작성되어 작성할 수 없습니다."),
-
     NOT_FOUND_VALID_TITLE(4005, "제목을 입력해주세요."),
-
     NOT_FOUND_VALID_DATE(4006, "날짜를 입력해주세요."),
-
     NOT_FOUND_CALENDAR_CODE(4007, "등록된 일정이 없습니다."),
-
     NOT_FOUND_NOTE_CODE(3000, "쪽지 코드에 해당하는 쪽지가 없습니다."),
-// ALREADY_EXIST_REVIEW(6001, "이미 리뷰가 작성되어 작성할 수 없습니다.");
 
     /* 프로젝트 관련 실패 코드 */
-    NOT_FOUND_DEPT_CODE(3001, "부서코드에 해당하는 부서가 존재하지 않습니다."),
     NOT_FOUND_MEMBER_CODE(3002, "회원 코드가 존재하지 않습니다.");
 
 

@@ -27,8 +27,8 @@ public class NoteResponse {
     public static NoteResponse from(Note note) {
 
         return new NoteResponse(
-                note.getNoteSender().getMemberInfo().getDeptCode().getDeptName(),
-                note.getNoteSender().getMemberInfo().getJobCode().getJobName(),
+                note.getNoteSender().getMemberInfo().getDept().getDeptName(),
+                note.getNoteSender().getMemberInfo().getJob().getJobName(),
                 note.getNoteSender().getMemberInfo().getInfoName(),
                 note.getNoteReceiver().getMemberInfo().getInfoName(),
                 note.getNoteSentDate(),

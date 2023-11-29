@@ -28,10 +28,10 @@ public class ApprovalService {
     private final ReferenceRepository referenceRepository;
 
 
-    @Value("${file.approval-url}")
-    private String APPROVAL_URL;
-    @Value("${file.approval-dir}")
-    private String APPROVAL_DIR;
+//    @Value("${file.approval-url}")
+//    private String APPROVAL_URL;
+//    @Value("${file.approval-dir}")
+//    private String APPROVAL_DIR;
 
 
     private String getRandomName() {

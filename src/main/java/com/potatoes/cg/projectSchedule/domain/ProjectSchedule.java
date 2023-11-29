@@ -1,6 +1,5 @@
 package com.potatoes.cg.projectSchedule.domain;
 
-import com.potatoes.cg.calendar.domain.type.StatusType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -12,7 +11,6 @@ import javax.persistence.*;
 
 import java.time.LocalDateTime;
 
-import static com.potatoes.cg.calendar.domain.type.StatusType.PROGRESS;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -49,9 +47,9 @@ public class ProjectSchedule {
     @Column(nullable = false)
     private LocalDateTime scheduleModifyDate;
 
-    @Enumerated(value = STRING)
-    @Column(nullable = false)
-    private StatusType scheduleStatus = PROGRESS;
+//    @Enumerated(value = STRING)
+//    @Column(nullable = false)
+//    private StatusType scheduleStatus = PROGRESS;
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "memberCode")
