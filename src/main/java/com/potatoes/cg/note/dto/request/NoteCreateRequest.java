@@ -9,10 +9,10 @@ import javax.validation.constraints.NotBlank;
 
 @RequiredArgsConstructor
 @Getter
-public class NoteRequest {
+public class NoteCreateRequest {
 
     @Min(value = 1)
-    private final Long NoteCode;
+    private final Long noteCode;
 
     @NotBlank
     private final String noteBody;

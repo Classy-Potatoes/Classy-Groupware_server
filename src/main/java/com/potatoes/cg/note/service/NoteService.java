@@ -1,8 +1,10 @@
 package com.potatoes.cg.note.service;
 
 import com.potatoes.cg.common.exception.NotFoundException;
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.repository.NoteRepository;
+import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_NOTE_CODE;
+import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -71,5 +73,35 @@ public class NoteService {
         return NoteResponse.from(note);
 
     }
+
+    //보낸 쪽지 삭제
+    public void deleteSentNote(final Long noteCode) {
+
+        noteRepository.deleteById(noteCode);
+
+    }
+
+    //받은 쪽지 삭제
+    public void deleteReceivedNote(final Long noteCode) {
+
+        noteRepository.deleteById(noteCode);
+
+    }
+
+    //쪽지 쓰기
+//    public Long save(final NoteCreateRequest noteRequest, final CustomUser customUser) {
+//
+//        Note note = noteRepository.findById(customUser.getInfoCode().)
+//                .orElseThrow(() -> new NotFoundException(NOT_FOUND_INFO_NAME));
+//
+//        final Note newNote = Note.of(
+//
+//        );
+//
+//        final Note note = noteRepository.save(newNote);
+//
+//        return note.getNoteCode();
+//
+//    }
 
 }
