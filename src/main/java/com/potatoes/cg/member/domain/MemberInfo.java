@@ -22,11 +22,11 @@ public class MemberInfo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "jobCode")
-    private Job jobCode;
+    private Job job;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "deptCode")
-    private Dept deptCode;
+    private Dept dept;
 
     @Column(nullable = false)
     private String infoEmail;
@@ -41,11 +41,11 @@ public class MemberInfo {
 
 
 
-    public MemberInfo( String infoName, Job jobCode, Dept deptCode, String infoEmail, String infoPhone,
+    public MemberInfo( String infoName, Job job, Dept dept, String infoEmail, String infoPhone,
                       Long infoZipcode, String infoAddress, String infoAddressAdd ) {
         this.infoName = infoName;
-        this.jobCode = jobCode;
-        this.deptCode = deptCode;
+        this.job = job;
+        this.dept = dept;
         this.infoEmail = infoEmail;
         this.infoPhone = infoPhone;
         this.infoZipcode = infoZipcode;
@@ -53,13 +53,13 @@ public class MemberInfo {
         this.infoAddressAdd = infoAddressAdd;
     }
 
-    public static MemberInfo of( String infoName, Job jobCode, Dept deptCode, String infoEmail, String infoPhone,
+    public static MemberInfo of( String infoName, Job job, Dept dept, String infoEmail, String infoPhone,
                                 Long infoZipcode, String infoAddress, String infoAddressAdd ) {
 
         return new MemberInfo(
                 infoName,
-                jobCode,
-                deptCode,
+                job,
+                dept,
                 infoEmail,
                 infoPhone,
                 infoZipcode,
