@@ -1,12 +1,16 @@
 package com.potatoes.cg.member.service;
 
+import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.member.domain.repository.MemberRepository;
 import com.potatoes.cg.member.dto.request.MemberSignupRequest;
+import com.potatoes.cg.member.dto.response.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_MEMBER_ID;
 
 
 @Service
@@ -33,15 +37,15 @@ public class MemberService {
     }
 
 
-//    @Transactional(readOnly = true)     // 조회문이기 때문에
-//    public ProfileResponse getProfile( String memberId ) {
-//
-//        final Member member = memberRepository.findByMemberId( memberId )
-//                .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_ID ));
-//
-//        return ProfileResponse.from( member );
-//
-//    }
+    @Transactional(readOnly = true)     // 조회문이기 때문에
+    public ProfileResponse getProfile(String memberId ) {
+
+        final Member member = memberRepository.findByMemberId( memberId )
+                .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_ID ));
+
+        return ProfileResponse.from( member );
+
+    }
 
 
 }

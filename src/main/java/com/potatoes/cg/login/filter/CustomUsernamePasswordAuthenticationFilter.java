@@ -22,7 +22,7 @@ public class CustomUsernamePasswordAuthenticationFilter extends AbstractAuthenti
 
     // POST방식으로 /member/login 요청으로 왔을때 이 필터가 동작
     private static final String HTTP_MEHOD = "POST";
-    private static final String LOGIN_REQUEST_URL = "/cg/login";
+    private static final String LOGIN_REQUEST_URL = "/member/login";
     private static final String CONTENT_TYPE = "application/json";
 
     private static final String USERNAME = "memberId";

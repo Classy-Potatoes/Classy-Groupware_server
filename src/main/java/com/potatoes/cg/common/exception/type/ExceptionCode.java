@@ -17,7 +17,8 @@ public enum ExceptionCode {
     UNAUTHORIZED(1401, "인증 되지 않은 요청입니다."),
     NOT_FOUND_MEMBER_ID(1402, "아이디에 해당하는 유저가 없습니다."),
     ACCESS_DENIED(1403, "허가 되지 않은 요청입니다."),
-
+    NOT_FOUND_JOB_CODE(1404, "직급 코드에 해당하는 직급이 존재하지 않습니다."),
+    NOT_FOUND_DEPT_CODE(1405, "부서 코드에 해당하는 부서가 존재하지 않습니다."),
 
     /* 멤버 조회 실패 코드 */
 
