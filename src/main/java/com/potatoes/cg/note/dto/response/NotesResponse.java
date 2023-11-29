@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class NotesResponse {
 
+    private final Long noteCode;
+
     private final String noteSender;
 
     private final String noteReceiver;
@@ -23,6 +25,7 @@ public class NotesResponse {
     public static NotesResponse from(Note note) {
 
         return new NotesResponse(
+                note.getNoteCode(),
                 note.getNoteSender().getMemberInfo().getInfoName(),
                 note.getNoteReceiver().getMemberInfo().getInfoName(),
                 note.getNoteSentDate(),

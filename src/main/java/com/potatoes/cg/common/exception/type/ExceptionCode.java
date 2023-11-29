@@ -27,7 +27,8 @@ public enum ExceptionCode {
 
 
     /* JH(주) */
-
+    NOT_FOUND_NOTE_CODE(5000, "쪽지 코드에 해당하는 쪽지가 없습니다."),
+    NOT_FOUND_INFO_NAME(5001, "일치하는 직원이 없습니다."),
 
     /* WS */
 
@@ -37,11 +38,8 @@ public enum ExceptionCode {
     ALREADY_EXIST_REVIEW(6001, "이미 리뷰가 작성되어 작성할 수 없습니다."),
     NOT_FOUND_VALID_TITLE(4005, "제목을 입력해주세요."),
     NOT_FOUND_VALID_DATE(4006, "날짜를 입력해주세요."),
-    NOT_FOUND_CALENDAR_CODE(4007, "등록된 일정이 없습니다."),
-    NOT_FOUND_NOTE_CODE(3000, "쪽지 코드에 해당하는 쪽지가 없습니다."),
+    NOT_FOUND_CALENDAR_CODE(4007, "등록된 일정이 없습니다.");
 
-    /* 프로젝트 관련 실패 코드 */
-    NOT_FOUND_MEMBER_CODE(3002, "회원 코드가 존재하지 않습니다.");
 
 
     /* enum 쪽에서 필드를 생성이 가능하고, 기본 생성자와 getter를 생성했기 때문에

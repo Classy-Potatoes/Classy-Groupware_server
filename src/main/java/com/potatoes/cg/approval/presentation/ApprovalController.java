@@ -2,12 +2,10 @@ package com.potatoes.cg.approval.presentation;
 
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
 import com.potatoes.cg.approval.service.ApprovalService;
-import com.potatoes.cg.common.util.FileUploadUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.net.URI;

@@ -52,4 +52,23 @@ public class Note {
     @Column
     private LocalDateTime noteReceiverDeleteDate;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "infoName")
+//    @Column
+//    private Member infoName;
+
+//    public Note(String noteBody, String infoName) {
+//        this.noteBody = noteBody;
+//        this.infoName = infoName;
+//    }
+//
+//    public static Note of(final String noteBody, final Member infoName) {
+//
+//        return new Note(
+//                noteBody,
+//                infoName
+//        );
+
+//    }
+
 }

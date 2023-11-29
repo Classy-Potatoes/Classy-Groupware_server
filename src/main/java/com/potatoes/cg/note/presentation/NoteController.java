@@ -27,6 +27,7 @@ public class NoteController {
 //            @AuthenticationPrincipal Member memberCode
             @RequestParam final Long memberCode
     ) {
+
         LocalDateTime noteSentDate = LocalDateTime.now();
 
         final Page<NotesResponse> notes = noteService.sentNotes(page, memberCode, noteSentDate);
@@ -54,6 +55,7 @@ public class NoteController {
 //            @AuthenticationPrincipal Member memberCode
             @RequestParam final Long memberCode
     ) {
+
         LocalDateTime noteSentDate = LocalDateTime.now();
 
         final Page<NotesResponse> notes = noteService.receivedNotes(page, memberCode, noteSentDate);
@@ -73,5 +75,36 @@ public class NoteController {
         return ResponseEntity.ok(noteResponse);
 
     }
+
+    //보낸 쪽지 삭제
+    @DeleteMapping("/sent/{noteCode}")
+    public ResponseEntity<Void> deleteSentNote(@PathVariable final Long noteCode) {
+
+        noteService.deleteSentNote(noteCode);
+
+        return ResponseEntity.noContent().build();
+
+    }
+
+    //받은 쪽지 삭제
+    @DeleteMapping("/received/{noteCode}")
+    public ResponseEntity<Void> deleteReceivedNote(@PathVariable final Long noteCode) {
+
+        noteService.deleteReceivedNote(noteCode);
+
+        return ResponseEntity.noContent().build();
+
+    }
+
+
+//    //쪽지 쓰기
+//    @PostMapping("/write")
+//    public ResponseEntity<Void> save(@RequestBody @Valid final NoteCreateRequest noteRequest, CustomUser customUser) {
+//
+//        final Long noteCode = noteService.save(noteRequest, customUser);
+//
+//        return ResponseEntity.created(URI.create("/api/v1/note/" + noteCode)).build();
+//
+//    }
 
 }
