@@ -11,22 +11,28 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class NoteResponse {
 
-    private final String noteBody;
+    private final String deptName;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private final LocalDateTime noteSentDate;
+    private final String jobName;
 
     private final String noteSender;
 
     private final String noteReceiver;
 
-    public static NotesResponse from(Note note) {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private final LocalDateTime noteSentDate;
 
-        return new NotesResponse(
-                note.getNoteBody(),
-                note.getNoteSentDate(),
+    private final String noteBody;
+
+    public static NoteResponse from(Note note) {
+
+        return new NoteResponse(
+                note.getNoteSender().getMemberInfo().getDeptCode().getDeptName(),
+                note.getNoteSender().getMemberInfo().getJobCode().getJobName(),
                 note.getNoteSender().getMemberInfo().getInfoName(),
-                note.getNoteReceiver().getMemberInfo().getInfoName()
+                note.getNoteReceiver().getMemberInfo().getInfoName(),
+                note.getNoteSentDate(),
+                note.getNoteBody()
         );
 
     }

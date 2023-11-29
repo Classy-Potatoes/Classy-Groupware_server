@@ -9,9 +9,12 @@ import java.time.LocalDateTime;
 
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
-    //받은 쪽지와 보낸 쪽지 날짜별 조회
+    //보낸 쪽지 날짜별 조회
     Page<Note> findByNoteSenderMemberCodeAndNoteSentDateBefore (Pageable pageable, Long MemberCode, LocalDateTime noteSentDate);
 
+    //받은 쪽지 날짜별 조회
     Page<Note> findByNoteReceiverMemberCodeAndNoteSentDateBefore (Pageable pageable, Long MemberCode, LocalDateTime noteSentDate);
+
+
 
 }

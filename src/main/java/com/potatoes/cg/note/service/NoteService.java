@@ -1,11 +1,11 @@
 package com.potatoes.cg.note.service;
 
+import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.repository.NoteRepository;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+
+import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_NOTE_CODE;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public class NoteService {
 
     }
 
+    //보낸 쪽지 전체 조회
     @Transactional(readOnly = true)
     public Page<NotesResponse> sentNotes(final int page, final Long memberCode, LocalDateTime noteSentDate) {
 
@@ -37,11 +40,36 @@ public class NoteService {
 
     }
 
-//    @Transactional(readOnly = true)
-//    public NoteResponse sentNote(Long noteCode) {
-//
-//        final Note note = noteRepository.findById(noteCode)
-//                .orElseThrow() -> new ChangeSetPersister.NotFoundException()
-//    }
+    //보낸 쪽지 상세 조회
+    @Transactional(readOnly = true)
+    public NoteResponse sentNote(final Long noteCode) {
+
+        Note note = noteRepository.findById(noteCode)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_NOTE_CODE));
+
+        return NoteResponse.from(note);
+
+    }
+
+    //받은 쪽지 전체 조회
+    @Transactional(readOnly = true)
+    public Page<NotesResponse> receivedNotes(final int page, final Long memberCode, LocalDateTime noteSentDate) {
+
+        Page<Note> notes = noteRepository.findByNoteReceiverMemberCodeAndNoteSentDateBefore(getPageable(page), memberCode, noteSentDate);
+
+        return notes.map(note -> NotesResponse.from(note));
+
+    }
+
+    //받은 쪽지 상세 조회
+    @Transactional(readOnly = true)
+    public NoteResponse receivedNote(final Long noteCode) {
+
+        Note note = noteRepository.findById(noteCode)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_NOTE_CODE));
+
+        return NoteResponse.from(note);
+
+    }
 
 }
