@@ -13,7 +13,11 @@ import static lombok.AccessLevel.PRIVATE;
 @Getter
 public class ScheduleResponse {
 
+    private final Long calendarCode;
+
     private final String title;
+
+    private final String content;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
 //    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
@@ -27,9 +31,11 @@ public class ScheduleResponse {
 
     private boolean isPersonal;
 
-    public ScheduleResponse(String calendarTitle, LocalDateTime calendarStartedDate, LocalDateTime calendarEndDate, StatusType status, boolean isPersonal) {
+    public ScheduleResponse(Long calendarCode,String calendarTitle, String calendarContent, LocalDateTime calendarStartedDate, LocalDateTime calendarEndDate, StatusType status, boolean isPersonal) {
 
+        this.calendarCode = calendarCode;
         this.title = calendarTitle;
+        this.content = calendarContent;
         this.start = calendarStartedDate;
         this.end = calendarEndDate;
         this.status = status;
@@ -37,10 +43,12 @@ public class ScheduleResponse {
     }
 
 
-    public static ScheduleResponse from(String calendarTitle, LocalDateTime calendarStartedDate, LocalDateTime calendarEndDate, StatusType status, boolean isPersonal) {
+    public static ScheduleResponse from(Long calendarCode, String calendarTitle, String calendarContent, LocalDateTime calendarStartedDate, LocalDateTime calendarEndDate, StatusType status, boolean isPersonal) {
 
         return new ScheduleResponse(
+                calendarCode,
                 calendarTitle,
+                calendarContent,
                 calendarStartedDate,
                 calendarEndDate,
                 status,
