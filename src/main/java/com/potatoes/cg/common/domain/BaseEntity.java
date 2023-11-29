@@ -1,6 +1,5 @@
 //package com.potatoes.cg.common.domain;
 //
-//import com.ohgiraffers.comprehensive.common.domain.type.StatusType;
 //import lombok.Getter;
 //import lombok.NoArgsConstructor;
 //import org.springframework.data.annotation.CreatedDate;
@@ -13,7 +12,6 @@
 //import javax.persistence.MappedSuperclass;
 //import java.time.LocalDateTime;
 //
-//import static com.ohgiraffers.comprehensive.common.domain.type.StatusType.USABLE;
 //import static javax.persistence.EnumType.STRING;
 //
 //@Getter
