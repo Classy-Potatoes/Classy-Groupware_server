@@ -20,6 +20,7 @@ public class NoteController {
 
     private final NoteService noteService;
 
+    //보낸 쪽지 전체 조회
     @GetMapping("/send")
     public ResponseEntity<PagingResponse> getSentNotes(
             @RequestParam(defaultValue = "1") final Integer page,
@@ -36,13 +37,41 @@ public class NoteController {
 
     }
 
-//    @GetMapping("/send/{note_no}")
-//    public ResponseEntity<NoteResponse> getSentNote(@PathVariable final Long noteCode) {
-//
-//        final NoteResponse noteResponse = noteService.sentNote(noteCode);
-//
-//        return ResponseEntity.ok(noteResponse);
-//
-//    }
+    //보낸 쪽지 상세 조회
+    @GetMapping("/send/{noteCode}")
+    public ResponseEntity<NoteResponse> getSentNote(@PathVariable final Long noteCode) {
+
+        final NoteResponse noteResponse = noteService.sentNote(noteCode);
+
+        return ResponseEntity.ok(noteResponse);
+
+    }
+
+    //받은 쪽지 전체 조회
+    @GetMapping("/received")
+    public ResponseEntity<PagingResponse> getReceivedNotes(
+            @RequestParam(defaultValue = "1") final Integer page,
+//            @AuthenticationPrincipal Member memberCode
+            @RequestParam final Long memberCode
+    ) {
+        LocalDateTime noteSentDate = LocalDateTime.now();
+
+        final Page<NotesResponse> notes = noteService.receivedNotes(page, memberCode, noteSentDate);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
+        final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
+
+    }
+
+    //받은 쪽지 상세 조회
+    @GetMapping("/received/{noteCode}")
+    public ResponseEntity<NoteResponse> getReceivedNote(@PathVariable final Long noteCode) {
+
+        final NoteResponse noteResponse = noteService.receivedNote(noteCode);
+
+        return ResponseEntity.ok(noteResponse);
+
+    }
 
 }
