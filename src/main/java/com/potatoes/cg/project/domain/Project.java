@@ -63,16 +63,16 @@ public class Project {
 
 //    @ManyToOne
 //    @JoinColumn(name = "memberCode")
-//    private Member member;
+//    private Member memberCode;
 
     @Column
-    private int memberCode;
+    private Long memberCode;
 
     @OneToMany(mappedBy = "project")
     private List<ProjectParticipant> participants;
 
     public Project(String projectTitle,String projectBody,Date projectStartDate,
-                   Date projectEndDate,Dept dept, int memberCode){
+                   Date projectEndDate,Dept dept, Long memberCode){
         this.projectTitle =projectTitle;
         this.projectBody = projectBody;
         this.projectStartDate = projectStartDate;
@@ -82,7 +82,7 @@ public class Project {
     }
     public static Project of(
             final String projectTitle, final String projectBody,
-            final Date projectStartDate, final Date projectEndDate, final Dept dept, final int memberCode
+            final Date projectStartDate, final Date projectEndDate, final Dept dept, final Long memberCode
     ) {
 
         return new Project(

@@ -26,4 +26,7 @@ public class ProjectCreateRequest {
     @Min(value = 1)
     private final Long deptCode;
 
+    @Min(value = 1)
+    private final Long memberCode;
+
 }

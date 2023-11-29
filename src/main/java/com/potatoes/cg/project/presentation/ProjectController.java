@@ -3,6 +3,7 @@ package com.potatoes.cg.project.presentation;
 import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.project.dto.request.ProjectCreateRequest;
 import com.potatoes.cg.project.dto.response.ProjectResponse;
@@ -31,11 +32,11 @@ public class ProjectController {
 
     /* 프로젝트 생성 */
     @PostMapping("/projects")
-    public ResponseEntity<Void> save(@RequestBody @Valid final ProjectCreateRequest projectRequest
+    public ResponseEntity<Void> save(@RequestBody @Valid final ProjectCreateRequest projectRequest,
+                                     @AuthenticationPrincipal final CustomUser customUser
     ) {
-        int memberCode = 2;
 
-        final Long projectCode = projectService.save(projectRequest, memberCode);
+        final Long projectCode = projectService.save(projectRequest, customUser);
 
         return ResponseEntity.created(URI.create("/project/" + projectCode)).build();
     }
