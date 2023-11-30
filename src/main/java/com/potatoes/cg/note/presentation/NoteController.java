@@ -3,6 +3,7 @@ package com.potatoes.cg.note.presentation;
 import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
+import com.potatoes.cg.note.dto.request.NoteMoveRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
 import com.potatoes.cg.note.service.NoteService;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.net.URI;
 import java.time.LocalDateTime;
 
 @RestController
@@ -21,7 +24,7 @@ public class NoteController {
     private final NoteService noteService;
 
     //보낸 쪽지 전체 조회
-    @GetMapping("/send")
+    @GetMapping("/sent")
     public ResponseEntity<PagingResponse> getSentNotes(
             @RequestParam(defaultValue = "1") final Integer page,
 //            @AuthenticationPrincipal Member memberCode
@@ -30,7 +33,7 @@ public class NoteController {
 
         LocalDateTime noteSentDate = LocalDateTime.now();
 
-        final Page<NotesResponse> notes = noteService.sentNotes(page, memberCode, noteSentDate);
+        final Page<NotesResponse> notes = noteService.getSentNotes(page, memberCode, noteSentDate);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -39,10 +42,10 @@ public class NoteController {
     }
 
     //보낸 쪽지 상세 조회
-    @GetMapping("/send/{noteCode}")
+    @GetMapping("/sent/{noteCode}")
     public ResponseEntity<NoteResponse> getSentNote(@PathVariable final Long noteCode) {
 
-        final NoteResponse noteResponse = noteService.sentNote(noteCode);
+        final NoteResponse noteResponse = noteService.getSentNote(noteCode);
 
         return ResponseEntity.ok(noteResponse);
 
@@ -58,7 +61,7 @@ public class NoteController {
 
         LocalDateTime noteSentDate = LocalDateTime.now();
 
-        final Page<NotesResponse> notes = noteService.receivedNotes(page, memberCode, noteSentDate);
+        final Page<NotesResponse> notes = noteService.getReceivedNotes(page, memberCode, noteSentDate);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -70,7 +73,7 @@ public class NoteController {
     @GetMapping("/received/{noteCode}")
     public ResponseEntity<NoteResponse> getReceivedNote(@PathVariable final Long noteCode) {
 
-        final NoteResponse noteResponse = noteService.receivedNote(noteCode);
+        final NoteResponse noteResponse = noteService.getReceivedNote(noteCode);
 
         return ResponseEntity.ok(noteResponse);
 
@@ -95,6 +98,29 @@ public class NoteController {
         return ResponseEntity.noContent().build();
 
     }
+
+    //보낸 쪽지 검색 조회
+    @GetMapping("sent/search")
+    public ResponseEntity<PagingResponse> getSentNoteBySearch(
+            @RequestParam(defaultValue = "1") final Integer page, @RequestParam String searchCondition, @RequestParam String searchValue) {
+
+        final Page<NotesResponse> notes = noteService.getSentNoteByNoteSenderOrNoteBody(page, searchCondition, searchValue);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
+        final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
+
+    }
+
+    //쪽지 이동
+//    @PostMapping("/note/{noteCode}")
+//    public ResponseEntity<Void> move(@PathVariable final Long noteCode, @RequestPart @Valid final NoteMoveRequest noteRequest) {
+//
+//        noteService.move(noteCode, noteRequest);
+//
+//        return ResponseEntity.created(URI.create("/note" + noteCode)).build();
+//
+//    }
 
 
 //    //쪽지 쓰기

@@ -3,22 +3,21 @@ package com.potatoes.cg.note.domain.type;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum NoteStatusType {
+public enum NoteReceiptStatus {
 
-    DEFAULT("default"),
-    IMPORTANT("important"),
-    DELETED("deleted");
+    UNREAD("unread"),
+    READ("read");
 
     private final String value;
 
-    NoteStatusType(String value) {
+    NoteReceiptStatus(String value) {
         this.value = value;
     }
 
     @JsonCreator
-    public static NoteStatusType from(String value) {
+    public static NoteReceiptStatus from(String value) {
 
-        for (NoteStatusType status : NoteStatusType.values()) {
+        for (NoteReceiptStatus status : NoteReceiptStatus.values()) {
             if (status.getValue().equals(value)) {
                 return status;
             }

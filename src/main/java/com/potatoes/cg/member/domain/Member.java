@@ -52,7 +52,6 @@ public class Member {
 
     private String memberToken;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "infoCode")
     private MemberInfoSelect memberInfoSelect;
@@ -78,6 +77,5 @@ public class Member {
     public void updateRefreshToken( String memberToken ) {
         this.memberToken = memberToken;
     }
-
 
 }

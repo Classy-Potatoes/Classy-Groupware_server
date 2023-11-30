@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 
 @RequiredArgsConstructor
 @Getter
-public class NoteCreateRequest {
+public class NoteMoveRequest {
 
     @Min(value = 1)
     private final Long noteCode;

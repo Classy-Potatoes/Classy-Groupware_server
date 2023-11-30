@@ -1,6 +1,8 @@
 package com.potatoes.cg.note.domain;
 
 import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.note.domain.type.NoteReceiptStatus;
+import com.potatoes.cg.note.domain.type.NoteStatusType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -9,6 +11,9 @@ import javax.persistence.*;
 
 import java.time.LocalDateTime;
 
+import static com.potatoes.cg.note.domain.type.NoteReceiptStatus.UNREAD;
+import static com.potatoes.cg.note.domain.type.NoteStatusType.DEFAULT;
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -32,11 +37,13 @@ public class Note {
     @Column
     private LocalDateTime noteSenderDeleteDate;
 
+    @Enumerated(value = STRING)
     @Column(nullable = false)
-    private String noteReceiptStatus;
+    private NoteReceiptStatus noteReceiptStatus = UNREAD;
 
+    @Enumerated(value = STRING)
     @Column(nullable = false)
-    private String noteSenderStatus;
+    private NoteStatusType noteSenderStatus = DEFAULT;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "noteSender")
@@ -46,29 +53,17 @@ public class Note {
     @JoinColumn(name = "noteReceiver")
     private Member noteReceiver;
 
+    @Enumerated(value = STRING)
     @Column(nullable = false)
-    private String noteReceiverStatus;
+    private NoteStatusType noteReceiverStatus = DEFAULT;
 
     @Column
     private LocalDateTime noteReceiverDeleteDate;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "infoName")
-//    @Column
-//    private Member infoName;
-
-//    public Note(String noteBody, String infoName) {
-//        this.noteBody = noteBody;
-//        this.infoName = infoName;
-//    }
-//
-//    public static Note of(final String noteBody, final Member infoName) {
-//
-//        return new Note(
-//                noteBody,
-//                infoName
-//        );
-
-//    }
+    public void move(Member noteSender, Member noteReceiver, String noteBody) {
+        this.noteSender = noteSender;
+        this.noteReceiver = noteReceiver;
+        this.noteBody = noteBody;
+    }
 
 }
