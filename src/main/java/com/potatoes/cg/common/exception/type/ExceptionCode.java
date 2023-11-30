@@ -28,7 +28,7 @@ public enum ExceptionCode {
 
     /* JH(주) */
     NOT_FOUND_NOTE_CODE(5000, "쪽지 코드에 해당하는 쪽지가 없습니다."),
-    NOT_FOUND_INFO_NAME(5001, "일치하는 직원이 없습니다."),
+    NOT_FOUND_NOTE(5001, "검색한 키워드에 일치하는 쪽지가 없습니다."),
 
     /* WS */
 
