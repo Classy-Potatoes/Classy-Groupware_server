@@ -37,7 +37,7 @@ public class Approval {
     @Column(nullable = false)
     private ApprovalStatusType approvalStatus;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "memberCode")
     private Member member;
 
@@ -59,7 +59,7 @@ public class Approval {
     @Column(nullable = false)
     private String documentTitle;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST )
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "approvalCode")
     private List<ApprovalLine> approvalLine;
 
@@ -67,30 +67,35 @@ public class Approval {
     @JoinColumn(name = "approvalCode")
     private List<Reference> referenceLine;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "approvalCode")
+    private List<ApprovalFile> fileEntity;
 
-//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-//    @JoinColumn(name = "approvalCode")
-//    private List<FileEntity> fileEntity;
-
-    public Approval(String documentTitle, List<ApprovalLine> approvalLine, List<Reference> referenceLine, DocumentType documentType) {
+    /* 품의서 = 생성자 + of 메소드 ========================================== */
+    public Approval(String documentTitle, List<ApprovalLine> approvalLine, List<Reference> referenceLine,
+                    DocumentType documentType, Member member, List<ApprovalFile> fileEntity) {
         this.documentTitle = documentTitle;
         this.approvalLine = approvalLine;
         this.referenceLine = referenceLine;
         this.documentType = documentType;
+        this.member = member;
+        this.fileEntity = fileEntity;
         this.approvalStatus = WAITING;
     }
 
     public static Approval of(final String documentTitle, final List<Reference> referenceLine, final List<ApprovalLine> approvalLine
-                              ,final DocumentType documentType) {
+                              ,final DocumentType documentType,final Member member, final List<ApprovalFile> fileEntity) {
 
         return new Approval(
                 documentTitle,
                 approvalLine,
                 referenceLine,
-                documentType
+                documentType,
+                member,
+                fileEntity
 
         );
     }
-
+  /* ====================================================================*/
 
 }

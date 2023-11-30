@@ -20,17 +20,21 @@ public class Letter {
     @Column(nullable = false)
     private String letterBody;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "approvalCode")
     private Approval approval;
 
-    public Letter(String letterBody) {
+    public Letter(String letterBody, Approval approval) {
         this.letterBody = letterBody;
+        this.approval = approval;
     }
 
-    public static Letter of(String letterBody) {
+    public static Letter of(final String letterBody, Approval approval) {
         return new Letter(
-                letterBody
+                letterBody,
+                approval
+
         );
     }
+
 }
