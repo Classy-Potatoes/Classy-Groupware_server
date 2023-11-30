@@ -1,7 +1,6 @@
 package com.potatoes.cg.project.domain;
 
 import com.potatoes.cg.member.domain.Dept;
-import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.project.domain.type.ProjectStatusType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

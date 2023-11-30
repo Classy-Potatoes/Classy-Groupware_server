@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -11,7 +12,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name="tbl_member_info")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class MemberInfo {
+public class MemberInfoSelect {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -41,8 +42,8 @@ public class MemberInfo {
 
 
 
-    public MemberInfo( String infoName, Job job, Dept dept, String infoEmail, String infoPhone,
-                      Long infoZipcode, String infoAddress, String infoAddressAdd ) {
+    public MemberInfoSelect(String infoName, Job job, Dept dept, String infoEmail, String infoPhone,
+                            Long infoZipcode, String infoAddress, String infoAddressAdd ) {
         this.infoName = infoName;
         this.job = job;
         this.dept = dept;
@@ -53,21 +54,22 @@ public class MemberInfo {
         this.infoAddressAdd = infoAddressAdd;
     }
 
-    public static MemberInfo of( String infoName, Job job, Dept dept, String infoEmail, String infoPhone,
-                                Long infoZipcode, String infoAddress, String infoAddressAdd ) {
 
-        return new MemberInfo(
-                infoName,
-                job,
-                dept,
-                infoEmail,
-                infoPhone,
-                infoZipcode,
-                infoAddress,
-                infoAddressAdd
-        );
-
-    }
-
+    /* 엔티티 분리로 인한 사용x */
+//    public static MemberInfoSelect of(String infoName, Job job, Dept dept, String infoEmail, String infoPhone,
+//                                      Long infoZipcode, String infoAddress, String infoAddressAdd ) {
+//
+//        return new MemberInfoSelect(
+//                infoName,
+//                job,
+//                dept,
+//                infoEmail,
+//                infoPhone,
+//                infoZipcode,
+//                infoAddress,
+//                infoAddressAdd
+//        );
+//
+//    }
 
 }

@@ -21,4 +21,11 @@ public class Job {
     @Column(nullable = false)
     private String jobName;
 
+    public Job(Long jobCode) {
+        this.jobCode = jobCode;
+    }
+
+    public static Job of(Long jobCode) {
+        return new Job(jobCode);
+    }
 }

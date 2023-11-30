@@ -8,10 +8,10 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // null에 대해서 처리하기 위해서 Optional
-    Optional<Member> findByMemberId( String memberId );
+    Optional<Member> findByMemberId(String memberId );
 
     // DB에서 refreshToken 조회
-    Optional<Member> findByMemberToken( String refreshToken );
+    Optional<Member> findByMemberToken(String refreshToken );
 
 
 }

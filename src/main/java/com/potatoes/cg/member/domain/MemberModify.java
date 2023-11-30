@@ -22,7 +22,8 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class Member {
+public class MemberModify {
+    /* 수정용 Member 엔티티 */
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -52,31 +53,26 @@ public class Member {
 
     private String memberToken;
 
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "infoCode")
-    private MemberInfoSelect memberInfoSelect;
+    @Column(nullable = false)
+    private Long infoCode;
 
 
-    public Member(String memberId, String memberPassword, MemberInfoSelect memberInfoSelect) {
+    public MemberModify(String memberId, String memberPassword, Long infoCode) {
         this.memberId = memberId;
         this.memberPassword = memberPassword;
-        this.memberInfoSelect = memberInfoSelect;
+        this.infoCode = infoCode;
     }
+
 
     // 넘어온 값으로 새로운 엔티티를 만들어서 반환해라
-    public static Member of(String memberId, String memberPassword, MemberInfoSelect memberInfoSelect) {
+    public static MemberModify of(String memberId, String memberPassword, Long infoCode) {
 
-        return new Member(
+        return new MemberModify(
                 memberId,
                 memberPassword,
-                memberInfoSelect
+                infoCode
         );
 
-    }
-
-    public void updateRefreshToken( String memberToken ) {
-        this.memberToken = memberToken;
     }
 
 

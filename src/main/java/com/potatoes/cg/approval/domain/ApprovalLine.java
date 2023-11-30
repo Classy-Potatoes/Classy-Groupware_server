@@ -5,8 +5,6 @@ import com.potatoes.cg.approval.domain.type.ApprovalLineWaitingStatusType;
 import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
