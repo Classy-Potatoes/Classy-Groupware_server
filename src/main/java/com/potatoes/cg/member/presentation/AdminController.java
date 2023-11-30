@@ -19,6 +19,7 @@ public class AdminController {
 
     private final AdminService adminService;
 
+    /* 회원 정보 가입(tbl_member_info) */
     @PostMapping("/member/info/regist")
     public ResponseEntity<Void> infoRegist(@RequestBody @Valid InfoRegistRequest infoRequest) {
 

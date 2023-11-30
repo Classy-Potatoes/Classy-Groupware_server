@@ -3,7 +3,6 @@ package com.potatoes.cg.approval.domain;
 import com.potatoes.cg.approval.domain.type.ApprovalStatusType;
 import com.potatoes.cg.approval.domain.type.DocumentType;
 import com.potatoes.cg.member.domain.Member;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -12,7 +11,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.potatoes.cg.approval.domain.type.ApprovalStatusType.WAITING;

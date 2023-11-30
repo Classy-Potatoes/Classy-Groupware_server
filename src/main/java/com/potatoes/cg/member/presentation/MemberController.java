@@ -1,5 +1,6 @@
 package com.potatoes.cg.member.presentation;
 
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.dto.request.MemberSignupRequest;
 import com.potatoes.cg.member.dto.response.ProfileResponse;
 import com.potatoes.cg.member.service.MemberService;
@@ -20,15 +21,15 @@ public class MemberController {
     private final MemberService memberService;
 
     /* 1. 회원 가입 */
-//    @PostMapping("/regist")
-//    public ResponseEntity<Void> regist(@RequestBody @Valid MemberSignupRequest memberRequest) {
-//
-//        memberService.regist( memberRequest );
-//
-//        return ResponseEntity.status( HttpStatus.CREATED ).build();
-//
-//    }
-//
+    @PostMapping("/regist")
+    public ResponseEntity<Void> regist(@RequestBody @Valid MemberSignupRequest memberRequest) {
+
+        memberService.regist( memberRequest );
+
+        return ResponseEntity.status( HttpStatus.CREATED ).build();
+
+    }
+
 //    /* 프로필 조회 */
 //    // @GetMapping 만 적었을 경우 상단에 /api/v1/member 그대로 적용됨
 //    @GetMapping

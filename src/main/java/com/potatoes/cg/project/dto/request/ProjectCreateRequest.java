@@ -1,7 +1,5 @@
 package com.potatoes.cg.project.dto.request;
 
-import com.potatoes.cg.member.domain.Dept;
-import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

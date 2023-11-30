@@ -1,11 +1,9 @@
 package com.potatoes.cg.approval.domain;
 
-import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "tbl_reference")

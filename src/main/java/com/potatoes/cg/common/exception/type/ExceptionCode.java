@@ -14,11 +14,11 @@ public enum ExceptionCode {
     /* HS */
     FAIL_LOGIN(1400, "로그인에 실패하였습니다."),
     UNAUTHORIZED(1401, "인증 되지 않은 요청입니다."),
-    NOT_FOUND_MEMBER_ID(1402, "아이디에 해당하는 유저가 없습니다."),
     ACCESS_DENIED(1403, "허가 되지 않은 요청입니다."),
-    NOT_FOUND_JOB_CODE(1404, "직급 코드에 해당하는 직급이 존재하지 않습니다."),
-    NOT_FOUND_DEPT_CODE(1405, "부서 코드에 해당하는 부서가 존재하지 않습니다."),
-
+    NOT_FOUND_MEMBER_ID(1421, "아이디에 해당하는 유저가 없습니다."),
+    NOT_FOUND_JOB_CODE(1422, "직급 코드에 해당하는 직급이 존재하지 않습니다."),
+    NOT_FOUND_DEPT_CODE(1423, "부서 코드에 해당하는 부서가 존재하지 않습니다."),
+    NOT_FOUND_INFO_CODE(1424, "존재하지 않는 사번입니다."),
 
     /* JH(준) */
 

@@ -231,7 +231,7 @@ public class JwtService {
                 .build();
 
 
-        CustomUser customUser = CustomUser.of( member.getMemberCode(), member.getMemberInfo().getInfoCode(), userDetails);
+        CustomUser customUser = CustomUser.of( member.getMemberCode(), member.getMemberInfoSelect().getInfoCode(), userDetails);
 
         // userDetails.getAuthorities() User,ADMIN인지 확인
         // 1. principal(인증주체)
