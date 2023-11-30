@@ -89,16 +89,6 @@ public class NoteService {
 
     }
 
-    //보낸 쪽지함 - 이름 검색
-//    @Transactional(readOnly = true)
-//    public Page<NotesResponse> getSentNotesByNoteSender(final Integer page, final String noteSender) {
-//
-//        Page<Note> notes = noteRepository.findByNoteSenderContainsAndNoteSenderStatus(getPageable(page), noteSender, DEFAULT);
-//
-//        return notes.map(note -> NotesResponse.from(note));
-//
-//    }
-
     //보낸 쪽지함 검색 조회
     @Transactional(readOnly = true)
     public Page<NotesResponse> getSentNoteByNoteSenderOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
@@ -110,7 +100,7 @@ public class NoteService {
                     (getPageable(page), searchValue, searchValue, DEFAULT);
         }
         else if (searchCondition.equals("noteSender")) {
-            notes = noteRepository.findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(getPageable(page), searchValue, DEFAULT);
+            notes = noteRepository.findByNoteSenderMemberInfoSelectInfoNameContainsAndNoteSenderStatus(getPageable(page), searchValue, DEFAULT);
         } else if (searchCondition.equals("noteBody")) {
             notes = noteRepository.findByNoteBodyContainsAndNoteSenderStatus(getPageable(page), searchValue, DEFAULT);
         } else {
