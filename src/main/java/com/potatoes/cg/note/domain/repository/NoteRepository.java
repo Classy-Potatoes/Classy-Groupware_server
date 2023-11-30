@@ -23,11 +23,11 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     Page<Note> findByNoteBodyContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatusType noteStatusType);
 
     //보낸 쪽지함 검색 - 이름
-    Page<Note> findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatusType noteStatusType);
+    Page<Note> findByNoteSenderMemberInfoSelectInfoNameContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatusType noteStatusType);
 
     //보낸 쪽지함 검색 - 전체
-    @EntityGraph(attributePaths = { "noteSender", "noteSender.memberInfo", "noteReceiver", "noteReceiver.memberInfo" })
-    @Query(value = "select n from Note n where (n.noteBody like %:noteBody% or n.noteSender.memberInfo.infoName like %:noteSender%) and n.noteSenderStatus = :noteSenderStatus")
+    @EntityGraph(attributePaths = { "noteSender", "noteSender.memberInfoSelect", "noteReceiver", "noteReceiver.memberInfoSelect" })
+    @Query(value = "select n from Note n where (n.noteBody like %:noteBody% or n.noteSender.memberInfoSelect.infoName like %:noteSender%) and n.noteSenderStatus = :noteSenderStatus")
     Page<Note> findBySearchAll(Pageable pageable, @Param(value = "noteBody") String noteBody, @Param(value = "noteSender") String noteSender, @Param(value = "noteSenderStatus") NoteStatusType noteStatusType);
 
 }
