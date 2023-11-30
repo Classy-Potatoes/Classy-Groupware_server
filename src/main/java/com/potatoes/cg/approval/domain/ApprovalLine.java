@@ -1,6 +1,7 @@
 package com.potatoes.cg.approval.domain;
 
 import com.potatoes.cg.approval.domain.type.ApprovalLineResultType;
+import com.potatoes.cg.approval.domain.type.ApprovalLineTurnType;
 import com.potatoes.cg.approval.domain.type.ApprovalLineWaitingStatusType;
 import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
@@ -8,7 +9,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import static com.potatoes.cg.approval.domain.type.ApprovalLineWaitingStatusType.REQUEST;
 import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -26,12 +29,15 @@ public class ApprovalLine {
 //    @JoinColumn(name = "approvalCode")
 //    private Approval approval;
 
-    @ManyToOne
-    @JoinColumn(name =  "memberCode")
-    private Member member;
+//    @ManyToOne(cascade = CascadeType.PERSIST)
+//    @JoinColumn(name =  "memberCode")
+//    private Member member;
 
-    @Column
-    private String turn;
+    private Long memberCode;
+
+    @Enumerated(value = STRING)
+    @Column(nullable = false)
+    private ApprovalLineTurnType turn;
 
     @Enumerated(value = STRING)
     @Column(nullable = true)
@@ -43,24 +49,28 @@ public class ApprovalLine {
 
     @Column(nullable = true)
     private LocalDateTime approvalLineDate;
-
-    public ApprovalLine(String turn) {
-        this.turn = turn;
-        setApprovalLineWaitingStatus();
-        }
-
-
-    public static ApprovalLine of(String turn) {
-
-        return new ApprovalLine(
-                 turn);
+    /* 결재순서(turn)를 정해야하는데 결재순서는 리액트에서 다뤄서 동적으로 가져온다*/
+    public ApprovalLine(Long memberCode) {
+            this.memberCode = memberCode;
+            this.turn = ApprovalLineTurnType.FIRST;
+            setApprovalLineWaitingStatus();
     }
 
     private void setApprovalLineWaitingStatus() {
-        if("first".equals(turn)){
+        if ("first".equals(turn)) {
             this.approvalLineWaitingStatus = ApprovalLineWaitingStatusType.REQUEST;
-        } else  {
+        } else {
             this.approvalLineWaitingStatus = ApprovalLineWaitingStatusType.WAIT;
         }
     }
+
+    public static ApprovalLine of(Long memberCode) {
+
+        return new ApprovalLine(
+                memberCode
+        );
+
+    }
+
+
 }

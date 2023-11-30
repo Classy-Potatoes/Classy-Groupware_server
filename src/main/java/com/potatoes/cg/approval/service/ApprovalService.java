@@ -1,16 +1,21 @@
 package com.potatoes.cg.approval.service;
 
-import com.potatoes.cg.approval.domain.Approval;
-import com.potatoes.cg.approval.domain.ApprovalLine;
-import com.potatoes.cg.approval.domain.Letter;
-import com.potatoes.cg.approval.domain.Reference;
+import com.potatoes.cg.approval.domain.*;
 import com.potatoes.cg.approval.domain.repository.*;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
+import com.potatoes.cg.common.exception.NotFoundException;
+import com.potatoes.cg.common.exception.type.ExceptionCode;
+import com.potatoes.cg.common.util.MultipleFileUploadUtils;
+import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -18,7 +23,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ApprovalService {
 
     private final ApprovalRepository approvalRepository;
@@ -26,11 +30,11 @@ public class ApprovalService {
     private final LetterRepository letterRepository;
     private final FileEntityRepository fileEntityRepository;
     private final ReferenceRepository referenceRepository;
+    private final MemberRepository memberRepository;
 
 
-    //@Value("${file.approval-url}")
-    private String APPROVAL_URL;
-   // @Value("${file.approval-dir}")
+
+    @Value("${file.approval-dir}")
     private String APPROVAL_DIR;
 
 
@@ -38,36 +42,60 @@ public class ApprovalService {
         return UUID.randomUUID().toString().replace("-", "");
     }
 
+    private String getFileExtension(String fileName) {
+        return fileName.substring(fileName.lastIndexOf(".") + 1);
+    }
+
+
     /* 기안서 작성 - 품의서 */
     @Transactional
-    public Long letterSave(final LetterCreateRequest letterRequest/*, final MultipartFile attachment*/) {
+    public Long letterSave(final LetterCreateRequest letterRequest, final List<MultipartFile> attachment
+                            , final CustomUser customUser) {
 
         /* 전달 된 파일을 서버의 지정 경로에 저장 */
-//        String replaceFileName = FileUploadUtils.saveFile(APPROVAL_DIR, getRandomName(), attachment);
+        List<String> replaceFileNames = MultipleFileUploadUtils.saveFiles(APPROVAL_DIR,(attachment));
 
+        /*파일 정보 저장 */
+        List<ApprovalFile> files = new ArrayList<>();
+        for (String replaceFileName : replaceFileNames) {
+            ApprovalFile fileEntity = new ApprovalFile(
+                    replaceFileName,
+                    APPROVAL_DIR,
+                    getRandomName(),
+                    getFileExtension(replaceFileName)
+
+            );
+            files.add(fileEntity);
+        }
+
+        /* 로그인한 계정 정보 */
+        final Member findByLoginmember = memberRepository.findById(customUser.getMemberCode())
+                .orElseThrow( () -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
+        /* 참조자 memberCode */
         final List<Reference> referenceLine =
                 letterRequest.getReferenceLine().stream().map(memberCode -> Reference.of(memberCode)).collect(Collectors.toList());
-
+        /* 결재자 memberCode*/
         final List<ApprovalLine> approvalLine =
-                letterRequest.getApprovalLine().stream().map(turn -> ApprovalLine.of(turn)).collect(Collectors.toList());
+                letterRequest.getApprovalLine().stream().map(memberCode -> ApprovalLine.of(memberCode)).collect(Collectors.toList());
 
-        final Letter letterBody = Letter.of(letterRequest.getLetterBody());
 
-        final Approval newLetter = Approval.of(
+        final Approval newApproval = Approval.of(
                 letterRequest.getDocumentTitle(),
                 referenceLine,
                 approvalLine,
-                letterRequest.getDocumentType()
+                letterRequest.getDocumentType(),
+                findByLoginmember,
+                files
+
         );
 
 
-        final Approval approvalCode = approvalRepository.save(newLetter);
-        final Letter LetterCode = letterRepository.save(letterBody);
+
+        final Letter newLetter = Letter.of(letterRequest.getLetterBody(), newApproval);
+
+        final Letter letter = letterRepository.save(newLetter);
 
 
-
-
-
-        return approvalCode.getApprovalCode();
+        return letter.getApproval().getApprovalCode();
     }
 }
