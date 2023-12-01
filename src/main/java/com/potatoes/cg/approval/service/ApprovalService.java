@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -53,8 +51,10 @@ public class ApprovalService {
                             , final CustomUser customUser) {
 
         /* 전달 된 파일을 서버의 지정 경로에 저장 */
-        List<String> replaceFileNames = MultipleFileUploadUtils.saveFiles(APPROVAL_DIR,(attachment));
-
+            List<String> replaceFileNames = Collections.emptyList(); //collections.emtyList 불변목록 nullpointer 방지기능
+            if(attachment != null && !attachment.isEmpty()) {
+            replaceFileNames = MultipleFileUploadUtils.saveFiles(APPROVAL_DIR, (attachment));
+            }
         /*파일 정보 저장 */
         List<ApprovalFile> files = new ArrayList<>();
         for (String replaceFileName : replaceFileNames) {
@@ -68,12 +68,17 @@ public class ApprovalService {
             files.add(fileEntity);
         }
 
+
         /* 로그인한 계정 정보 */
         final Member findByLoginmember = memberRepository.findById(customUser.getMemberCode())
                 .orElseThrow( () -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
-        /* 참조자 memberCode */
+        /* 참조자 memberCode  참조자는 안넣을수도 있기때문에 nullpointer 핸들링*/
         final List<Reference> referenceLine =
-                letterRequest.getReferenceLine().stream().map(memberCode -> Reference.of(memberCode)).collect(Collectors.toList());
+                Optional.ofNullable(letterRequest.getReferenceLine())
+                                .orElse(Collections.emptyList())
+                                        .stream()
+                                                .map(memberCode -> Reference.of(memberCode))
+                                                        .collect(Collectors.toList());
         /* 결재자 memberCode*/
         final List<ApprovalLine> approvalLine =
                 letterRequest.getApprovalLine().stream().map(memberCode -> ApprovalLine.of(memberCode)).collect(Collectors.toList());
@@ -88,7 +93,6 @@ public class ApprovalService {
                 files
 
         );
-
 
 
         final Letter newLetter = Letter.of(letterRequest.getLetterBody(), newApproval);

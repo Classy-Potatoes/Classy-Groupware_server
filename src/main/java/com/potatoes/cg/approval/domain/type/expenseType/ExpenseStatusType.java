@@ -1,25 +1,26 @@
-package com.potatoes.cg.approval.domain.type;
+package com.potatoes.cg.approval.domain.type.expenseType;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 
-public enum ApprovalLineWaitingStatusType {
+public enum ExpenseStatusType {
 
-    REQUEST("결재요청"),
-    WAIT("결재대기"),
-    COMPLETE ("결재완료");
+    PERSONAL("personal"),
+
+    CORPORATE("corporate");
 
 
 
     private final String value;
 
-    ApprovalLineWaitingStatusType(String value) {
+    ExpenseStatusType(String value) {
         this.value = value;
     }
 
     @JsonCreator
-    public static ApprovalLineWaitingStatusType from(String value) {
-        for (ApprovalLineWaitingStatusType status : ApprovalLineWaitingStatusType.values()) {
+    public static DocumentType from(String value) {
+        for (DocumentType status : DocumentType.values()) {
             if (status.getValue().equals(value)) {
                 return status;
             }
@@ -32,4 +33,6 @@ public enum ApprovalLineWaitingStatusType {
     public String getValue() {
         return value;
     }
-}
+
+    }
+
