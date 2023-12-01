@@ -1,6 +1,7 @@
 package com.potatoes.cg.project.domain;
 
 import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.MemberInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -26,11 +27,18 @@ public class ProjectParticipant implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "member_code", insertable = false, updatable = false)
-    private Member member;
+    private MemberInfo member;
 
-    public ProjectParticipant(Project project, Member member) {
-        this.id = new ProjectParticipantId(project.getProjectCode(), member.getMemberCode());
+    public ProjectParticipant(Project project, MemberInfo member) {
+        this.id = new ProjectParticipantId(project.getProjectCode(), member.getInfoCode());
         this.project = project;
         this.member = member;
+    }
+
+    public static ProjectParticipant of(Project project, MemberInfo member) {
+        return new ProjectParticipant(
+                project,
+                member
+        );
     }
 }

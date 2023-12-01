@@ -26,6 +26,20 @@ public class ProjectResponse {
     private final String deptName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime projectCreatedDate;
-    private final int memberCode;
+    private final Long memberCode;
 
+    public static ProjectResponse from(final Project project) {
+        return new ProjectResponse(
+                project.getProjectCode(),
+                project.getProjectTitle(),
+                project.getProjectBody(),
+                project.getProjectStartDate(),
+                project.getProjectEndDate(),
+                project.getProjectStatus(),
+                project.getDept().getDeptCode(),
+                project.getDept().getDeptName(),
+                project.getProjectCreatedDate(),
+                project.getMemberCode()
+        );
+    }
 }

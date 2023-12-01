@@ -15,7 +15,8 @@ public class CustomUser extends User {
 
     // 부서, 직급코드는 infoCode로 각 로직에서 조회해서 사용바랍니다.
 
-    public CustomUser( Long memberCode, Long infoCode, UserDetails userDetails ) {
+
+    public CustomUser( Long memberCode, Long infoCode,  UserDetails userDetails ) {
 
         super(
                 userDetails.getUsername(),
