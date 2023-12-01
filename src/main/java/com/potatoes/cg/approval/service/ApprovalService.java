@@ -4,6 +4,7 @@ import com.potatoes.cg.approval.domain.*;
 import com.potatoes.cg.approval.domain.repository.*;
 import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
+import com.potatoes.cg.approval.dto.request.VacationCreateRequest;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.common.exception.type.ExceptionCode;
 import com.potatoes.cg.common.util.MultipleFileUploadUtils;
@@ -30,6 +31,7 @@ public class ApprovalService {
     private final LetterRepository letterRepository;
     private final MemberRepository memberRepository;
     private final ExpenseRepository expenseRepository;
+    private final VacationRepository vacationRepository;
 
 
     @Value("${file.approval-dir}")
@@ -178,6 +180,49 @@ public class ApprovalService {
 
 
         return expense.getApproval().getApprovalCode();
+
+    }
+
+    public Long vacationSave(VacationCreateRequest vacationRequest, CustomUser customUser) {
+
+        /* 로그인한 계정 정보 */
+        final Member findByLoginmember = memberRepository.findById(customUser.getMemberCode())
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
+
+        /* 참조자 memberCode */
+        final List<Reference> referenceLine =
+                Optional.ofNullable(vacationRequest.getReferenceLine())
+                        .orElse(Collections.emptyList())
+                        .stream()
+                        .map(memberCode -> Reference.of(memberCode))
+                        .collect(Collectors.toList());
+
+        /* 결재자 memberCode */
+        final List<ApprovalLine> approvalLine =
+                vacationRequest.getApprovalLine().stream().map(memberCode -> ApprovalLine.of(memberCode)).collect(Collectors.toList());
+
+        final Approval newApproval = Approval.from(
+                vacationRequest.getDocumentTitle(),
+                referenceLine,
+                approvalLine,
+                vacationRequest.getDocumentType(),
+                findByLoginmember
+        );
+
+        final Vacation newVacation = Vacation.of(
+                vacationRequest.getVacationType(),
+                vacationRequest.getVacationStartDate(),
+                vacationRequest.getVacationEndDate(),
+                vacationRequest.getVacationBody(),
+                vacationRequest.getVacationEmergencyPhone(),
+                newApproval
+
+        );
+
+        final Vacation vacation = vacationRepository.save(newVacation);
+
+
+        return vacation.getApproval().getApprovalCode();
 
     }
 }
