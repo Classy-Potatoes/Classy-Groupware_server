@@ -1,25 +1,24 @@
-package com.potatoes.cg.approval.domain.type;
+package com.potatoes.cg.approval.domain.type.approvalLineType;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-
-public enum DocumentType {
-
-        LETTER("품의서"),
-        EXPENSE("지출결의서"),
-        VACATION("휴가신청서");
-
+public enum ApprovalLineTurnType {
+    FIRST("first"),
+    SECOND("second"),
+    THIRD("third"),
+    FOURTH("fourth"),
+    FIFTH("fifth");
 
     private final String value;
 
-    DocumentType(String value) {
+    ApprovalLineTurnType(String value) {
         this.value = value;
     }
 
     @JsonCreator
-    public static DocumentType from(String value) {
-        for (DocumentType status : DocumentType.values()) {
+    public static ApprovalLineWaitingStatusType from(String value) {
+        for (ApprovalLineWaitingStatusType status : ApprovalLineWaitingStatusType.values()) {
             if (status.getValue().equals(value)) {
                 return status;
             }
@@ -32,9 +31,5 @@ public enum DocumentType {
     public String getValue() {
         return value;
     }
-
     }
-
-
-
 

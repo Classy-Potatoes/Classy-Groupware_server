@@ -1,7 +1,7 @@
 package com.potatoes.cg.approval.domain;
 
-import com.potatoes.cg.approval.domain.type.ApprovalStatusType;
-import com.potatoes.cg.approval.domain.type.DocumentType;
+import com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType;
+import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +13,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.potatoes.cg.approval.domain.type.ApprovalStatusType.WAITING;
-import static com.potatoes.cg.approval.domain.type.DocumentType.LETTER;
+import static com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType.WAITING;
+import static com.potatoes.cg.approval.domain.type.approvalType.DocumentType.LETTER;
 import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -69,22 +69,22 @@ public class Approval {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "approvalCode")
-    private List<ApprovalFile> fileEntity;
+    private List<ApprovalFile> attachment;
 
     /* 품의서 = 생성자 + of 메소드 ========================================== */
     public Approval(String documentTitle, List<ApprovalLine> approvalLine, List<Reference> referenceLine,
-                    DocumentType documentType, Member member, List<ApprovalFile> fileEntity) {
+                    DocumentType documentType, Member member, List<ApprovalFile> attachment) {
         this.documentTitle = documentTitle;
         this.approvalLine = approvalLine;
         this.referenceLine = referenceLine;
         this.documentType = documentType;
         this.member = member;
-        this.fileEntity = fileEntity;
+        this.attachment = attachment;
         this.approvalStatus = WAITING;
     }
 
     public static Approval of(final String documentTitle, final List<Reference> referenceLine, final List<ApprovalLine> approvalLine
-                              ,final DocumentType documentType,final Member member, final List<ApprovalFile> fileEntity) {
+                              ,final DocumentType documentType,final Member member, final List<ApprovalFile> attachment) {
 
         return new Approval(
                 documentTitle,
@@ -92,7 +92,7 @@ public class Approval {
                 referenceLine,
                 documentType,
                 member,
-                fileEntity
+                attachment
 
         );
     }

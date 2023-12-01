@@ -1,25 +1,22 @@
-package com.potatoes.cg.approval.domain.type;
+package com.potatoes.cg.approval.domain.type.approvalLineType;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum ApprovalStatusType {
+public enum ApprovalLineResultType {
 
-    WAITING("결재대기"),
-    PAYING("결재중"),
     APPROVE("승인"),
-    TURNBACK("반려"),
-    RECALL("회수");
+    TURNBACK("반려");
 
     private final String value;
 
-    ApprovalStatusType(String value) {
+    ApprovalLineResultType(String value) {
         this.value = value;
     }
 
     @JsonCreator
-    public static ApprovalStatusType from(String value) {
-        for (ApprovalStatusType status : ApprovalStatusType.values()) {
+    public static ApprovalLineResultType from(String value) {
+        for (ApprovalLineResultType status : ApprovalLineResultType.values()) {
             if (status.getValue().equals(value)) {
                 return status;
             }
@@ -32,5 +29,4 @@ public enum ApprovalStatusType {
     public String getValue() {
         return value;
     }
-
 }

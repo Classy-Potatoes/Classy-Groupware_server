@@ -22,14 +22,23 @@ public class ApprovalController {
 
     /* 기안서 작성 - 품의서  */
     @PostMapping("/letter")
-    public ResponseEntity<Void> letterSave(@RequestPart @Valid final LetterCreateRequest letterRequest,
+    public ResponseEntity<Void> letterSave(@RequestPart(required = false) @Valid final LetterCreateRequest letterRequest,
                                            @AuthenticationPrincipal CustomUser customUser,
                                            @RequestPart(required = false) final List<MultipartFile> attachment) {
 
-
-        final Long letterCode = approvalService.letterSave(letterRequest,attachment,customUser);
+        final Long letterCode = approvalService.letterSave(letterRequest, attachment, customUser);
 
 
         return ResponseEntity.created(URI.create("/letter/" + letterCode)).build();
     }
+
+    /* 기안서 작성 - 지출결의서 */
+//    @PostMapping("/expense")
+//    public ResponseEntity<Void> expenseSave(@RequestPart @Valid final expenseCreateRequest expenseRequest,
+//                                            @AuthenticationPrincipal CustomUser customUser,
+//                                            @RequestPart(required = false) final List<MultipartFile> attachment) {
+//
+//
+//        return null;
+//    }
 }

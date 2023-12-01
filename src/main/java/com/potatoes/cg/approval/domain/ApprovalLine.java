@@ -1,17 +1,14 @@
 package com.potatoes.cg.approval.domain;
 
-import com.potatoes.cg.approval.domain.type.ApprovalLineResultType;
-import com.potatoes.cg.approval.domain.type.ApprovalLineTurnType;
-import com.potatoes.cg.approval.domain.type.ApprovalLineWaitingStatusType;
-import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineResultType;
+import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineTurnType;
+import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineWaitingStatusType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
-import static com.potatoes.cg.approval.domain.type.ApprovalLineWaitingStatusType.REQUEST;
 import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
 
