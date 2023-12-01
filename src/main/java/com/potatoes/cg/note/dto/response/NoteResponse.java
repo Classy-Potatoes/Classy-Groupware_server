@@ -30,10 +30,10 @@ public class NoteResponse {
 
         return new NoteResponse(
                 note.getNoteCode(),
-                note.getNoteSender().getMemberInfoSelect().getDept().getDeptName(),
-                note.getNoteSender().getMemberInfoSelect().getJob().getJobName(),
-                note.getNoteSender().getMemberInfoSelect().getInfoName(),
-                note.getNoteReceiver().getMemberInfoSelect().getInfoName(),
+                note.getNoteSender().getMemberInfo().getDept().getDeptName(),
+                note.getNoteSender().getMemberInfo().getJob().getJobName(),
+                note.getNoteSender().getMemberInfo().getInfoName(),
+                note.getNoteReceiver().getMemberInfo().getInfoName(),
                 note.getNoteSentDate(),
                 note.getNoteBody()
         );
