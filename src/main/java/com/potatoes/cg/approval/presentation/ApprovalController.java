@@ -1,7 +1,9 @@
 package com.potatoes.cg.approval.presentation;
 
+import com.potatoes.cg.approval.domain.type.vacationType.VacationType;
 import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
+import com.potatoes.cg.approval.dto.request.VacationCreateRequest;
 import com.potatoes.cg.approval.service.ApprovalService;
 import com.potatoes.cg.jwt.CustomUser;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +50,15 @@ public class ApprovalController {
         return ResponseEntity.created(URI.create("/expense/" + expenseCode)).build();
 
 
+    }
+
+    /* 기안서 작성 - 휴가 신청서 */
+    @PostMapping("/vacation")
+    public ResponseEntity<Void> vacationSave(@RequestBody(required = false) @Valid final VacationCreateRequest vacationRequest,
+                                             @AuthenticationPrincipal CustomUser customUser) {
+
+        final Long vacationCode = approvalService.vacationSave(vacationRequest,customUser);
+
+        return ResponseEntity.created(URI.create("/vacation/"+vacationCode)).build();
     }
 }
