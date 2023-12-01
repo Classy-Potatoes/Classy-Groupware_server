@@ -1,13 +1,13 @@
 package com.potatoes.cg.member.service;
 
-import com.potatoes.cg.common.exception.NotFoundException;
+import com.potatoes.cg.approval.domain.Reference;
 import com.potatoes.cg.member.domain.Dept;
+import com.potatoes.cg.member.domain.History;
 import com.potatoes.cg.member.domain.Job;
-import com.potatoes.cg.member.domain.MemberInfoModify;
-import com.potatoes.cg.member.domain.MemberInfoSelect;
+import com.potatoes.cg.member.domain.MemberInfo;
 import com.potatoes.cg.member.domain.repository.DeptRepository;
-import com.potatoes.cg.member.domain.repository.InfoModifyRepository;
-import com.potatoes.cg.member.domain.repository.InfoSelectRepository;
+import com.potatoes.cg.member.domain.repository.HistoryRepository;
+import com.potatoes.cg.member.domain.repository.InfoRepository;
 import com.potatoes.cg.member.domain.repository.JobRepository;
 import com.potatoes.cg.member.dto.request.InfoRegistRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_DEPT_CODE;
-import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_JOB_CODE;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -24,8 +25,7 @@ import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_JOB_
 @Transactional
 public class AdminService {
 
-    private final InfoSelectRepository infoSelectRepository;
-    private final InfoModifyRepository infoModifyRepository;
+    private final InfoRepository infoRepository;
     private final JobRepository jobRepository;
     private final DeptRepository deptRepository;
 
@@ -34,18 +34,32 @@ public class AdminService {
     /* 사전 회원정보 등록 */
     public void infoRegist( final InfoRegistRequest infoRequest ) {
 
-        final MemberInfoModify newMemberInfoModify = MemberInfoModify.of(
+        Dept dept = deptRepository.getReferenceById( infoRequest.getDeptCode() );
+        Job job = jobRepository.getReferenceById( infoRequest.getJobCode() );
+
+        // 활동 이력 추가, infoCode는 insert후 영속성전이로 업데이트.
+        final List<History> newHistory = new ArrayList<>();
+        newHistory.add( History.of(
+                "최초입사",
+                dept,
+                job,
+                "입사"
+        ));
+
+        // 사전등록, 활동이력도 동시에 insert
+        final MemberInfo newMemberInfo = MemberInfo.of(
                 infoRequest.getInfoName(),
-                infoRequest.getJobCode(),
-                infoRequest.getDeptCode(),
+                dept,
+                job,
                 "blank",
                 "blank",
                 0L,
                 "blank",
-                "blank"
+                "blank",
+                newHistory
         );
 
-        infoModifyRepository.save( newMemberInfoModify );
+        infoRepository.save( newMemberInfo );
 
     }
 

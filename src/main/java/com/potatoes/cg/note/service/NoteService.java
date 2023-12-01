@@ -100,7 +100,7 @@ public class NoteService {
                     (getPageable(page), searchValue, searchValue, DEFAULT);
         }
         else if (searchCondition.equals("noteSender")) {
-            notes = noteRepository.findByNoteSenderMemberInfoSelectInfoNameContainsAndNoteSenderStatus(getPageable(page), searchValue, DEFAULT);
+            notes = noteRepository.findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(getPageable(page), searchValue, DEFAULT);
         } else if (searchCondition.equals("noteBody")) {
             notes = noteRepository.findByNoteBodyContainsAndNoteSenderStatus(getPageable(page), searchValue, DEFAULT);
         } else {

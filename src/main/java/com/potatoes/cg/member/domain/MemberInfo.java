@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+
+import java.util.List;
+
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -11,7 +14,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name="tbl_member_info")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class MemberInfoModify {
+public class MemberInfo {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -20,11 +23,13 @@ public class MemberInfoModify {
     @Column(nullable = false)
     private String infoName;
 
-    @Column(nullable = false)
-    private Long jobCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "deptCode")
+    private Dept dept;
 
-    @Column(nullable = false)
-    private Long deptCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "jobCode")
+    private Job job;
 
     @Column(nullable = false)
     private String infoEmail;
@@ -37,47 +42,53 @@ public class MemberInfoModify {
 
     private String infoAddressAdd;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "infoCode")
+    private List<History> history;
 
 
-    public MemberInfoModify(String infoName, Long jobCode, Long deptCode, String infoEmail, String infoPhone,
-                            Long infoZipcode, String infoAddress, String infoAddressAdd ) {
+    public MemberInfo(String infoName, Dept dept, Job job, String infoEmail, String infoPhone,
+                      Long infoZipcode, String infoAddress, String infoAddressAdd, List<History> history) {
         this.infoName = infoName;
-        this.jobCode = jobCode;
-        this.deptCode = deptCode;
+        this.dept = dept;
+        this.job = job;
         this.infoEmail = infoEmail;
         this.infoPhone = infoPhone;
         this.infoZipcode = infoZipcode;
         this.infoAddress = infoAddress;
         this.infoAddressAdd = infoAddressAdd;
+        this.history = history;
     }
 
-    public static MemberInfoModify of(String infoName, Long jobCode, Long deptCode, String infoEmail, String infoPhone,
-                                      Long infoZipcode, String infoAddress, String infoAddressAdd ) {
+    public static MemberInfo of(String infoName, Dept dept, Job job, String infoEmail, String infoPhone,
+                                Long infoZipcode, String infoAddress, String infoAddressAdd, List<History> history) {
 
-        return new MemberInfoModify(
+        return new MemberInfo(
                 infoName,
-                jobCode,
-                deptCode,
+                dept,
+                job,
                 infoEmail,
                 infoPhone,
                 infoZipcode,
                 infoAddress,
-                infoAddressAdd
+                infoAddressAdd,
+                history
         );
 
     }
 
 
-    public void update(String infoName, Long deptCode, Long jobCode, String infoEmail, String infoPhone,
+    public void update(String infoName, Dept dept, Job job, String infoEmail, String infoPhone,
                        Long infoZipcode, String infoAddress, String infoAddressAdd) {
 
         this.infoName = infoName;
-        this.deptCode = deptCode;
-        this.jobCode = jobCode;
+        this.dept = dept;
+        this.job = job;
         this.infoEmail = infoEmail;
         this.infoPhone = infoPhone;
         this.infoZipcode = infoZipcode;
         this.infoAddress = infoAddress;
         this.infoAddressAdd = infoAddressAdd;
     }
+
 }

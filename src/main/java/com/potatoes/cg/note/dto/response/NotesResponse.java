@@ -26,8 +26,8 @@ public class NotesResponse {
 
         return new NotesResponse(
                 note.getNoteCode(),
-                note.getNoteSender().getMemberInfoSelect().getInfoName(),
-                note.getNoteReceiver().getMemberInfoSelect().getInfoName(),
+                note.getNoteSender().getMemberInfo().getInfoName(),
+                note.getNoteReceiver().getMemberInfo().getInfoName(),
                 note.getNoteSentDate(),
                 note.getNoteBody()
         );

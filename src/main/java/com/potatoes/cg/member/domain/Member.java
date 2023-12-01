@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.potatoes.cg.member.domain.type.MemberRole.USER;
 import static com.potatoes.cg.member.domain.type.MemberStatus.ACTIVE;
@@ -51,25 +52,23 @@ public class Member {
     private LocalDateTime memberUpdateDate;
 
     private String memberToken;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "infoCode")
-    private MemberInfoSelect memberInfoSelect;
+    private MemberInfo memberInfo;
 
 
-    public Member(String memberId, String memberPassword, MemberInfoSelect memberInfoSelect) {
+    public Member(String memberId, String memberPassword, MemberInfo memberInfo) {
         this.memberId = memberId;
         this.memberPassword = memberPassword;
-        this.memberInfoSelect = memberInfoSelect;
+        this.memberInfo = memberInfo;
     }
 
-    // 넘어온 값으로 새로운 엔티티를 만들어서 반환해라
-    public static Member of(String memberId, String memberPassword, MemberInfoSelect memberInfoSelect) {
+    public static Member of(String memberId, String memberPassword, MemberInfo memberInfo) {
 
         return new Member(
                 memberId,
                 memberPassword,
-                memberInfoSelect
+                memberInfo
         );
 
     }

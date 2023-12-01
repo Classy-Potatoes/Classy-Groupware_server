@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
