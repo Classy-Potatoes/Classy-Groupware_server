@@ -86,15 +86,9 @@ public class MemberService {
     }
 
     /* 아이디 중복 검사 */
-    public String duplicateId( final String inputMemberId ) {
+    public Boolean duplicateId( final String memberId ) {
 
-        final Member member = memberRepository.findByMemberId( inputMemberId )
-                .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_ID ));
-
-//        final Member member = memberRepository.findByMemberId( inputMemberId )
-//                .ifPresentOrElse( () -> new NotFoundException( NOT_FOUND_MEMBER_ID ));
-
-        return member.getMemberId();
+        return memberRepository.existsByMemberId( memberId );
     }
 
 

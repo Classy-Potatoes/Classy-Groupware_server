@@ -9,13 +9,17 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
 
-    Optional<Member> findByMemberInfoInfoCodeAndMemberInfoInfoName(Long infoCode, String infoName);
+    Optional<Member> findByMemberInfoInfoCodeAndMemberInfoInfoName( Long infoCode, String infoName );
 
-    // null에 대해서 처리하기 위해서 Optional
+    /* 아이디 중복검사 */
+    Boolean existsByMemberId( String memberId );
+
+    /* 아이디찾기(로그인쪽) */
     Optional<Member> findByMemberId( String memberId );
 
-    // DB에서 refreshToken 조회
-    Optional<Member> findByMemberToken(String refreshToken );
+    /* DB에서 refreshToken 조회 */
+    Optional<Member> findByMemberToken( String refreshToken );
+
 
 
 }

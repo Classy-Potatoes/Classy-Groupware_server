@@ -31,7 +31,6 @@ public class MemberController {
         return ResponseEntity.ok( searchInfoResponse );
     }
 
-
     /* 계정 가입 */
     @PostMapping("/member/regist")
     public ResponseEntity<Void> regist(@RequestBody @Valid final MemberSignupRequest memberRequest) {
@@ -39,9 +38,7 @@ public class MemberController {
         memberService.regist( memberRequest );
 
         return ResponseEntity.status( HttpStatus.CREATED ).build();
-
     }
-
 
     /* 아이디 찾기 */
     @GetMapping("/member/search")
@@ -52,6 +49,12 @@ public class MemberController {
         return ResponseEntity.ok( memberResponse );
     }
 
+    /* 아이디 중복 검사 */
+    @GetMapping("/member/duplicateId")
+    public Boolean duplicateId(@RequestParam final String inputMemberId) {
+
+        return memberService.duplicateId( inputMemberId );
+    }
 
     /* 비밀번호 찾기 */
     @GetMapping("/member/pwdSearch")
@@ -60,16 +63,6 @@ public class MemberController {
         MemberResponse memberResponse = memberService.searchId( memberSearchIdRequest );
 
         return ResponseEntity.ok( memberResponse );
-    }
-
-
-    /* 아이디 중복 검사 */
-    @GetMapping("/member/duplicateId")
-    public ResponseEntity<String> duplicateId(@RequestParam final String inputMemberId) {
-
-        String memberId = memberService.duplicateId( inputMemberId );
-
-        return ResponseEntity.ok( memberId );
     }
 
 
