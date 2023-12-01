@@ -2,6 +2,7 @@ package com.potatoes.cg.approval.service;
 
 import com.potatoes.cg.approval.domain.*;
 import com.potatoes.cg.approval.domain.repository.*;
+import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.common.exception.type.ExceptionCode;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,13 +26,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ApprovalService {
 
-    private final ApprovalRepository approvalRepository;
-    private final ApprovalLineRepository approvalLineRepository;
-    private final LetterRepository letterRepository;
-    private final FileEntityRepository fileEntityRepository;
-    private final ReferenceRepository referenceRepository;
-    private final MemberRepository memberRepository;
 
+    private final LetterRepository letterRepository;
+    private final MemberRepository memberRepository;
+    private final ExpenseRepository expenseRepository;
 
 
     @Value("${file.approval-dir}")
@@ -48,13 +48,13 @@ public class ApprovalService {
     /* 기안서 작성 - 품의서 */
     @Transactional
     public Long letterSave(final LetterCreateRequest letterRequest, final List<MultipartFile> attachment
-                            , final CustomUser customUser) {
+            , final CustomUser customUser) {
 
         /* 전달 된 파일을 서버의 지정 경로에 저장 */
-            List<String> replaceFileNames = Collections.emptyList(); //collections.emtyList 불변목록 nullpointer 방지기능
-            if(attachment != null && !attachment.isEmpty()) {
+        List<String> replaceFileNames = Collections.emptyList(); //collections.emtyList 불변목록 nullpointer 방지기능
+        if (attachment != null && !attachment.isEmpty()) {
             replaceFileNames = MultipleFileUploadUtils.saveFiles(APPROVAL_DIR, (attachment));
-            }
+        }
         /*파일 정보 저장 */
         List<ApprovalFile> files = new ArrayList<>();
         for (String replaceFileName : replaceFileNames) {
@@ -71,14 +71,14 @@ public class ApprovalService {
 
         /* 로그인한 계정 정보 */
         final Member findByLoginmember = memberRepository.findById(customUser.getMemberCode())
-                .orElseThrow( () -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
         /* 참조자 memberCode  참조자는 안넣을수도 있기때문에 nullpointer 핸들링*/
         final List<Reference> referenceLine =
                 Optional.ofNullable(letterRequest.getReferenceLine())
-                                .orElse(Collections.emptyList())
-                                        .stream()
-                                                .map(memberCode -> Reference.of(memberCode))
-                                                        .collect(Collectors.toList());
+                        .orElse(Collections.emptyList())
+                        .stream()
+                        .map(memberCode -> Reference.of(memberCode))
+                        .collect(Collectors.toList());
         /* 결재자 memberCode*/
         final List<ApprovalLine> approvalLine =
                 letterRequest.getApprovalLine().stream().map(memberCode -> ApprovalLine.of(memberCode)).collect(Collectors.toList());
@@ -101,5 +101,83 @@ public class ApprovalService {
 
 
         return letter.getApproval().getApprovalCode();
+    }
+
+    public Long expenseSave(ExpenseCreateRequest expenseRequest, List<MultipartFile> attachment, CustomUser customUser) {
+
+        /* 전달 된 파일을 서버의 지정 경로에 저장 */
+        List<String> replaceFileNames = Collections.emptyList(); //collections.emtyList 불변목록 nullpointer 방지기능
+        if (attachment != null && !attachment.isEmpty()) {
+            replaceFileNames = MultipleFileUploadUtils.saveFiles(APPROVAL_DIR, (attachment));
+        }
+        /*파일 정보 DB 저장 */
+        List<ApprovalFile> files = new ArrayList<>();
+        for (String replaceFileName : replaceFileNames) {
+            ApprovalFile fileEntity = new ApprovalFile(
+                    replaceFileName,
+                    APPROVAL_DIR,
+                    getRandomName(),
+                    getFileExtension(replaceFileName)
+
+            );
+            files.add(fileEntity);
+        }
+
+        /* 로그인한 계정 정보 */
+        final Member findByLoginmember = memberRepository.findById(customUser.getMemberCode())
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
+
+        /* 참조자 memberCode */
+        final List<Reference> referenceLine =
+                Optional.ofNullable(expenseRequest.getReferenceLine())
+                        .orElse(Collections.emptyList())
+                        .stream()
+                        .map(memberCode -> Reference.of(memberCode))
+                        .collect(Collectors.toList());
+
+        /* 결재자 memberCode */
+        final List<ApprovalLine> approvalLine =
+                expenseRequest.getApprovalLine().stream().map(memberCode -> ApprovalLine.of(memberCode)).collect(Collectors.toList());
+
+        /* expenseDetail 데이터 (계정과목,지출날짜,금액,적요) */
+        final List<ExpenseDetail> expenseDetail = new ArrayList<>();
+        for (Map<String, String> detailRequest : expenseRequest.getExpenseDetails()) {
+            String expenseAccount = detailRequest.get("expenseAccount");
+            String expenseBriefs = detailRequest.get("expenseBriefs");
+            LocalDate expenseDate = LocalDate.parse(detailRequest.get("expenseDate"));
+            Long expensePrice = Long.parseLong(detailRequest.get("expensePrice"));
+
+            ExpenseDetail expenseDetails = ExpenseDetail.of(
+                    expenseAccount,
+                    expenseDate,
+                    expensePrice,
+                    expenseBriefs
+            );
+
+            expenseDetail.add(expenseDetails);
+
+        }
+        final Approval newApproval = Approval.of(
+                expenseRequest.getDocumentTitle(),
+                referenceLine,
+                approvalLine,
+                expenseRequest.getDocumentType(),
+                findByLoginmember,
+                files
+        );
+
+        final Expense newExpense = Expense.of(
+                expenseRequest.getExpenseNote(),
+                expenseRequest.getExpenseStatus(),
+                expenseDetail,
+                newApproval
+
+        );
+
+        final Expense expense = expenseRepository.save(newExpense);
+
+
+        return expense.getApproval().getApprovalCode();
+
     }
 }

@@ -6,9 +6,9 @@ import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 
 public enum ExpenseStatusType {
 
-    PERSONAL("personal"),
+    PERSONAL("개인"),
 
-    CORPORATE("corporate");
+    CORPORATE("법인");
 
 
 

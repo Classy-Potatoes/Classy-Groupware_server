@@ -71,7 +71,6 @@ public class Approval {
     @JoinColumn(name = "approvalCode")
     private List<ApprovalFile> attachment;
 
-    /* 품의서 = 생성자 + of 메소드 ========================================== */
     public Approval(String documentTitle, List<ApprovalLine> approvalLine, List<Reference> referenceLine,
                     DocumentType documentType, Member member, List<ApprovalFile> attachment) {
         this.documentTitle = documentTitle;

@@ -7,6 +7,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
+import java.util.List;
+
+import static javax.persistence.EnumType.STRING;
+
 @Entity
 @Table(name = "tbl_expense")
 @Getter
@@ -21,6 +25,7 @@ public class Expense {
     @Column
     private String expenseNote;
 
+    @Enumerated(value = STRING)
     @Column
     private ExpenseStatusType expenseStatus;
 
@@ -28,7 +33,26 @@ public class Expense {
     @JoinColumn(name = "approvalCode")
     private Approval approval;
 
-//    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-//    @JoinColumn(name = "expenseCode")
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "expenseCode")
+    private List<ExpenseDetail> expenseDetail;
 
+    public Expense(String expenseNote, ExpenseStatusType expenseStatus,
+                   List<ExpenseDetail> expenseDetail, Approval approval) {
+        this.expenseNote = expenseNote;
+        this.expenseStatus = expenseStatus;
+        this.expenseDetail = expenseDetail;
+        this.approval = approval;
+    }
+
+    public static Expense of(String expenseNote, ExpenseStatusType expenseStatus,
+                             List<ExpenseDetail> expenseDetail, Approval approval) {
+
+        return new Expense(
+                expenseNote,
+                expenseStatus,
+                expenseDetail,
+                approval
+        );
+    }
 }
