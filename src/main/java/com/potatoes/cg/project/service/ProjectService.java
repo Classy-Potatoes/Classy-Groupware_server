@@ -1,26 +1,42 @@
 package com.potatoes.cg.project.service;
 
 
+import com.potatoes.cg.approval.domain.ApprovalFile;
 import com.potatoes.cg.common.exception.NotFoundException;
+import com.potatoes.cg.common.util.MultipleFileUploadUtils;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Dept;
+import com.potatoes.cg.member.domain.MemberInfo;
+import com.potatoes.cg.member.domain.repository.InfoRepository;
 import com.potatoes.cg.project.domain.Project;
-import com.potatoes.cg.project.domain.repository.ProjectDeptRepository;
-import com.potatoes.cg.project.domain.repository.ProjectParticipantRepository;
-import com.potatoes.cg.project.domain.repository.ProjectRepository;
-import com.potatoes.cg.project.domain.repository.ProjectmemberRepository;
+import com.potatoes.cg.project.domain.ProjectParticipantId;
+import com.potatoes.cg.project.domain.ProjectPost;
+import com.potatoes.cg.project.domain.repository.*;
 import com.potatoes.cg.project.dto.request.ProjectCreateRequest;
+import com.potatoes.cg.project.dto.request.ProjectInviteMemberRequest;
+import com.potatoes.cg.project.dto.request.ProjectPostCreateRequest;
+import com.potatoes.cg.project.dto.request.ProjectUpdateRequest;
+import com.potatoes.cg.project.dto.response.MemberDeptResponse;
+import com.potatoes.cg.project.dto.response.ProjectResponse;
 import com.potatoes.cg.project.dto.response.ProjectsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_DEPT_CODE;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
+import static com.potatoes.cg.member.domain.type.MemberStatus.ACTIVE;
+import static com.potatoes.cg.project.domain.type.ProjectStatusType.DELETED;
 import static com.potatoes.cg.project.domain.type.ProjectStatusType.USABLE;
 
 @Slf4j
@@ -32,18 +48,15 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectDeptRepository projectDeptRepository;
     private final ProjectParticipantRepository projectParticipantRepository;
-    private final ProjectmemberRepository projectmemberRepository;
+    private final InfoRepository infoRepository;
 
 
     /* 뉴 프로젝트 생성 */
-    public Long save(ProjectCreateRequest projectRequest, CustomUser customUser) {
+    public Long save(final ProjectCreateRequest projectRequest, final CustomUser customUser) {
 
 
         Dept dept = projectDeptRepository.findById(projectRequest.getDeptCode())
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_DEPT_CODE));
-
-//        Member memberCode = projectmemberRepository.findById(member.getMemberCode())
-//                .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER_CODE));
 
         final Project newProject = Project.of(
                 projectRequest.getProjectTitle(),
@@ -65,10 +78,13 @@ public class ProjectService {
         return PageRequest.of(page - 1, 5, Sort.by("projectCode").descending());
     }
 
-    @Transactional(readOnly = true)
-    public Page<ProjectsResponse> getMyDeptProjects(Integer page, Long deptCode) {
+    public Page<ProjectsResponse> getMyDeptProjects(final Integer page, final CustomUser customUser) {
 
-        Page<Project> projects = projectRepository.findByDeptDeptCodeAndProjectStatus(getPageable(page), deptCode, USABLE);
+        MemberInfo info = infoRepository.findById( customUser.getInfoCode() )
+                .orElseThrow( () -> new NotFoundException(NOT_FOUND_DEPT_CODE) );
+
+
+        Page<Project> projects = projectRepository.findByDeptDeptCodeAndProjectStatus(getPageable(page), info.getDept().getDeptCode(), USABLE);
 
         return projects.map(project -> ProjectsResponse.from(project));
     }
@@ -76,17 +92,54 @@ public class ProjectService {
 
     /* 내가 참여 중인 프로젝트 조회 */
     @Transactional(readOnly = true)
-    public Page<ProjectsResponse> getMyProjects(Integer page, Long memberCode) {
+    public Page<ProjectsResponse> getMyProjects(final Integer page, final CustomUser customUser) {
 
+        Page<Project> projects = projectRepository.findMyProjects(getPageable(page), customUser.getMemberCode());
 
-        return projectRepository.findMyProjects(getPageable(page), memberCode);
+        return projects.map(project -> ProjectsResponse.from(project));
     }
 
     /* 프로젝트에 참여인원 조회 */
-    public long countParticipantsByProjectCode(Long projectCode) {
+    public long countParticipantsByProjectCode(final Long projectCode) {
 
-        return projectParticipantRepository.countParticipantsByProjectCode(projectCode);
+        return projectRepository.countParticipantsByProjectCode(projectCode);
     }
+
+    /* 프로젝트 디테일 조회 */
+    @Transactional(readOnly = true)
+    public ProjectResponse getProjectDetail(final Long projectCode) {
+
+        Project project = projectRepository.findByProjectCodeAndProjectStatus(projectCode, USABLE)
+                .orElseThrow(() -> new NotFoundException(NOT_PROJECT_CODE));
+
+        return ProjectResponse.from(project);
+    }
+
+    /* 프로젝트 수정 */
+    public void projectUpdate(final Long projectCode, final ProjectUpdateRequest projectRequest) {
+
+        Project project = projectRepository.findByProjectCodeAndProjectStatusNot(projectCode, DELETED)
+                .orElseThrow(() -> new NotFoundException(NOT_PROJECT_CODE));
+
+        Dept dept = projectDeptRepository.findById(projectRequest.getDeptCode())
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_DEPT_CODE));
+
+        project.projectUpdate(
+                projectRequest.getProjectTitle(),
+                projectRequest.getProjectBody(),
+                projectRequest.getProjectStartDate(),
+                projectRequest.getProjectEndDate(),
+                dept
+        );
+
+    }
+
+    /* 프로젝트 삭제 */
+    public void projectDelete(final Long projectCode) {
+
+        projectRepository.deleteById(projectCode);
+    }
+
 }
 
 
