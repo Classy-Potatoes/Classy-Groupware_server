@@ -1,7 +1,7 @@
 package com.potatoes.cg.member.domain.repository;
 
 import com.potatoes.cg.member.domain.Member;
-import com.potatoes.cg.member.domain.MemberInfo;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.validation.constraints.NotBlank;
@@ -18,7 +18,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // DB에서 refreshToken 조회
     Optional<Member> findByMemberToken(String refreshToken );
-
-
 
 }

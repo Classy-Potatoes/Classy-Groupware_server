@@ -23,5 +23,5 @@ public class ProjectParticipantId implements Serializable {
         // 기본 생성자
     }
 
-    // equals, hashCode 등 필요한 메서드 추가
+// equals, hashCode 등 필요한 메서드 추가
 }

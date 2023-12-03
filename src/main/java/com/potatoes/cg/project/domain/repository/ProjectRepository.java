@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
@@ -24,5 +25,16 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                 countQuery = "SELECT COUNT(p) FROM Project p " +
                         "JOIN ProjectParticipant pp ON p.projectCode = pp.id.projectCode " +
                         "WHERE pp.id.memberCode = :memberCode")
-        Page<ProjectsResponse> findMyProjects(Pageable pageable, @Param("memberCode") Long memberCode);
+        Page<Project> findMyProjects(Pageable pageable, @Param("memberCode") Long memberCode);
+
+        /* 프로젝트 디테일 조회 */
+        Optional<Project> findByProjectCodeAndProjectStatus(Long projectCode, ProjectStatusType projectStatusType);
+
+        /* 프로젝트 수정 */
+        @EntityGraph(attributePaths = {"dept"})
+        Optional<Project> findByProjectCodeAndProjectStatusNot(Long projectCode, ProjectStatusType projectStatusType);
+
+        /* 프로젝트 참여자 수 */
+        @Query("SELECT COUNT(pp) FROM ProjectParticipant pp WHERE pp.project.projectCode = :projectCode")
+        long countParticipantsByProjectCode(@Param("projectCode") Long projectCode);
 }

@@ -25,7 +25,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Getter
 @EntityListeners(AuditingEntityListener.class)
-@SQLDelete(sql = "UPDATE tbl_project SET status = 'DELETED' WHERE project_code = ?")
+@SQLDelete(sql = "UPDATE tbl_project SET project_status = 'DELETED' WHERE project_code = ?")
 public class Project {
 
     @Id
@@ -79,6 +79,7 @@ public class Project {
         this.dept = dept;
         this.memberCode = memberCode;
     }
+
     public static Project of(
             final String projectTitle, final String projectBody,
             final Date projectStartDate, final Date projectEndDate, final Dept dept, final Long memberCode
@@ -92,5 +93,14 @@ public class Project {
                 dept,
                 memberCode
         );
+    }
+
+    /* 프로젝트 수정 */
+    public void projectUpdate(String projectTitle, String projectBody, Date projectStartDate, Date projectEndDate, Dept dept) {
+        this.projectTitle = projectTitle;
+        this.projectBody = projectBody;
+        this.projectStartDate = projectStartDate;
+        this.projectEndDate = projectEndDate;
+        this.dept = dept;
     }
 }
