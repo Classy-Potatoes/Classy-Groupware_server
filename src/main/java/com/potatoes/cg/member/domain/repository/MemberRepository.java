@@ -10,6 +10,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 
     Optional<Member> findByMemberInfoInfoCodeAndMemberInfoInfoName( Long infoCode, String infoName );
+    Optional<Member> findByMemberInfoInfoCodeAndMemberId( Long infoCode, String memberId );
 
     /* 아이디 중복검사 */
     Boolean existsByMemberId( String memberId );

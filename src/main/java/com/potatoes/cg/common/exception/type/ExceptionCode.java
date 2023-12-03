@@ -20,6 +20,7 @@ public enum ExceptionCode {
     NOT_FOUND_DEPT_CODE(1423, "부서 코드에 해당하는 부서가 존재하지 않습니다."),
     NOT_FOUND_INFO_CODE(1424, "존재하지 않는 사번입니다."),
     NOT_FOUND_INFO_CODE_AND_INFO_NAME(1425, "해당하는 사번과 이름에 일치하는 아이디를 찾지 못했습니다."),
+    NOT_FOUND_INFO_CODE_AND_MEMBER_ID(1426, "해당하는 사번과 아이디가 일치하지 않습니다."),
 
     /* JH(준) */
 

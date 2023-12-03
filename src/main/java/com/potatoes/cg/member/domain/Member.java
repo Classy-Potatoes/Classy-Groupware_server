@@ -77,4 +77,10 @@ public class Member {
         this.memberToken = memberToken;
     }
 
+    // 이메일 임시비밀번호 변경
+    public void updatePwd( String memberPassword ) {
+        this.memberPassword = memberPassword;
+    }
+
+
 }

@@ -1,12 +1,13 @@
 package com.potatoes.cg.member.presentation;
 
-import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.dto.request.MemberPwSendEmailRequest;
 import com.potatoes.cg.member.dto.request.MemberSearchIdRequest;
 import com.potatoes.cg.member.dto.request.MemberSignupRequest;
+import com.potatoes.cg.member.dto.MailSendDTO;
 import com.potatoes.cg.member.dto.response.MemberResponse;
-import com.potatoes.cg.member.dto.response.ProfileResponse;
 import com.potatoes.cg.member.dto.response.SearchInfoResponse;
 import com.potatoes.cg.member.service.MemberService;
+import com.potatoes.cg.member.service.SendEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,8 @@ import javax.validation.Valid;
 public class MemberController {
 
     private final MemberService memberService;
+    private final SendEmailService sendEmailService;
+
 
 
     /* 사번 검증 */
@@ -56,13 +59,13 @@ public class MemberController {
         return memberService.duplicateId( inputMemberId );
     }
 
-    /* 비밀번호 찾기 */
-    @GetMapping("/member/pwdSearch")
-    public ResponseEntity<MemberResponse> pwdSearch(@RequestBody @Valid final MemberSearchIdRequest memberSearchIdRequest) {
+    /* 비밀번호 찾기(이메일 전송) */
+    @PostMapping("/member/pwdSearch/sendEmail")
+    public @ResponseBody void sendEmail(@RequestBody @Valid final MemberPwSendEmailRequest pwSendEmailRequest) {
 
-        MemberResponse memberResponse = memberService.searchId( memberSearchIdRequest );
+        MailSendDTO mailSendDTO = sendEmailService.createMailAndChangePwd( pwSendEmailRequest );
 
-        return ResponseEntity.ok( memberResponse );
+        sendEmailService.mailSend( mailSendDTO );
     }
 
 

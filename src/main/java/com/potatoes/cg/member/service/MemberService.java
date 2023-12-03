@@ -30,7 +30,6 @@ public class MemberService {
     private final InfoRepository infoRepository;
     private final JobRepository jobRepository;
     private final DeptRepository deptRepository;
-    private final HistoryRepository historyRepository;
 
 
 
