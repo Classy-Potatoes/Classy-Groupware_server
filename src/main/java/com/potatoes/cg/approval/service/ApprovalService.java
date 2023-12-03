@@ -5,13 +5,18 @@ import com.potatoes.cg.approval.domain.repository.*;
 import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
 import com.potatoes.cg.approval.dto.request.VacationCreateRequest;
+import com.potatoes.cg.approval.dto.response.LoginUserInfoResponse;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.common.exception.type.ExceptionCode;
 import com.potatoes.cg.common.util.MultipleFileUploadUtils;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.MemberInfo;
+import com.potatoes.cg.member.domain.repository.InfoRepository;
 import com.potatoes.cg.member.domain.repository.MemberRepository;
+import com.potatoes.cg.member.dto.response.ProfileResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ApprovalService {
 
 
@@ -32,6 +38,7 @@ public class ApprovalService {
     private final MemberRepository memberRepository;
     private final ExpenseRepository expenseRepository;
     private final VacationRepository vacationRepository;
+    private final InfoRepository infoRepository;
 
 
     @Value("${file.approval-dir}")
@@ -104,7 +111,7 @@ public class ApprovalService {
 
         return letter.getApproval().getApprovalCode();
     }
-
+    @Transactional
     public Long expenseSave(ExpenseCreateRequest expenseRequest, List<MultipartFile> attachment, CustomUser customUser) {
 
         /* 전달 된 파일을 서버의 지정 경로에 저장 */
@@ -182,7 +189,7 @@ public class ApprovalService {
         return expense.getApproval().getApprovalCode();
 
     }
-
+    @Transactional
     public Long vacationSave(VacationCreateRequest vacationRequest, CustomUser customUser) {
 
         /* 로그인한 계정 정보 */
@@ -225,4 +232,16 @@ public class ApprovalService {
         return vacation.getApproval().getApprovalCode();
 
     }
+
+    /* 로그인 유저 찾아서 품의서, 지출결의서, 휴가신청서에 생성 */
+    @Transactional(readOnly = true)
+    public LoginUserInfoResponse getApprovalProfile(CustomUser customUser) {
+
+        final Member memberInfo = memberRepository.findById(customUser.getMemberCode())
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
+
+        return LoginUserInfoResponse.from(memberInfo);
+    }
+
+
 }
