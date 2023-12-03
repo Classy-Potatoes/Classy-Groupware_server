@@ -82,6 +82,17 @@ public class Approval {
         this.approvalStatus = WAITING;
     }
 
+    public Approval(String documentTitle, List<Reference> referenceLine,
+                    List<ApprovalLine> approvalLine, DocumentType documentType,
+                    Member findByLoginmember) {
+        this.documentTitle = documentTitle;
+        this.referenceLine = referenceLine;
+        this.approvalLine = approvalLine;
+        this.documentType = documentType;
+        this.member = findByLoginmember;
+        this.approvalStatus = WAITING;
+    }
+
     public static Approval of(final String documentTitle, final List<Reference> referenceLine, final List<ApprovalLine> approvalLine
                               ,final DocumentType documentType,final Member member, final List<ApprovalFile> attachment) {
 
@@ -95,6 +106,17 @@ public class Approval {
 
         );
     }
-  /* ====================================================================*/
 
+
+    public static Approval from(String documentTitle, List<Reference> referenceLine,
+                                List<ApprovalLine> approvalLine, DocumentType documentType,
+                                Member findByLoginmember) {
+        return new Approval(
+                documentTitle,
+                referenceLine,
+                approvalLine,
+                documentType,
+                findByLoginmember
+        );
+    }
 }
