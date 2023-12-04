@@ -74,8 +74,7 @@ public class NoteService {
         if (searchCondition.equals("all")) {
             notes = noteRepository.findBySearchAll
                     (getPageable(page), searchValue, searchValue, DEFAULT);
-        }
-        else if (searchCondition.equals("noteSender")) {
+        } else if (searchCondition.equals("noteSender")) {
             notes = noteRepository.findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(getPageable(page), searchValue, DEFAULT);
         } else if (searchCondition.equals("noteBody")) {
             notes = noteRepository.findByNoteBodyContainsAndNoteSenderStatus(getPageable(page), searchValue, DEFAULT);
@@ -115,6 +114,26 @@ public class NoteService {
     public void deleteReceivedNote(final Long noteCode) {
 
         noteRepository.deleteById(noteCode);
+
+    }
+
+    //검색 조회
+    public Page<NotesResponse> getReceivedNoteByNoteReceiverOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
+
+        Page<Note> notes = null;
+
+        if (searchCondition.equals("all")) {
+            notes = noteRepository.findBySearchAll(
+                    getPageable(page), searchValue, searchValue, DEFAULT);
+        } else if (searchCondition.equals("noteReceiver")) {
+            notes = noteRepository.findByNoteReceiverMemberInfoInfoNameContainsAndNoteReceiverStatus(getPageable(page), searchValue, DEFAULT);
+        } else if (searchCondition.equals("noteBody")) {
+            notes = noteRepository.findByNoteBodyContainsAndNoteReceiverStatus(getPageable(page), searchValue, DEFAULT);
+        } else {
+            new NotFoundException(NOT_FOUND_NOTE);
+        }
+
+        return notes.map(note -> NotesResponse.from(note));
 
     }
 
