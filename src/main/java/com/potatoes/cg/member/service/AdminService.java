@@ -40,10 +40,10 @@ public class AdminService {
         // 활동 이력 추가, infoCode는 insert후 영속성전이로 업데이트.
         final List<History> newHistory = new ArrayList<>();
         newHistory.add( History.of(
-                "최초입사",
+                "입사",
                 dept,
                 job,
-                "입사"
+                "최초입사"
         ));
 
         // 사전등록, 활동이력도 동시에 insert

@@ -32,7 +32,7 @@ public class MemberResponse {
     private final String infoAddress;
     private final String infoAddressAdd;
 
-    public static MemberResponse from(final Member member ) {
+    public static MemberResponse from( final Member member ) {
 
         return new MemberResponse(
                 member.getMemberCode(),

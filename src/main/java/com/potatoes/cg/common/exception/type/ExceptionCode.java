@@ -16,11 +16,13 @@ public enum ExceptionCode {
     UNAUTHORIZED(1401, "인증 되지 않은 요청입니다."),
     ACCESS_DENIED(1403, "허가 되지 않은 요청입니다."),
     NOT_FOUND_MEMBER_ID(1421, "아이디에 해당하는 유저가 없습니다."),
-    NOT_FOUND_JOB_CODE(1422, "직급 코드에 해당하는 직급이 존재하지 않습니다."),
-    NOT_FOUND_DEPT_CODE(1423, "부서 코드에 해당하는 부서가 존재하지 않습니다."),
-    NOT_FOUND_INFO_CODE(1424, "존재하지 않는 사번입니다."),
-    NOT_FOUND_INFO_CODE_AND_INFO_NAME(1425, "해당하는 사번과 이름에 일치하는 아이디를 찾지 못했습니다."),
-    NOT_FOUND_INFO_CODE_AND_MEMBER_ID(1426, "해당하는 사번과 아이디가 일치하지 않습니다."),
+    NOT_FOUND_MEMBER_CODE(1422, "계정코드가 존재하지 않습니다."),
+    NOT_FOUND_MEMBER_NON_STATUS(1423, "계정을 사용할 수 없습니다."),
+    NOT_FOUND_JOB_CODE(1424, "직급 코드에 해당하는 직급이 존재하지 않습니다."),
+    NOT_FOUND_DEPT_CODE(1425, "부서 코드에 해당하는 부서가 존재하지 않습니다."),
+    NOT_FOUND_INFO_CODE(1426, "존재하지 않는 사번입니다."),
+    NOT_FOUND_INFO_CODE_AND_INFO_NAME(1427, "해당하는 사번과 이름에 일치하는 아이디를 찾지 못했습니다."),
+    NOT_FOUND_INFO_CODE_AND_MEMBER_ID(1428, "해당하는 사번과 아이디가 일치하지 않습니다."),
 
     /* JH(준) */
 

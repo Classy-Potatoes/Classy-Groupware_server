@@ -48,7 +48,7 @@ public class SendEmailService {
                 + "임시비밀번호로 로그인하셔서 원하시는 비밀번호로 변경바랍니다.");
 
         // 임시비밀번호로 DB 업데이트
-        member.updatePwd( authNum );
+        member.updatePwdEmail( authNum );
 
         return mailSendDTO;
     }

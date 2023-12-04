@@ -52,23 +52,30 @@ public class Member {
     private LocalDateTime memberUpdateDate;
 
     private String memberToken;
+
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "infoCode")
     private MemberInfo memberInfo;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "memberCode")
+    private List<ProfileImage> profileImage;
 
-    public Member(String memberId, String memberPassword, MemberInfo memberInfo) {
+
+    public Member(String memberId, String memberPassword, MemberInfo memberInfo, List<ProfileImage> profileImage) {
         this.memberId = memberId;
         this.memberPassword = memberPassword;
         this.memberInfo = memberInfo;
+        this.profileImage = profileImage;
     }
 
-    public static Member of(String memberId, String memberPassword, MemberInfo memberInfo) {
+    public static Member of(String memberId, String memberPassword, MemberInfo memberInfo, List<ProfileImage> profileImage) {
 
         return new Member(
                 memberId,
                 memberPassword,
-                memberInfo
+                memberInfo,
+                profileImage
         );
 
     }
@@ -78,8 +85,19 @@ public class Member {
     }
 
     // 이메일 임시비밀번호 변경
+    public void updatePwdEmail( String memberPassword ) {
+        this.memberPassword = memberPassword;
+    }
+
+    // 비밀번호 변경(마이페이지)
     public void updatePwd( String memberPassword ) {
         this.memberPassword = memberPassword;
+    }
+
+    // 회원반납
+    public void returnUser( MemberStatus memberStatus, String memberToken ) {
+        this.memberStatus = memberStatus;
+        this.memberToken = memberToken;
     }
 
 

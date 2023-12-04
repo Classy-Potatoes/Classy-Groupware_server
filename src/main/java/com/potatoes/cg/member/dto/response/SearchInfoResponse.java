@@ -15,7 +15,7 @@ public class SearchInfoResponse {
     private final Long deptCode;
     private final Long jobCode;
 
-    public static SearchInfoResponse from(final MemberInfo info ) {
+    public static SearchInfoResponse from( final MemberInfo info ) {
 
         return new SearchInfoResponse(
                 info.getInfoCode(),
