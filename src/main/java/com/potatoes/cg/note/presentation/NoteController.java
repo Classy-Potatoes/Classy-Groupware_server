@@ -53,7 +53,7 @@ public class NoteController {
 
     }
 
-    //보낸 쪽지 삭제
+    //삭제
     @DeleteMapping("/sent/{noteCode}")
     public ResponseEntity<Void> deleteSentNote(@PathVariable final Long noteCode) {
 
@@ -107,13 +107,26 @@ public class NoteController {
 
     }
 
-    //받은 쪽지 삭제
+    //삭제
     @DeleteMapping("/received/{noteCode}")
     public ResponseEntity<Void> deleteReceivedNote(@PathVariable final Long noteCode) {
 
         noteService.deleteReceivedNote(noteCode);
 
         return ResponseEntity.noContent().build();
+
+    }
+
+    //검색 조회
+    @GetMapping("/received/search")
+    public ResponseEntity<PagingResponse> getReceivedNoteBySearch(
+            @RequestParam(defaultValue = "1") final Integer page, @RequestParam String searchCondition, @RequestParam String searchValue) {
+
+        final Page<NotesResponse> notes = noteService.getReceivedNoteByNoteReceiverOrNoteBody(page, searchCondition, searchValue);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
+        final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
 
     }
 

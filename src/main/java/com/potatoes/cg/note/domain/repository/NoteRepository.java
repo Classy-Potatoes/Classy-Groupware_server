@@ -18,15 +18,15 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     //전체 조회
     Page<Note> findByNoteSenderMemberCodeAndNoteSentDateBeforeAndNoteSenderStatus(Pageable pageable, Long memberCode, LocalDateTime noteSentDate, NoteStatus noteStatus);
 
+    //검색 - 받는 사람
+    Page<Note> findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
+
     //검색 - 내용
     Page<Note> findByNoteBodyContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
 
-    //검색 - 이름
-    Page<Note> findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
-
     //검색 - 전체
-    @EntityGraph(attributePaths = { "noteSender", "noteSender.memberInfo", "noteReceiver", "noteReceiver.memberInfo" })
-    @Query(value = "select n from Note n where (n.noteBody like %:noteBody% or n.noteSender.memberInfo.infoName like %:noteSender%) and n.noteSenderStatus = :noteSenderStatus")
+    @EntityGraph(attributePaths = {"noteSender", "noteSender.memberInfo", "noteReceiver", "noteReceiver.memberInfo" })
+    @Query(value = "select n from Note n where (n.noteBody like %:noteBody% or n.noteSender.memberInfo.infoName like %:noteSender%) and  n.noteSenderStatus = :noteSenderStatus")
     Page<Note> findBySearchAll(Pageable pageable, @Param(value = "noteBody") String noteBody, @Param(value = "noteSender") String noteSender, @Param(value = "noteSenderStatus") NoteStatus noteStatus);
 
 
@@ -35,6 +35,10 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     //전체 조회
     Page<Note> findByNoteReceiverMemberCodeAndNoteSentDateBeforeAndNoteReceiverStatus(Pageable pageable, Long memberCode, LocalDateTime noteSentDate, NoteStatus noteStatus);
 
+    //검색 - 보낸 사람
+    Page<Note> findByNoteReceiverMemberInfoInfoNameContainsAndNoteReceiverStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
 
+    //검색 - 내용
+    Page<Note> findByNoteBodyContainsAndNoteReceiverStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
 
 }
