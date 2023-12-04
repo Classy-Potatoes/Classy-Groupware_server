@@ -1,6 +1,5 @@
 package com.potatoes.cg.common.exception;
 
-
 import com.potatoes.cg.common.exception.type.ExceptionCode;
 import lombok.Getter;
 
@@ -15,4 +14,5 @@ public class CustomException extends RuntimeException {
         this.code = exceptionCode.getCode();
         this.message = exceptionCode.getMessage();
     }
+
 }
