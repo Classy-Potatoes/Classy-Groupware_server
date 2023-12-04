@@ -14,6 +14,7 @@ import com.potatoes.cg.project.dto.response.ProjectsResponse;
 import com.potatoes.cg.project.service.PostService;
 import com.potatoes.cg.project.service.ProjectMemberService;
 import com.potatoes.cg.project.service.ProjectService;
+import com.potatoes.cg.project.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,8 @@ public class ProjectController {
     private final PostService postService;
 
     private final ProjectMemberService projectMemberService;
+
+    private final ReplyService replyService;
 
     /* 프로젝트 생성 - 부장이상 */
     @PostMapping("/projects")
@@ -161,6 +164,7 @@ public class ProjectController {
 //        return ResponseEntity.created(URI.create("/invite" + id)).build();
 //
 //    }
+    /* 회원 초대하기 */
     @PostMapping("/invite")
     public ResponseEntity<List<ProjectParticipantId>> inviteMembers(
             @RequestBody @Valid final List<ProjectInviteMemberRequest> projectInviteMemberRequests
@@ -219,4 +223,19 @@ public class ProjectController {
 
         return ResponseEntity.ok(projectPostResponse);
     }
+
+    /* 프로젝트 일반 게시글 댓글 */
+    @PostMapping("/post/reply")
+    public ResponseEntity<Void> postReplySave(
+            @RequestBody @Valid final ProjectReplyCreateRequest projectReplyCreateRequest,
+            @AuthenticationPrincipal final CustomUser customUser
+
+    ) {
+
+        final Long replyCode = replyService.replySave(projectReplyCreateRequest, customUser);
+
+        return ResponseEntity.created(URI.create("/post/reply/" + replyCode)).build();
+    }
+
+
 }
