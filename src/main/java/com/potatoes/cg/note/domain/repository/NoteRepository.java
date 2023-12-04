@@ -25,9 +25,9 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     Page<Note> findByNoteBodyContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
 
     //검색 - 전체
-    @EntityGraph(attributePaths = {"noteSender", "noteSender.memberInfo", "noteReceiver", "noteReceiver.memberInfo" })
-    @Query(value = "select n from Note n where (n.noteBody like %:noteBody% or n.noteSender.memberInfo.infoName like %:noteSender%) and  n.noteSenderStatus = :noteSenderStatus")
-    Page<Note> findBySearchAll(Pageable pageable, @Param(value = "noteBody") String noteBody, @Param(value = "noteSender") String noteSender, @Param(value = "noteSenderStatus") NoteStatus noteStatus);
+    @EntityGraph(attributePaths = { "noteSender", "noteSender.memberInfo", "noteReceiver", "noteReceiver.memberInfo" })
+    @Query(value = "select n from Note n where (n.noteBody like %:noteBody% or n.noteSender.memberInfo.infoName like %:noteSender%) and n.noteSenderStatus = :noteSenderStatus")
+    Page<Note> findByNoteSentSearchAll(Pageable pageable, @Param(value = "noteBody") String noteBody, @Param(value = "noteSender") String noteSender, @Param(value = "noteSenderStatus") NoteStatus noteStatus);
 
 
     /********************************************* 받은 쪽지함 *********************************************/
@@ -40,5 +40,12 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
     //검색 - 내용
     Page<Note> findByNoteBodyContainsAndNoteReceiverStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
+
+    //검색 - 전체
+    @EntityGraph(attributePaths = { "noteSender", "noteSender.memberInfo", "noteReceiver", "noteReceiver.memberInfo" })
+    @Query(value = "select n from Note n where (n.noteBody like %:noteBody% or n.noteSender.memberInfo.infoName like %:noteReceiver%) and n.noteReceiverStatus = :noteReceiverStatus")
+    Page<Note> findByNoteReceivedSearchAll(Pageable pageable, @Param(value = "noteBody") String noteBody, @Param(value = "noteReceiver") String noteReceiver, @Param(value = "noteReceiverStatus") NoteStatus noteStatus);
+
+
 
 }

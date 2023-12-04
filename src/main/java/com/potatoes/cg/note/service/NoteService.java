@@ -72,7 +72,7 @@ public class NoteService {
         Page<Note> notes = null;
 
         if (searchCondition.equals("all")) {
-            notes = noteRepository.findBySearchAll
+            notes = noteRepository.findByNoteSentSearchAll
                     (getPageable(page), searchValue, searchValue, DEFAULT);
         } else if (searchCondition.equals("noteSender")) {
             notes = noteRepository.findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(getPageable(page), searchValue, DEFAULT);
@@ -123,7 +123,7 @@ public class NoteService {
         Page<Note> notes = null;
 
         if (searchCondition.equals("all")) {
-            notes = noteRepository.findBySearchAll(
+            notes = noteRepository.findByNoteReceivedSearchAll(
                     getPageable(page), searchValue, searchValue, DEFAULT);
         } else if (searchCondition.equals("noteReceiver")) {
             notes = noteRepository.findByNoteReceiverMemberInfoInfoNameContainsAndNoteReceiverStatus(getPageable(page), searchValue, DEFAULT);
