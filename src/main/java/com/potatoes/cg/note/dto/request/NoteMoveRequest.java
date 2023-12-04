@@ -1,26 +1,26 @@
 package com.potatoes.cg.note.dto.request;
 
 import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.note.domain.type.NoteStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
 public class NoteMoveRequest {
 
-    @Min(value = 1)
-    private final Long noteCode;
+    @NotNull
+    private final List<Long> noteCodes; //바꾸고 싶은 쪽지 코드
 
-    @NotBlank
-    private final Member noteSender;
+    @NotNull
+    private final String noteDivision; //쪽지 상태(받은 쪽지인지 보낸 쪽지인지)
 
-    @NotBlank
-    private final Member noteReceiver;
-
-    @NotBlank
-    private final String noteBody;
+    @NotNull
+    private final NoteStatus noteStatus; //어떤 상태로 변화할 것인지(기본, 중요, 삭제)
 
 }
