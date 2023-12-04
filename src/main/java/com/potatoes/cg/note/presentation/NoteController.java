@@ -9,11 +9,11 @@ import com.potatoes.cg.note.dto.response.NotesResponse;
 import com.potatoes.cg.note.service.NoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.time.LocalDateTime;
 
 @RestController
@@ -23,7 +23,9 @@ public class NoteController {
 
     private final NoteService noteService;
 
-    //보낸 쪽지 전체 조회
+    /********************************************* 보낸 쪽지함 *********************************************/
+
+    //전체 조회
     @GetMapping("/sent")
     public ResponseEntity<PagingResponse> getSentNotes(
             @RequestParam(defaultValue = "1") final Integer page,
@@ -41,7 +43,7 @@ public class NoteController {
 
     }
 
-    //보낸 쪽지 상세 조회
+    //상세 조회
     @GetMapping("/sent/{noteCode}")
     public ResponseEntity<NoteResponse> getSentNote(@PathVariable final Long noteCode) {
 
@@ -51,7 +53,33 @@ public class NoteController {
 
     }
 
-    //받은 쪽지 전체 조회
+    //삭제
+    @DeleteMapping("/sent/{noteCode}")
+    public ResponseEntity<Void> deleteSentNote(@PathVariable final Long noteCode) {
+
+        noteService.deleteSentNote(noteCode);
+
+        return ResponseEntity.noContent().build();
+
+    }
+
+    //검색 조회
+    @GetMapping("sent/search")
+    public ResponseEntity<PagingResponse> getSentNoteBySearch(
+            @RequestParam(defaultValue = "1") final Integer page, @RequestParam String searchCondition, @RequestParam String searchValue) {
+
+        final Page<NotesResponse> notes = noteService.getSentNoteByNoteSenderOrNoteBody(page, searchCondition, searchValue);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
+        final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
+
+    }
+
+
+    /********************************************* 받은 쪽지함 *********************************************/
+
+    //전체 조회
     @GetMapping("/received")
     public ResponseEntity<PagingResponse> getReceivedNotes(
             @RequestParam(defaultValue = "1") final Integer page,
@@ -69,7 +97,7 @@ public class NoteController {
 
     }
 
-    //받은 쪽지 상세 조회
+    //상세 조회
     @GetMapping("/received/{noteCode}")
     public ResponseEntity<NoteResponse> getReceivedNote(@PathVariable final Long noteCode) {
 
@@ -79,17 +107,7 @@ public class NoteController {
 
     }
 
-    //보낸 쪽지 삭제
-    @DeleteMapping("/sent/{noteCode}")
-    public ResponseEntity<Void> deleteSentNote(@PathVariable final Long noteCode) {
-
-        noteService.deleteSentNote(noteCode);
-
-        return ResponseEntity.noContent().build();
-
-    }
-
-    //받은 쪽지 삭제
+    //삭제
     @DeleteMapping("/received/{noteCode}")
     public ResponseEntity<Void> deleteReceivedNote(@PathVariable final Long noteCode) {
 
@@ -99,12 +117,12 @@ public class NoteController {
 
     }
 
-    //보낸 쪽지 검색 조회
-    @GetMapping("sent/search")
-    public ResponseEntity<PagingResponse> getSentNoteBySearch(
+    //검색 조회
+    @GetMapping("/received/search")
+    public ResponseEntity<PagingResponse> getReceivedNoteBySearch(
             @RequestParam(defaultValue = "1") final Integer page, @RequestParam String searchCondition, @RequestParam String searchValue) {
 
-        final Page<NotesResponse> notes = noteService.getSentNoteByNoteSenderOrNoteBody(page, searchCondition, searchValue);
+        final Page<NotesResponse> notes = noteService.getReceivedNoteByNoteReceiverOrNoteBody(page, searchCondition, searchValue);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -112,25 +130,18 @@ public class NoteController {
 
     }
 
+
+    /***************************************************************************************************************/
+
     //쪽지 이동
-//    @PostMapping("/note/{noteCode}")
-//    public ResponseEntity<Void> move(@PathVariable final Long noteCode, @RequestPart @Valid final NoteMoveRequest noteRequest) {
-//
-//        noteService.move(noteCode, noteRequest);
-//
-//        return ResponseEntity.created(URI.create("/note" + noteCode)).build();
-//
-//    }
+    @PutMapping("/move")
+    public ResponseEntity<Void> moveNote(@RequestBody @Valid final NoteMoveRequest noteRequest) {
 
+        noteService.moveNote(noteRequest);
 
-//    //쪽지 쓰기
-//    @PostMapping("/write")
-//    public ResponseEntity<Void> save(@RequestBody @Valid final NoteCreateRequest noteRequest, CustomUser customUser) {
-//
-//        final Long noteCode = noteService.save(noteRequest, customUser);
-//
-//        return ResponseEntity.created(URI.create("/api/v1/note/" + noteCode)).build();
-//
-//    }
+        return ResponseEntity.status(HttpStatus.CREATED).build(); //201 응답
+
+    }
+
 
 }
