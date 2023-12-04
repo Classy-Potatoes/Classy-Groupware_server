@@ -3,6 +3,7 @@ package com.potatoes.cg.note.service;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.repository.NoteRepository;
+import com.potatoes.cg.note.domain.type.NoteStatus;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
@@ -15,9 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import static com.potatoes.cg.note.domain.type.NoteStatusType.DEFAULT;
+import java.util.List;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
+import static com.potatoes.cg.note.domain.type.NoteStatus.*;
 
 
 @Service
@@ -33,7 +35,9 @@ public class NoteService {
 
     }
 
-    //보낸 쪽지 전체 조회
+    /********************************************* 보낸 쪽지함 *********************************************/
+
+    //전체 조회
     @Transactional(readOnly = true)
     public Page<NotesResponse> getSentNotes(final int page, final Long memberCode, LocalDateTime noteSentDate) {
 
@@ -43,7 +47,7 @@ public class NoteService {
 
     }
 
-    //보낸 쪽지 상세 조회
+    //상세 조회
     @Transactional(readOnly = true)
     public NoteResponse getSentNote(final Long noteCode) {
 
@@ -54,42 +58,14 @@ public class NoteService {
 
     }
 
-    //받은 쪽지 전체 조회
-    @Transactional(readOnly = true)
-    public Page<NotesResponse> getReceivedNotes(final int page, final Long memberCode, LocalDateTime noteSentDate) {
-
-        Page<Note> notes = noteRepository.findByNoteReceiverMemberCodeAndNoteSentDateBeforeAndNoteReceiverStatus(getPageable(page), memberCode, noteSentDate, DEFAULT);
-
-        return notes.map(note -> NotesResponse.from(note));
-
-    }
-
-    //받은 쪽지 상세 조회
-    @Transactional(readOnly = true)
-    public NoteResponse getReceivedNote(final Long noteCode) {
-
-        Note note = noteRepository.findById(noteCode)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_NOTE_CODE));
-
-        return NoteResponse.from(note);
-
-    }
-
-    //보낸 쪽지 삭제
+    //삭제
     public void deleteSentNote(final Long noteCode) {
 
         noteRepository.deleteById(noteCode);
 
     }
 
-    //받은 쪽지 삭제
-    public void deleteReceivedNote(final Long noteCode) {
-
-        noteRepository.deleteById(noteCode);
-
-    }
-
-    //보낸 쪽지함 검색 조회
+    //검색 조회
     @Transactional(readOnly = true)
     public Page<NotesResponse> getSentNoteByNoteSenderOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
 
@@ -111,35 +87,87 @@ public class NoteService {
 
     }
 
-    //쪽지 이동
-//    @Transactional
-//    public void move(final Long noteCode, final NoteMoveRequest noteRequest) {
-//
-//        Note note = noteRepository.findById(noteRequest.getNoteCode())
-//                .orElseThrow(() -> new NotFoundException(NOT_FOUND_NOTE_CODE));
-//
-//        note.move(
-//                noteRequest.getNoteSender(),
-//                noteRequest.getNoteReceiver(),
-//                noteRequest.getNoteBody()
-//        );
-//
-//    }
 
-    //쪽지 쓰기
-//    public Long save(final NoteCreateRequest noteRequest, final CustomUser customUser) {
-//
-//        Note note = noteRepository.findById(customUser.getInfoCode().)
-//                .orElseThrow(() -> new NotFoundException(NOT_FOUND_INFO_NAME));
-//
-//        final Note newNote = Note.of(
-//
-//        );
-//
-//        final Note note = noteRepository.save(newNote);
-//
-//        return note.getNoteCode();
-//
-//    }
+    /********************************************* 받은 쪽지함 *********************************************/
+
+    //전체 조회
+    @Transactional(readOnly = true)
+    public Page<NotesResponse> getReceivedNotes(final int page, final Long memberCode, LocalDateTime noteSentDate) {
+
+        Page<Note> notes = noteRepository.findByNoteReceiverMemberCodeAndNoteSentDateBeforeAndNoteReceiverStatus(getPageable(page), memberCode, noteSentDate, DEFAULT);
+
+        return notes.map(note -> NotesResponse.from(note));
+
+    }
+
+    //상세 조회
+    @Transactional(readOnly = true)
+    public NoteResponse getReceivedNote(final Long noteCode) {
+
+        Note note = noteRepository.findById(noteCode)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_NOTE_CODE));
+
+        return NoteResponse.from(note);
+
+    }
+
+    //삭제
+    public void deleteReceivedNote(final Long noteCode) {
+
+        noteRepository.deleteById(noteCode);
+
+    }
+
+
+    /***************************************************************************************************************/
+
+    //이동
+    @Transactional
+    public void moveNote(NoteMoveRequest noteRequest) {
+
+        List<Note> notes = noteRepository.findAllById(noteRequest.getNoteCodes());
+
+        //받은 쪽지인지 보낸 쪽지인지 판단해서 분기하고 컬럼에 따른 수정 (스트림, forEach)
+        notes.forEach(note -> {
+            if (noteRequest.getNoteDivision().equals("sent")) {
+                moveSentNote(note, noteRequest.getNoteStatus());
+            } else if (noteRequest.getNoteDivision().equals("received")) {
+                moveReceivedNote(note, noteRequest.getNoteStatus());
+            }
+        });
+
+        noteRepository.saveAll(notes);
+
+    }
+
+    private void moveSentNote(Note note, NoteStatus noteStatus) {
+
+        switch (noteStatus) {
+            case DEFAULT:
+                note.setNoteSenderStatus(DEFAULT);
+                break;
+            case IMPORTANT:
+                note.setNoteSenderStatus(IMPORTANT);
+                break;
+        }
+
+    }
+
+    private void moveReceivedNote(Note note, NoteStatus noteStatus) {
+
+        switch (noteStatus) {
+            case DEFAULT:
+                note.setNoteReceiverStatus(DEFAULT);
+                break;
+            case IMPORTANT:
+                note.setNoteReceiverStatus(IMPORTANT);
+                break;
+        }
+
+    }
+
+    /***************************************************************************************************************/
+
+
 
 }
