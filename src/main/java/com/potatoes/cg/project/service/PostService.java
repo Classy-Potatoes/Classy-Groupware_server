@@ -2,20 +2,20 @@ package com.potatoes.cg.project.service;
 
 import com.potatoes.cg.approval.domain.repository.FileEntityRepository;
 import com.potatoes.cg.common.exception.NotFoundException;
-import com.potatoes.cg.common.util.FileUploadUtils;
 import com.potatoes.cg.common.util.MultipleFileUploadUtils;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.MemberInfo;
 import com.potatoes.cg.member.domain.repository.InfoRepository;
-import com.potatoes.cg.project.domain.PostFile;
-import com.potatoes.cg.project.domain.PostReply;
+import com.potatoes.cg.project.domain.ProjectFile;
 import com.potatoes.cg.project.domain.Project;
 import com.potatoes.cg.project.domain.ProjectPost;
+import com.potatoes.cg.project.domain.ProjectReply;
 import com.potatoes.cg.project.domain.repository.ProjectPostRepository;
+import com.potatoes.cg.project.domain.repository.ProjectReplyRepository;
 import com.potatoes.cg.project.domain.repository.ProjectRepository;
+import com.potatoes.cg.project.domain.type.ProjectFileType;
 import com.potatoes.cg.project.dto.request.PostUpdateRequest;
 import com.potatoes.cg.project.dto.request.ProjectPostCreateRequest;
-import com.potatoes.cg.project.dto.response.PostReplyResponse;
 import com.potatoes.cg.project.dto.response.ProjectPostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +46,7 @@ public class PostService {
     private final ProjectRepository projectRepository;
     private final InfoRepository infoRepository;
     private final FileEntityRepository fileEntityRepository;
+    private final ProjectReplyRepository projectReplyRepository;
 
     @Value("${file.projectpost-dir}")
     private String PROJECTPOST_DIR;
@@ -67,26 +68,24 @@ public class PostService {
         List<String> replaceFileNames = MultipleFileUploadUtils.saveFiles(PROJECTPOST_DIR, (attachment));
 
         /*파일 정보 저장 */
-        List<PostFile> files = new ArrayList<>();
+        List<ProjectFile> files = new ArrayList<>();
         for (String replaceFileName : replaceFileNames) {
-            PostFile fileEntity = new PostFile(
+            ProjectFile fileEntity = new ProjectFile(
                     replaceFileName,
                     PROJECTPOST_DIR,
                     getRandomName(),
-                    getFileExtension(replaceFileName)
-
+                    getFileExtension(replaceFileName),
+                    ProjectFileType.POST
             );
             files.add(fileEntity);
         }
 
-        Project project = projectRepository.findById(projectPostRequest.getProjectCode())
-                .orElseThrow(() -> new NotFoundException(NOT_PROJECT_CODE));
+        Project project = projectRepository.getReferenceById(projectPostRequest.getProjectCode());
 
-        MemberInfo member = infoRepository.findById(customUser.getInfoCode())
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_INFO_CODE));
+        MemberInfo member = infoRepository.getReferenceById(customUser.getInfoCode());
 
         final ProjectPost newProjectPost = ProjectPost.of(
-                project,
+                project.getProjectCode(),
                 member,
                 projectPostRequest.getPostTitle(),
                 projectPostRequest.getPostBody(),
@@ -104,24 +103,30 @@ public class PostService {
     }
 
     /* 프로젝트 일반 글 디테일 조회 */
-    @Transactional(readOnly = true)
-    public ProjectPostResponse getPostDetail(final Long postCode) {
-
-        ProjectPost post = projectPostRepository.findByPostCodeAndPostStatus(postCode, USABLE)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_POST_CODE));
-
-        return ProjectPostResponse.from(post);
-
-    }
+//    @Transactional(readOnly = true)
+//    public ProjectPostResponse getPostDetail(final Long postCode) {
+//
+//        ProjectPost post = projectPostRepository.findByPostCodeAndPostStatus(postCode, USABLE)
+//                .orElseThrow(() -> new NotFoundException(NOT_FOUND_POST_CODE));
+//
+//        return ProjectPostResponse.from(post);
+//
+//    }
 
     /* 프로젝트 일반 글 조회 */
     @Transactional(readOnly = true)
-    public Page<ProjectPostResponse> getPostsDetail(Integer page, Long projectCode) {
+    public Page<ProjectPostResponse> getPostsDetail(final Integer page, final Long projectCode) {
 
-        Page<ProjectPost> posts = projectPostRepository.findByProjectProjectCodeAndPostStatus(projectCode, getPageable(page),  USABLE );
+        Page<ProjectPost> posts = projectPostRepository.findByProjectCodeAndPostStatus(projectCode, getPageable(page),  USABLE );
 
-        return posts.map(post -> ProjectPostResponse.from(post));
+//        return posts.map(post -> ProjectPostResponse.from(post));
+        return posts.map(post -> {
+            List<ProjectReply> replies = post.getReplies(); // 댓글을 즉시 가져오기
+            return ProjectPostResponse.from(post, replies);
+        });
     }
+
+
 
 
     /* 프로젝트 일반 글 삭제 */
@@ -143,4 +148,5 @@ public class PostService {
         );
 
     }
+
 }

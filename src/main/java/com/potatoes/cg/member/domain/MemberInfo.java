@@ -60,6 +60,7 @@ public class MemberInfo {
         this.history = history;
     }
 
+
     public static MemberInfo of(String infoName, Dept dept, Job job, String infoEmail, String infoPhone,
                                 Long infoZipcode, String infoAddress, String infoAddressAdd, List<History> history) {
 

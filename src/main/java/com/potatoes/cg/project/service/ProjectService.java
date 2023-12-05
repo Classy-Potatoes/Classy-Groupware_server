@@ -55,8 +55,7 @@ public class ProjectService {
     public Long save(final ProjectCreateRequest projectRequest, final CustomUser customUser) {
 
 
-        Dept dept = projectDeptRepository.findById(projectRequest.getDeptCode())
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_DEPT_CODE));
+        Dept dept = projectDeptRepository.getReferenceById(projectRequest.getDeptCode());
 
         final Project newProject = Project.of(
                 projectRequest.getProjectTitle(),
@@ -80,9 +79,7 @@ public class ProjectService {
 
     public Page<ProjectsResponse> getMyDeptProjects(final Integer page, final CustomUser customUser) {
 
-        MemberInfo info = infoRepository.findById( customUser.getInfoCode() )
-                .orElseThrow( () -> new NotFoundException(NOT_FOUND_DEPT_CODE) );
-
+        MemberInfo info = infoRepository.getReferenceById( customUser.getInfoCode());
 
         Page<Project> projects = projectRepository.findByDeptDeptCodeAndProjectStatus(getPageable(page), info.getDept().getDeptCode(), USABLE);
 
