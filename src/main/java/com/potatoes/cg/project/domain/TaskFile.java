@@ -13,13 +13,14 @@ import javax.validation.constraints.NotBlank;
 
 import static com.potatoes.cg.approval.domain.type.ApprovalFileType.APPROVAL;
 import static com.potatoes.cg.project.domain.type.ProjectFileType.POST;
+import static com.potatoes.cg.project.domain.type.ProjectFileType.TASK;
 import static javax.persistence.EnumType.STRING;
 
 @Entity
 @Table(name = "tbl_file")
 @NoArgsConstructor
 @Getter
-public class PostFile {
+public class TaskFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,11 +40,11 @@ public class PostFile {
     private ProjectFileType projectFileType;
 
 
-    public PostFile(String replaceFileName, String filePathName, String randomName, String fileExtension) {
+    public TaskFile(String replaceFileName, String filePathName, String randomName, String fileExtension) {
         this.fileName = replaceFileName;
         this.filePathName = filePathName;
         this.fileSaveName = randomName;
         this.fileExtName = fileExtension;
-        this.projectFileType = POST;
+        this.projectFileType = TASK;
     }
 }

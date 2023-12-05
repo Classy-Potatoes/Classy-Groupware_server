@@ -46,9 +46,6 @@ public class ProjectPost {
     @Column(nullable = false)
     private LocalDateTime postModifyDate;
 
-    @Column(nullable = false)
-    private LocalDateTime postDeleteDate;
-
     @Enumerated(value = STRING)
     @Column(nullable = false)
     private ProjectStatusType postStatus = USABLE;
@@ -90,4 +87,8 @@ public class ProjectPost {
         );
     }
 
+    public void update(String postTitle, String postBody) {
+        this.postTitle = postTitle;
+        this.postBody = postBody;
+    }
 }

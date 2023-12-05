@@ -1,6 +1,6 @@
 package com.potatoes.cg.project.domain.type;
 
-public enum ReplyOptionType {
+public enum ProjectOptionType {
 
     POST,
     TASK,

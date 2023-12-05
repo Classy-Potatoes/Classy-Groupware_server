@@ -30,6 +30,7 @@ public enum ExceptionCode {
     /* IS */
     NOT_PROJECT_CODE(3000, "프로젝트코드에 해당하는 프로젝트가 존재하지 않습니다."),
     NOT_FOUND_POST_CODE(3001, "존재하지 않은 게시글입니다."),
+    NOT_FOUND_REPLY_CODE(3002, "존재하지 않은 댓글입니다. "),
 
     /* JH(주) */
     NOT_FOUND_NOTE_CODE(5000, "쪽지 코드에 해당하는 쪽지가 없습니다."),

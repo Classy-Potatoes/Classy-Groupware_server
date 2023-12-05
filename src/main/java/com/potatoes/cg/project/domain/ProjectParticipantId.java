@@ -11,7 +11,7 @@ public class ProjectParticipantId implements Serializable {
     @Column(name = "project_code")
     private Long projectCode;
 
-    @Column(name = "member_code")
+    @Column(name = "info_code")
     private Long memberCode;
 
     public ProjectParticipantId(Long projectCode, Long memberCode) {

@@ -14,6 +14,7 @@ import com.potatoes.cg.project.domain.repository.ProjectRepository;
 import com.potatoes.cg.project.domain.repository.ProjectmemberRepository;
 import com.potatoes.cg.project.dto.request.ProjectInviteMemberRequest;
 import com.potatoes.cg.project.dto.response.MemberDeptResponse;
+import com.potatoes.cg.project.dto.response.ProjectMemberResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_INFO_CODE;
 import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_PROJECT_CODE;
@@ -55,23 +57,6 @@ public class ProjectMemberService {
     }
 
     /* 프로젝트에 회원 초대 */
-//    public ProjectParticipantId inviteMember(ProjectInviteMemberRequest projectInviteMemberRequest) {
-//
-//        MemberInfo member = infoRepository.findById(projectInviteMemberRequest.getMemberCode())
-//                .orElseThrow(() -> new NotFoundException(NOT_FOUND_INFO_CODE));
-//
-//        Project project = projectRepository.findById(projectInviteMemberRequest.getProjectCode())
-//                .orElseThrow(() -> new NotFoundException(NOT_PROJECT_CODE));
-//
-//        final ProjectParticipant newProjectParticipant = ProjectParticipant.of(
-//                project,
-//                member
-//        );
-//
-//        final ProjectParticipant projectParticipant = projectParticipantRepository.save(newProjectParticipant);
-//
-//        return projectParticipant.getId();
-//    }
     public List<ProjectParticipantId> inviteMembers(List<ProjectInviteMemberRequest> projectInviteMemberRequests) {
         List<ProjectParticipantId> invitedMembers = new ArrayList<>();
 
@@ -92,6 +77,39 @@ public class ProjectMemberService {
         }
 
         return invitedMembers;
+    }
+
+    //    public ProjectParticipantId inviteMember(ProjectInviteMemberRequest projectInviteMemberRequest) {
+//
+//        MemberInfo member = infoRepository.findById(projectInviteMemberRequest.getMemberCode())
+//                .orElseThrow(() -> new NotFoundException(NOT_FOUND_INFO_CODE));
+//
+//        Project project = projectRepository.findById(projectInviteMemberRequest.getProjectCode())
+//                .orElseThrow(() -> new NotFoundException(NOT_PROJECT_CODE));
+//
+//        final ProjectParticipant newProjectParticipant = ProjectParticipant.of(
+//                project,
+//                member
+//        );
+//
+//        final ProjectParticipant projectParticipant = projectParticipantRepository.save(newProjectParticipant);
+//
+//        return projectParticipant.getId();
+//    }
+
+    /* 프로젝트 번호로 인원 조회 */
+    @Transactional(readOnly = true)
+    public List<ProjectMemberResponse> getMemberList(Long projectCode) {
+
+        List<ProjectParticipant> projectParticipantList = projectParticipantRepository.findAllByProjectProjectCode(projectCode);
+
+        List<ProjectMemberResponse> projectMemberResponseList = projectParticipantList.stream()
+                .map(projectParticipant -> ProjectMemberResponse.from(
+                        projectParticipant.getMember().getInfoCode(),
+                        projectParticipant.getMember().getInfoName()
+                )).collect(Collectors.toList());
+
+        return projectMemberResponseList;
     }
 
 }

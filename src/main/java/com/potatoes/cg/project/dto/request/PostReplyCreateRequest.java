@@ -1,7 +1,5 @@
 package com.potatoes.cg.project.dto.request;
 
-import com.potatoes.cg.project.domain.ProjectPost;
-import com.potatoes.cg.project.domain.type.ReplyOptionType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 
 @RequiredArgsConstructor
 @Getter
-public class ProjectReplyCreateRequest {
+public class PostReplyCreateRequest {
 
     @NotBlank
     private final String replyBody;
