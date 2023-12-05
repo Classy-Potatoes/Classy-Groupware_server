@@ -1,5 +1,6 @@
 package com.potatoes.cg.project.dto.response;
 
+import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +17,15 @@ public class ProjectMemberResponse {
                 infoCode,
                 infoName
         );
+    }
+
+    public static ProjectMemberResponse fromMember(final Member member) {
+
+            return new ProjectMemberResponse(
+                    member.getMemberInfo().getInfoCode(),
+                    member.getMemberInfo().getInfoName()
+            );
+
     }
 }
 

@@ -4,7 +4,6 @@ import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
 import com.potatoes.cg.jwt.CustomUser;
-import com.potatoes.cg.project.domain.ProjectManager;
 import com.potatoes.cg.project.domain.ProjectParticipantId;
 import com.potatoes.cg.project.dto.request.*;
 import com.potatoes.cg.project.dto.response.*;
@@ -169,13 +168,19 @@ public class ProjectController {
         return ResponseEntity.created(URI.create("/invite")).body(invitedMembers);
     }
 
-    /* 프로젝트에 참여한 참여자 조회 */
-//    public interface ProjectParticipantRepository extends JpaRepository<ProjectParticipant, Long> {
-//
-//        /* 프로젝트 코드로 참여자 조회 */
-//        List<ProjectParticipant> findAllByProjectProjectCode(Long projectCode);
-//
-//    }
+    /* 회원 검색 (초대) */
+    @GetMapping("/invite/search")
+    public ResponseEntity<PagingResponse> getInviteMemberSearch(@RequestParam(defaultValue = "1") final Integer page,
+                                                                @RequestParam final String infoName){
+
+        final Page<ProjectMemberResponse> members = projectMemberService.getInviteMemberSearch(page, infoName);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(members);
+        final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
+
+    }
+
 
     /* 프로젝트 인원 조회(이름) */
     @GetMapping("/projects/{projectCode}/searchMember")
@@ -226,41 +231,42 @@ public class ProjectController {
 
 
     /* 프로젝트 일반 게시글 디테일 */
-    @GetMapping("/post/{postCode}")
-    public ResponseEntity<ProjectPostResponse> getProjectPost(@PathVariable final Long postCode){
-
-        final ProjectPostResponse projectPostResponse = postService.getPostDetail(postCode);
-
-        return ResponseEntity.ok(projectPostResponse);
-    }
+//    @GetMapping("/post/{postCode}")
+//    public ResponseEntity<ProjectPostResponse> getProjectPost(@PathVariable final Long postCode){
+//
+//        final ProjectPostResponse projectPostResponse = postService.getPostDetail(postCode);
+//
+//        return ResponseEntity.ok(projectPostResponse);
+//    }
 
     /* 프로젝트 일반 게시글 조회 */
     @GetMapping("/projects/{projectCode}/post")
     public ResponseEntity<PagingResponse> getPost(
             @RequestParam(defaultValue = "1") final Integer page,
-            @PathVariable final Long projectCode) {
+            @PathVariable final Long projectCode
+           ) {
 
-
-        final Page<ProjectPostResponse> post = postService.getPostsDetail(page, projectCode);
+        final Page<ProjectPostResponse> posts = postService.getPostsDetail(page, projectCode);
 
         // 페이징 정보 구성
-        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(post);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(posts);
 
         // 응답 구성
-        final PagingResponse pagingResponse = PagingResponse.of(post.getContent(), pagingButtonInfo);
+        final PagingResponse pagingResponse = PagingResponse.of(posts.getContent(), pagingButtonInfo);
 
         return ResponseEntity.ok(pagingResponse);
     }
 
+
     /* 프로젝트 일반 게시글 댓글 */
     @PostMapping("/post/reply")
     public ResponseEntity<Void> postReplySave(
-            @RequestBody @Valid final PostReplyCreateRequest postReplyCreateRequest,
+            @RequestBody @Valid final ReplyCreateRequest replyCreateRequest,
             @AuthenticationPrincipal final CustomUser customUser
 
     ) {
 
-        final Long replyCode = replyService.replySave(postReplyCreateRequest, customUser);
+        final Long replyCode = replyService.postReplySave(replyCreateRequest, customUser);
 
         return ResponseEntity.created(URI.create("/post/reply/" + replyCode)).build();
     }
@@ -312,14 +318,81 @@ public class ProjectController {
     public ResponseEntity<Void> taskSave(
             @RequestPart @Valid final ProjectTaskCreateRequest projecttaskRequest,
             @AuthenticationPrincipal final CustomUser customUser,
-            @RequestPart(required = false) final List<MultipartFile> attachment,
-            @RequestPart final List<ProjectManager> projectManagers
+            @RequestPart(required = false) final List<MultipartFile> attachment
 
     ) {
 
-        final Long taskCode = taskService.taskSave(projecttaskRequest, customUser, attachment, projectManagers);
+        final Long taskCode = taskService.taskSave(projecttaskRequest, customUser, attachment);
 
         return ResponseEntity.created(URI.create("/task/" + taskCode)).build();
     }
+
+    /* 프로젝트 업무 조회 */
+
+    /* 프로젝트 업무 수정 */
+    @PutMapping("/task/{taskCode}")
+    public ResponseEntity<Void> taskUpdate(@PathVariable final Long taskCode,
+                                           @RequestBody @Valid final TaskUpdateRequest TaskUpdateRequest
+    ) {
+
+        taskService.taskUpdate(taskCode, TaskUpdateRequest);
+
+        return ResponseEntity.created(URI.create("/task/" + taskCode)).build();
+
+    }
+
+    /* 프로젝트 업무 삭제 */
+    @DeleteMapping("/task/{taskCode}")
+    public ResponseEntity<Void> taskDelete(@PathVariable final Long taskCode) {
+
+        taskService.taskDelete(taskCode);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /* 업무 댓글 작성 */
+    @PostMapping("/task/reply")
+    public ResponseEntity<Void> taskReplySave(
+            @RequestBody @Valid final ReplyCreateRequest replyCreateRequest,
+            @AuthenticationPrincipal final CustomUser customUser
+
+    ) {
+
+        final Long replyCode = replyService.taskReplySave(replyCreateRequest, customUser);
+
+        return ResponseEntity.created(URI.create("/task/reply/" + replyCode)).build();
+    }
+
+    /* 내 업무 조회 */
+    @GetMapping("/task/myTask")
+    public ResponseEntity<PagingResponse> getMyTask(
+            @RequestParam(defaultValue = "1") final Integer page,
+            @AuthenticationPrincipal final CustomUser customUser) {
+
+        final Page<MyTaskResponse> tasks = taskService.getMyTask(page, customUser);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(tasks);
+        final PagingResponse pagingResponse = PagingResponse.of(tasks.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
+    }
+
+    /* 업무 조회 */
+    @GetMapping("/projects/{projectCode}/task")
+    public ResponseEntity<PagingResponse> getTask(
+            @RequestParam(defaultValue = "1") final Integer page,
+            @PathVariable final Long projectCode
+    ) {
+
+        final Page<ProjectTaskResponse> tasks = taskService.getTaskDetail(page, projectCode);
+
+        // 페이징 정보 구성
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(tasks);
+
+        // 응답 구성
+        final PagingResponse pagingResponse = PagingResponse.of(tasks.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
+    }
+
 
 }

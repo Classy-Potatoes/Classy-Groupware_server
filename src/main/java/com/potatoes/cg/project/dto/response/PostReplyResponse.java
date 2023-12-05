@@ -1,7 +1,7 @@
 package com.potatoes.cg.project.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.potatoes.cg.project.domain.PostReply;
+import com.potatoes.cg.project.domain.ProjectReply;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -18,12 +18,12 @@ public class PostReplyResponse {
     private final Long postCode;
     private final String memberName;
 
-    public static PostReplyResponse from(PostReply reply) {
+    public static PostReplyResponse from(ProjectReply reply) {
         return new PostReplyResponse(
                 reply.getReplyCode(),
                 reply.getReplyBody(),
                 reply.getReplyCreatedDate(),
-                reply.getPost().getPostCode(),
+                reply.getPostCode(),
                 reply.getMember().getInfoName()
         );
     }

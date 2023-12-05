@@ -61,11 +61,9 @@ public class ProjectMemberService {
         List<ProjectParticipantId> invitedMembers = new ArrayList<>();
 
         for (ProjectInviteMemberRequest request : projectInviteMemberRequests) {
-            MemberInfo member = infoRepository.findById(request.getMemberCode())
-                    .orElseThrow(() -> new NotFoundException(NOT_FOUND_INFO_CODE));
+            MemberInfo member = infoRepository.getReferenceById(request.getMemberCode());
 
-            Project project = projectRepository.findById(request.getProjectCode())
-                    .orElseThrow(() -> new NotFoundException(NOT_PROJECT_CODE));
+            Project project = projectRepository.getReferenceById(request.getProjectCode());
 
             final ProjectParticipant newProjectParticipant = ProjectParticipant.of(
                     project,
@@ -112,4 +110,13 @@ public class ProjectMemberService {
         return projectMemberResponseList;
     }
 
+    @Transactional(readOnly = true)
+    /* 회원 검색 (초대) */
+    public Page<ProjectMemberResponse> getInviteMemberSearch(Integer page, String infoName) {
+
+        Page<Member> members = projectMemberRepository.findByMemberInfoInfoNameContainsAndMemberStatus(getPageable(page), infoName, ACTIVE);
+
+        return members.map(Member -> ProjectMemberResponse.fromMember(Member));
+
+    }
 }

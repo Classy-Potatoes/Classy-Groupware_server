@@ -10,4 +10,7 @@ public interface ProjectmemberRepository extends JpaRepository<Member, Long> {
 
     /* 부서별 회원 조회 */
     Page<Member> findByMemberInfoDeptDeptCodeAndMemberStatus(Pageable pageable, Long deptCode, MemberStatus memberStatus);
+
+    /* 회원 검색 (초대)*/
+    Page<Member> findByMemberInfoInfoNameContainsAndMemberStatus(Pageable pageable, String infoName, MemberStatus memberStatus);
 }
