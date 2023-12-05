@@ -15,7 +15,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import static com.potatoes.cg.project.domain.type.ProjectStatusType.USABLE;
-import static com.potatoes.cg.project.domain.type.ProjectOptionType.POST;
+import static com.potatoes.cg.project.domain.type.ProjectOptionType.TASK;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -26,7 +26,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE tbl_project_reply SET reply_state = 'DELETED' WHERE reply_code = ?")
-public class PostReply {
+public class TaskReply {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -50,30 +50,30 @@ public class PostReply {
 
     @Enumerated(value = STRING)
     @Column(nullable = false)
-    private ProjectOptionType replyOption = POST;
+    private ProjectOptionType replyOption = TASK;
 
     @ManyToOne
     @JoinColumn(name = "memberCode")
     private MemberInfo member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "postCode")
-    private ProjectPost post;
+    @JoinColumn(name = "taskCode")
+    private ProjectTask task;
 
-    public PostReply(String replyBody, MemberInfo member, ProjectPost post ) {
+    public TaskReply(String replyBody, MemberInfo member, ProjectTask task ) {
         this.replyBody = replyBody;
         this.member = member;
-        this.post = post;
+        this.task = task;
     }
 
-    public static PostReply of(final ProjectPost post, final MemberInfo member,
-                               final String replyBody) {
-        return new PostReply(
-                replyBody,
-                member,
-                post
-        );
-    }
+//    public static TaskReply of(final ProjectPost post, final MemberInfo member,
+//                               final String replyBody) {
+//        return new PostReply(
+//                replyBody,
+//                member,
+//                post
+//        );
+//    }
 
     public void update(String replyBody) {
 

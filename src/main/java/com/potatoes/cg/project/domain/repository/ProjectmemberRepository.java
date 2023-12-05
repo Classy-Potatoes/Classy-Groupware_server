@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProjectmemberRepository extends JpaRepository<Member, Long> {
 
-
+    /* 부서별 회원 조회 */
     Page<Member> findByMemberInfoDeptDeptCodeAndMemberStatus(Pageable pageable, Long deptCode, MemberStatus memberStatus);
 }
