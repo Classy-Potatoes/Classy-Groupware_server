@@ -10,6 +10,7 @@ import com.potatoes.cg.project.domain.ProjectParticipant;
 import com.potatoes.cg.project.domain.ProjectParticipantId;
 import com.potatoes.cg.project.domain.repository.ProjectParticipantRepository;
 import com.potatoes.cg.project.domain.repository.ProjectRepository;
+import com.potatoes.cg.project.domain.repository.ProjectmemberRepository;
 import com.potatoes.cg.project.dto.request.ProjectInviteMemberRequest;
 import com.potatoes.cg.project.dto.response.MemberDeptResponse;
 import com.potatoes.cg.project.dto.response.ProjectMemberResponse;
