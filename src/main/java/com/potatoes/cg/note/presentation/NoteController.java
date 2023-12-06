@@ -3,6 +3,7 @@ package com.potatoes.cg.note.presentation;
 import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,17 +28,16 @@ public class NoteController {
 
     /********************************************* 보낸 쪽지함 *********************************************/
 
-    //전체 조회
+    /* 1. 전체 조회 */
     @GetMapping("/sent")
     public ResponseEntity<PagingResponse> getSentNotes(
             @RequestParam(defaultValue = "1") final Integer page,
-//            @AuthenticationPrincipal Member memberCode
-            @RequestParam final Long memberCode
+            @AuthenticationPrincipal CustomUser customUser
     ) {
 
         LocalDateTime noteSentDate = LocalDateTime.now();
 
-        final Page<NotesResponse> notes = noteService.getSentNotes(page, memberCode, noteSentDate);
+        final Page<NotesResponse> notes = noteService.getSentNotes(page, customUser, noteSentDate);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -44,7 +45,7 @@ public class NoteController {
 
     }
 
-    //상세 조회
+    /* 2. 상세 조회 */
     @GetMapping("/sent/{noteCode}")
     public ResponseEntity<NoteResponse> getSentNote(@PathVariable final Long noteCode) {
 
@@ -54,7 +55,7 @@ public class NoteController {
 
     }
 
-    //삭제
+    /* 3. 삭제 */
     @DeleteMapping("/sent/{noteCode}")
     public ResponseEntity<Void> deleteSentNote(@PathVariable final Long noteCode) {
 
@@ -64,7 +65,7 @@ public class NoteController {
 
     }
 
-    //검색 조회
+    /* 4. 검색 조회 */
     @GetMapping("sent/search")
     public ResponseEntity<PagingResponse> getSentNoteBySearch(
             @RequestParam(defaultValue = "1") final Integer page, @RequestParam String searchCondition, @RequestParam String searchValue) {
@@ -80,17 +81,16 @@ public class NoteController {
 
     /********************************************* 받은 쪽지함 *********************************************/
 
-    //전체 조회
+    /* 5. 전체 조회 */
     @GetMapping("/received")
     public ResponseEntity<PagingResponse> getReceivedNotes(
             @RequestParam(defaultValue = "1") final Integer page,
-//            @AuthenticationPrincipal Member memberCode
-            @RequestParam final Long memberCode
-    ) {
+            @AuthenticationPrincipal CustomUser customUser
+            ) {
 
         LocalDateTime noteSentDate = LocalDateTime.now();
 
-        final Page<NotesResponse> notes = noteService.getReceivedNotes(page, memberCode, noteSentDate);
+        final Page<NotesResponse> notes = noteService.getReceivedNotes(page, customUser, noteSentDate);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -98,7 +98,7 @@ public class NoteController {
 
     }
 
-    //상세 조회
+    /* 6. 상세 조회 */
     @GetMapping("/received/{noteCode}")
     public ResponseEntity<NoteResponse> getReceivedNote(@PathVariable final Long noteCode) {
 
@@ -108,7 +108,7 @@ public class NoteController {
 
     }
 
-    //삭제
+    /* 7. 삭제 */
     @DeleteMapping("/received/{noteCode}")
     public ResponseEntity<Void> deleteReceivedNote(@PathVariable final Long noteCode) {
 
@@ -118,7 +118,7 @@ public class NoteController {
 
     }
 
-    //검색 조회
+    /* 8. 검색 조회 */
     @GetMapping("/received/search")
     public ResponseEntity<PagingResponse> getReceivedNoteBySearch(
             @RequestParam(defaultValue = "1") final Integer page, @RequestParam String searchCondition, @RequestParam String searchValue) {
@@ -134,16 +134,16 @@ public class NoteController {
 
     /********************************************* 중요 쪽지함 *********************************************/
 
-    //전체 조회
+    /* 9. 전체 조회 */
     @GetMapping("/important")
     public ResponseEntity<PagingResponse> getImportantNotes(
             @RequestParam(defaultValue = "1") final Integer page,
-            @RequestParam final Long memberCode
+            @AuthenticationPrincipal CustomUser customUser
     ) {
 
         LocalDateTime noteDate = LocalDateTime.now();
 
-        final Page<NotesResponse> notes = noteService.getImportantNotes(page, memberCode, noteDate);
+        final Page<NotesResponse> notes = noteService.getImportantNotes(page, customUser, noteDate);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -151,7 +151,7 @@ public class NoteController {
 
     }
 
-    //상세 조회
+    /* 10. 상세 조회 */
     @GetMapping("/important/{noteCode}")
     public ResponseEntity<NoteResponse> getImportantNote(@PathVariable final Long noteCode) {
 
@@ -161,7 +161,7 @@ public class NoteController {
 
     }
 
-    //삭제
+    /* 11. 삭제 */
     @DeleteMapping("/important/{noteCode}")
     public ResponseEntity<Void> deleteImportantNote(@PathVariable final Long noteCode) {
 
@@ -171,7 +171,7 @@ public class NoteController {
 
     }
 
-    //검색 조회
+    /* 12. 검색 조회 */
     @GetMapping("/important/search")
     public ResponseEntity<PagingResponse> getImportantNoteBySearch(
             @RequestParam(defaultValue = "1") final Integer page, @RequestParam String searchCondition, @RequestParam String searchValue) {
@@ -187,7 +187,7 @@ public class NoteController {
 
     /***************************************************************************************************************/
 
-    //쪽지 이동
+    /* 13. 이동 */
     @PutMapping("/move")
     public ResponseEntity<Void> moveNote(@RequestBody @Valid final NoteMoveRequest noteRequest) {
 

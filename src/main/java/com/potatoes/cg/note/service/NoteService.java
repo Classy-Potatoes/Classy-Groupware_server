@@ -1,6 +1,7 @@
 package com.potatoes.cg.note.service;
 
 import com.potatoes.cg.common.exception.NotFoundException;
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.repository.NoteRepository;
 import com.potatoes.cg.note.domain.type.NoteStatus;
@@ -12,8 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,17 +40,17 @@ public class NoteService {
 
     /********************************************* 보낸 쪽지함 *********************************************/
 
-    //전체 조회
+    /* 1. 전체 조회 */
     @Transactional(readOnly = true)
-    public Page<NotesResponse> getSentNotes(final int page, final Long memberCode, LocalDateTime noteSentDate) {
+    public Page<NotesResponse> getSentNotes(final int page, final CustomUser customUser, LocalDateTime noteSentDate) {
 
-        Page<Note> notes = noteRepository.findByNoteSenderMemberCodeAndNoteSentDateBeforeAndNoteSenderStatus(getPageable(page), memberCode, noteSentDate, DEFAULT);
+        Page<Note> notes = noteRepository.findByNoteSenderMemberCodeAndNoteSentDateBeforeAndNoteSenderStatus(getPageable(page), customUser.getMemberCode(), noteSentDate, DEFAULT);
 
         return notes.map(note -> NotesResponse.from(note));
 
     }
 
-    //상세 조회
+    /* 2. 상세 조회 */
     @Transactional(readOnly = true)
     public NoteResponse getSentNote(final Long noteCode) {
 
@@ -58,14 +61,14 @@ public class NoteService {
 
     }
 
-    //삭제
+    /* 3. 삭제 */
     public void deleteSentNote(final Long noteCode) {
 
         noteRepository.deleteById(noteCode);
 
     }
 
-    //검색 조회
+    /* 4. 검색 조회 */
     @Transactional(readOnly = true)
     public Page<NotesResponse> getSentNoteByNoteSenderOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
 
@@ -89,17 +92,18 @@ public class NoteService {
 
     /********************************************* 받은 쪽지함 *********************************************/
 
-    //전체 조회
+    /* 5. 전체 조회 */
     @Transactional(readOnly = true)
-    public Page<NotesResponse> getReceivedNotes(final int page, final Long memberCode, LocalDateTime noteSentDate) {
+    public Page<NotesResponse> getReceivedNotes(final int page, final CustomUser customUser, LocalDateTime noteSentDate) {
 
-        Page<Note> notes = noteRepository.findByNoteReceiverMemberCodeAndNoteSentDateBeforeAndNoteReceiverStatus(getPageable(page), memberCode, noteSentDate, DEFAULT);
+        Page<Note> notes = noteRepository.findByNoteReceiverMemberCodeAndNoteSentDateBeforeAndNoteReceiverStatus(
+                getPageable(page), customUser.getMemberCode(), noteSentDate, DEFAULT);
 
         return notes.map(note -> NotesResponse.from(note));
 
     }
 
-    //상세 조회
+    /* 6. 상세 조회 */
     @Transactional(readOnly = true)
     public NoteResponse getReceivedNote(final Long noteCode) {
 
@@ -110,14 +114,14 @@ public class NoteService {
 
     }
 
-    //삭제
+    /* 7. 삭제 */
     public void deleteReceivedNote(final Long noteCode) {
 
         noteRepository.deleteById(noteCode);
 
     }
 
-    //검색 조회
+    /* 8. 검색 조회 */
     public Page<NotesResponse> getReceivedNoteByNoteReceiverOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
 
         Page<Note> notes = null;
@@ -140,17 +144,18 @@ public class NoteService {
 
     /********************************************* 중요 쪽지함 *********************************************/
 
-    //전체 조회
+    /* 9. 전체 조회 */
     @Transactional(readOnly = true)
-    public Page<NotesResponse> getImportantNotes(final int page, final Long memberCode, LocalDateTime noteSentDate) {
+    public Page<NotesResponse> getImportantNotes(final int page, final CustomUser customUser, LocalDateTime noteSentDate) {
 
-        Page<Note> notes = noteRepository.findByAllMemberCodeAndNoteDateAndAllNoteStatus(getPageable(page), memberCode, noteSentDate, IMPORTANT);
+        Page<Note> notes = noteRepository.findByAllMemberCodeAndNoteDateAndAllNoteStatus(
+                getPageable(page), customUser.getMemberCode(), noteSentDate, IMPORTANT);
 
         return notes.map(note -> NotesResponse.from(note));
 
     }
 
-    //상세 조회
+    /* 10. 상세 조회 */
     @Transactional(readOnly = true)
     public NoteResponse getImportantNote(final Long noteCode) {
 
@@ -162,14 +167,14 @@ public class NoteService {
 
     }
 
-    //삭제
+    /* 11. 삭제 */
     public void deleteImportantNote(final Long noteCode) {
 
         noteRepository.deleteById(noteCode);
 
     }
 
-    //검색 조회
+    /* 12. 검색 조회 */
     public Page<NotesResponse> getImportantNoteByMemberOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
 
         Page<Note> notes = null;
@@ -194,7 +199,7 @@ public class NoteService {
 
     /***************************************************************************************************************/
 
-    //이동
+    /* 13. 이동 */
     @Transactional
     public void moveNote(NoteMoveRequest noteRequest) {
 

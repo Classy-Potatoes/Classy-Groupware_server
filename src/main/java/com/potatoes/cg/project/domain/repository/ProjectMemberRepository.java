@@ -1,6 +1,7 @@
 package com.potatoes.cg.project.domain.repository;
 
 import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.MemberInfo;
 import com.potatoes.cg.member.domain.type.MemberStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
