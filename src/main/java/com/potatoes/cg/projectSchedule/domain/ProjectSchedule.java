@@ -3,7 +3,7 @@ package com.potatoes.cg.projectSchedule.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.potatoes.cg.calendar.domain.type.StatusType;
 import com.potatoes.cg.project.domain.Project;
-import com.potatoes.cg.projectManager.domain.ProjectManager;
+import com.potatoes.cg.projectManagers.domain.ProjectManagers;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -71,9 +71,9 @@ public class ProjectSchedule {
 
     @OneToMany(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "scheduleCode")
-    private List<ProjectManager> projectManagerList;
+    private List<ProjectManagers> projectManagerList;
 
-    public ProjectSchedule(String scheduleTitle, String scheduleBody, LocalDateTime scheduleStartDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManager> projectManagerList) {
+    public ProjectSchedule(String scheduleTitle, String scheduleBody, LocalDateTime scheduleStartDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManagers> projectManagerList) {
         this.scheduleTitle = scheduleTitle;
         this.scheduleBody = scheduleBody;
         this.scheduleStartDate = scheduleStartDate;
@@ -82,7 +82,7 @@ public class ProjectSchedule {
         this.projectManagerList = projectManagerList;
     }
 
-    public static ProjectSchedule of(String scheduleTitle, String scheduleContent, LocalDateTime scheduleStartedDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManager> projectManagerList) {
+    public static ProjectSchedule of(String scheduleTitle, String scheduleContent, LocalDateTime scheduleStartedDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManagers> projectManagerList) {
         return new ProjectSchedule(
                 scheduleTitle,
                 scheduleContent,
@@ -93,7 +93,7 @@ public class ProjectSchedule {
                 );
     }
 
-    public void update(String scheduleTitle, String scheduleContent, LocalDateTime scheduleStartedDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManager> attendants) {
+    public void update(String scheduleTitle, String scheduleContent, LocalDateTime scheduleStartedDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManagers> attendants) {
         this.scheduleTitle = scheduleTitle;
         this.scheduleBody = scheduleContent;
         this.scheduleStartDate = scheduleStartedDate;
