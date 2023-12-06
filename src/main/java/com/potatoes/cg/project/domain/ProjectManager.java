@@ -20,21 +20,24 @@ public class ProjectManager {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long projectManagerCode;
 
-//    @ManyToOne
-//    @JoinColumn(name = "memberCode")
-//    private MemberInfo member;
+    @ManyToOne
+    @JoinColumn(name = "memberCode")
+    private MemberInfo memberCode;
+
+//    @Column
+//    private Long memberCode;
 
     @Column
-    private Long memberCode;
+    private Long taskCode;
 
-//    private String infoName;
 
     @Column(name = "projectOption")
     @Enumerated(value = STRING)
     private ProjectOptionType projectOptionType;
 
-    public ProjectManager(Long infoCode) {
+    public ProjectManager(MemberInfo infoCode) {
         this.memberCode = infoCode;
         this.projectOptionType = ProjectOptionType.TASK;
     }
+
 }

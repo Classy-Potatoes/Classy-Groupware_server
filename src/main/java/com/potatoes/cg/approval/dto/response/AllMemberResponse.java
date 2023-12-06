@@ -8,18 +8,20 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Getter
 @RequiredArgsConstructor(access = PRIVATE)
-public class LoginUserInfoResponse {
+public class AllMemberResponse {
 
     private final String jobName;
     private final String deptName;
     private final String infoName;
 
 
-    public static LoginUserInfoResponse from(Member member) {
-        return new LoginUserInfoResponse(
+    public static AllMemberResponse from(Member member) {
+        return new AllMemberResponse(
                 member.getMemberInfo().getJob().getJobName(),
                 member.getMemberInfo().getDept().getDeptName(),
                 member.getMemberInfo().getInfoName()
         );
     }
+
+
 }

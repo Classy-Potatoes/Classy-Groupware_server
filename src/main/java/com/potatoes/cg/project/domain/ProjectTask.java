@@ -71,20 +71,24 @@ public class ProjectTask {
     @Column(nullable = false)
     private ProjectStatusType taskDeleteStatus = USABLE;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "projectCode")
-    private Project project;
+    @Column
+    private Long projectCode;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "taskCode")
-    private List<TaskFile> fileEntity;
+    private List<ProjectFile> fileEntity;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "taskCode")
     private List<ProjectManager> projectManagers;
 
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "taskCode")
+    private List<ProjectReply> replies;
+
+
     public ProjectTask(String taskTitle, String taskBody, Date taskStartDate, Date taskEndDate,
-                       String taskPriority, MemberInfo member,  Project project, List<TaskFile> fileEntity,
+                       String taskPriority, MemberInfo member,  Long project, List<ProjectFile> fileEntity,
                        List<ProjectManager> projectManagers) {
         this.taskTitle = taskTitle;
         this.taskBody = taskBody;
@@ -92,15 +96,16 @@ public class ProjectTask {
         this.taskEndDate = taskEndDate;
         this.taskPriority = taskPriority;
         this.member = member;
-        this.project = project;
+        this.projectCode = project;
         this.fileEntity = fileEntity;
         this.projectManagers = projectManagers;
     }
 
 
-    public static ProjectTask of(Project project, MemberInfo member, String taskTitle,
+    /* 생성 */
+    public static ProjectTask of(Long project, MemberInfo member, String taskTitle,
                                  String taskBody, Date taskStartDate, Date taskEndDate,
-                                 String taskPriority, List<TaskFile> files, List<ProjectManager> managers) {
+                                 String taskPriority, List<ProjectFile> files, List<ProjectManager> managers) {
 
         return new ProjectTask(
                 taskTitle,
@@ -113,5 +118,15 @@ public class ProjectTask {
                 files,
                 managers
         );
+    }
+
+    /* 수정 */
+    public void update(String taskTitle, String taskBody, Date taskStartDate,
+                       Date taskEndDate, String taskPriority) {
+        this.taskTitle = taskTitle;
+        this.taskBody = taskBody;
+        this.taskStartDate = taskStartDate;
+        this.taskEndDate = taskEndDate;
+        this.taskPriority = taskPriority;
     }
 }

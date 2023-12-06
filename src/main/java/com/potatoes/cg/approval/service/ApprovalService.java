@@ -5,6 +5,8 @@ import com.potatoes.cg.approval.domain.repository.*;
 import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
 import com.potatoes.cg.approval.dto.request.VacationCreateRequest;
+import com.potatoes.cg.approval.dto.response.AllMemberAndLoginMemberResponse;
+import com.potatoes.cg.approval.dto.response.AllMemberResponse;
 import com.potatoes.cg.approval.dto.response.LoginUserInfoResponse;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.common.exception.type.ExceptionCode;
@@ -233,15 +235,26 @@ public class ApprovalService {
 
     }
 
-    /* 로그인 유저 찾아서 품의서, 지출결의서, 휴가신청서에 생성 */
+    /* 1. 로그인 유저 찾아서 품의서, 지출결의서, 휴가신청서에 생성 */
+    /* 2. 멤버 전체조회*/
     @Transactional(readOnly = true)
-    public LoginUserInfoResponse getApprovalProfile(CustomUser customUser) {
+    public AllMemberAndLoginMemberResponse getApprovalProfile(CustomUser customUser) {
 
         final Member memberInfo = memberRepository.findById(customUser.getMemberCode())
                 .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
 
-        return LoginUserInfoResponse.from(memberInfo);
-    }
+        LoginUserInfoResponse responseForLoginUser = LoginUserInfoResponse.from(memberInfo);
 
+
+        List<Member> allMembers = memberRepository.findAll();
+
+        List<AllMemberResponse> responsesForAllMembers = allMembers.stream()
+                .map(AllMemberResponse::from)
+                .collect(Collectors.toList());
+
+
+
+        return new AllMemberAndLoginMemberResponse(responseForLoginUser, responsesForAllMembers);
+    }
 
 }

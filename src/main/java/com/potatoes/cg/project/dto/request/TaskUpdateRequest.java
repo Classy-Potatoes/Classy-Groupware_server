@@ -1,17 +1,16 @@
 package com.potatoes.cg.project.dto.request;
 
-import com.potatoes.cg.member.domain.MemberInfo;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
-public class ProjectTaskCreateRequest {
+@NoArgsConstructor(force = true)
+public class TaskUpdateRequest {
 
     @NotBlank
     private final String taskTitle;
@@ -24,9 +23,4 @@ public class ProjectTaskCreateRequest {
     private final Date taskEndDate;
 
     private final String taskPriority;
-
-    @Min(value = 1)
-    private final Long projectCode;
-
-    private final List<MemberInfo> projectManagers;
 }
