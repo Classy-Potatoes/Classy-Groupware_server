@@ -37,14 +37,16 @@ public enum ExceptionCode {
     NOT_FOUND_NOTE(5001, "검색한 키워드에 일치하는 쪽지가 없습니다."),
 
     /* WS */
-
-
-
-
     ALREADY_EXIST_REVIEW(6001, "이미 리뷰가 작성되어 작성할 수 없습니다."),
     NOT_FOUND_VALID_TITLE(4005, "제목을 입력해주세요."),
     NOT_FOUND_VALID_DATE(4006, "날짜를 입력해주세요."),
-    NOT_FOUND_CALENDAR_CODE(4007, "등록된 일정이 없습니다.");
+    NOT_FOUND_CALENDAR_CODE(4007, "등록된 일정이 없습니다."),
+    NOT_VALID_DATE(4008, "시작일이 종료일보다 이전이어야 합니다."),
+    NOT_FOUND_MEMBERCODE(4009, "해당하는 멤버가 없습니다."),
+    NOT_FOUND_SCHEDULE_CODE(4010, "등록된 프로젝트 일정이 없습니다."),
+    NOT_FOUND_TODO_CODE(4011, "등록된 프로젝트 할일이 없습니다."),
+    NOT_FOUND_PROJECT_CODE(4011, "등록된 프로젝트번호가 없습니다.");
+
 
 
 
