@@ -4,8 +4,7 @@ import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
 import com.potatoes.cg.jwt.CustomUser;
-import com.potatoes.cg.member.dto.request.MemberPwSendEmailRequest;
-import com.potatoes.cg.member.dto.request.MemberSearchIdRequest;
+import com.potatoes.cg.member.dto.request.MemberPwdRequest;
 import com.potatoes.cg.member.dto.request.MemberSignupRequest;
 import com.potatoes.cg.member.dto.MailSendDTO;
 import com.potatoes.cg.member.dto.request.MemberUpdateRequest;
@@ -24,7 +23,7 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
-@RequestMapping({"/cg-api/v1", "/cg-api/v1/member", "/cg-api/v1/non"})
+@RequestMapping({"/cg-api/v1", "/cg-api/v1/member"})
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -34,7 +33,7 @@ public class MemberController {
 
 
     /* 사번 검증 */
-    @GetMapping("/member/info/search")
+    @GetMapping("/non/member/info/search")
     public ResponseEntity<SearchInfoResponse> infoSearch(@RequestParam final Long infoCode) {
 
         SearchInfoResponse searchInfoResponse = memberService.infoSearch( infoCode );
@@ -43,7 +42,7 @@ public class MemberController {
     }
 
     /* 계정 가입 */
-    @PostMapping("/member/regist")
+    @PostMapping("/non/member/regist")
     public ResponseEntity<Void> regist(@RequestPart @Valid final MemberSignupRequest memberRequest,
                                        @RequestPart final MultipartFile profileImg) {
 
@@ -53,26 +52,29 @@ public class MemberController {
     }
 
     /* 아이디 찾기 */
-    @GetMapping("/member/search")
-    public ResponseEntity<MemberResponse> searchId(@RequestBody @Valid final MemberSearchIdRequest memberSearchIdRequest) {
+    @GetMapping("/non/member/search")
+    public ResponseEntity<MemberResponse> searchId(@RequestParam final Long infoCode,
+                                                   @RequestParam final String infoName) {
 
-        MemberResponse memberResponse = memberService.searchId( memberSearchIdRequest );
+        MemberResponse memberResponse = memberService.searchId( infoCode, infoName );
 
         return ResponseEntity.ok( memberResponse );
     }
 
     /* 아이디 중복 검사 */
-    @GetMapping("/member/duplicateId")
+    @GetMapping("/non/member/duplicateId")
     public Boolean duplicateId(@RequestParam final String inputMemberId) {
 
         return memberService.duplicateId( inputMemberId );
     }
 
     /* 비밀번호 찾기(이메일 전송) */
-    @PostMapping("/member/pwdSearch/sendEmail")
-    public @ResponseBody void sendEmail(@RequestBody @Valid final MemberPwSendEmailRequest pwSendEmailRequest) {
+    @GetMapping("/non/member/pwdSearch/sendEmail")
+    public @ResponseBody void sendEmail(@RequestParam final String inputMemberId,
+                                        @RequestParam final Long inputInfoCode,
+                                        @RequestParam final String inputEmail) {
 
-        MailSendDTO mailSendDTO = sendEmailService.createMailAndChangePwd( pwSendEmailRequest );
+        MailSendDTO mailSendDTO = sendEmailService.createMailAndChangePwd( inputMemberId, inputInfoCode, inputEmail );
 
         sendEmailService.mailSend( mailSendDTO );
     }
@@ -82,18 +84,18 @@ public class MemberController {
 
     /* 현재 비밀번호 검증(마이페이지) */
     @PostMapping("/member/pwdSearch")
-    public Boolean pwdSearch(@RequestParam final String memberPwd,
+    public Boolean pwdSearch(@RequestBody final MemberPwdRequest pwdSearchRequest,
                              @AuthenticationPrincipal CustomUser customUser) {
 
-        return memberService.pwdSearch( memberPwd, customUser.getMemberCode() );
+        return memberService.pwdSearch( pwdSearchRequest, customUser.getMemberCode() );
     }
 
     /* 비밀번호 변경(마이페이지) */
     @PutMapping("/member/pwdUpdate")
-    public ResponseEntity<Void> pwdUpdate(@RequestParam final String memberPwd,
+    public ResponseEntity<Void> pwdUpdate(@RequestBody final MemberPwdRequest pwdSearchRequest,
                                           @AuthenticationPrincipal CustomUser customUser) {
 
-        memberService.pwdUpdate( memberPwd, customUser.getMemberCode() );
+        memberService.pwdUpdate( pwdSearchRequest, customUser.getMemberCode() );
 
         return ResponseEntity.created( URI.create("/cg-api/v1/dashboard") ).build();
     }

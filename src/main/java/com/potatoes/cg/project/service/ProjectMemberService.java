@@ -1,6 +1,5 @@
 package com.potatoes.cg.project.service;
 
-import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.member.domain.Member;
 
 import com.potatoes.cg.member.domain.MemberInfo;
@@ -10,7 +9,7 @@ import com.potatoes.cg.project.domain.ProjectParticipant;
 import com.potatoes.cg.project.domain.ProjectParticipantId;
 import com.potatoes.cg.project.domain.repository.ProjectParticipantRepository;
 import com.potatoes.cg.project.domain.repository.ProjectRepository;
-import com.potatoes.cg.project.domain.repository.ProjectmemberRepository;
+import com.potatoes.cg.project.domain.repository.ProjectMemberRepository;
 import com.potatoes.cg.project.dto.request.ProjectInviteMemberRequest;
 import com.potatoes.cg.project.dto.response.MemberDeptResponse;
 import com.potatoes.cg.project.dto.response.ProjectMemberResponse;
@@ -26,8 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_INFO_CODE;
-import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_PROJECT_CODE;
 import static com.potatoes.cg.member.domain.type.MemberStatus.ACTIVE;
 
 @Slf4j
@@ -36,7 +33,7 @@ import static com.potatoes.cg.member.domain.type.MemberStatus.ACTIVE;
 @Transactional
 public class ProjectMemberService {
 
-    private final ProjectmemberRepository projectMemberRepository;
+    private final ProjectMemberRepository projectMemberRepository;
     private final InfoRepository infoRepository;
     private final ProjectParticipantRepository projectParticipantRepository;
     private final ProjectRepository projectRepository;
