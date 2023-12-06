@@ -1,5 +1,6 @@
 package com.potatoes.cg.note.domain.repository;
 
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.type.NoteStatus;
 import org.springframework.data.domain.Page;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.time.LocalDateTime;
 
