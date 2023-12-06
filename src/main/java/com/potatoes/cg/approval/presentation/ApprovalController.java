@@ -1,18 +1,15 @@
 package com.potatoes.cg.approval.presentation;
 
-import com.potatoes.cg.approval.domain.type.vacationType.VacationType;
 import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
 import com.potatoes.cg.approval.dto.request.VacationCreateRequest;
-import com.potatoes.cg.approval.dto.response.LoginUserInfoResponse;
+import com.potatoes.cg.approval.dto.response.AllMemberAndLoginMemberResponse;
 import com.potatoes.cg.approval.service.ApprovalService;
 import com.potatoes.cg.jwt.CustomUser;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,13 +36,13 @@ public class ApprovalController {
 
         return ResponseEntity.created(URI.create("/letter/" + letterCode)).build();
     }
-    /* 기안서 작성 - 품의서 로그인 사용자 정보 조회*/
+    /* 기안서 작성 - 품의서 로그인 사용자 정보 조회 + 결재자를 위해 맴버 전체 조회*/
     @GetMapping(value = {"/letter","/expense","/vacation"})
-    public ResponseEntity<LoginUserInfoResponse> approvalProfile(@AuthenticationPrincipal CustomUser user) {
+    public ResponseEntity<AllMemberAndLoginMemberResponse> approvalProfile(@AuthenticationPrincipal CustomUser user) {
 
-        final LoginUserInfoResponse loginUserInfoResponse = approvalService.getApprovalProfile(user);
+        final AllMemberAndLoginMemberResponse memberInfoResponse = approvalService.getApprovalProfile(user);
 
-        return ResponseEntity.ok(loginUserInfoResponse);
+        return ResponseEntity.ok(memberInfoResponse);
     }
 
     /* 기안서 작성 - 지출결의서 */
