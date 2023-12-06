@@ -3,7 +3,6 @@ package com.potatoes.cg.member.service;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.member.domain.repository.MemberRepository;
-import com.potatoes.cg.member.dto.request.MemberPwSendEmailRequest;
 import com.potatoes.cg.member.dto.MailSendDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +27,10 @@ public class SendEmailService {
     private static final String FROM_ADDRESS = "classyGroupware";
 
 
+    public MailSendDTO createMailAndChangePwd( final String inputMemberId, final Long inputInfoCode, final String inputEmail ) {
 
-    public MailSendDTO createMailAndChangePwd( MemberPwSendEmailRequest request ) {
 
-
-        Member member = memberRepository.findByMemberInfoInfoCodeAndMemberId( request.getInputInfoCode(), request.getInputMemberId() )
+        Member member = memberRepository.findByMemberInfoInfoCodeAndMemberId( inputInfoCode, inputMemberId )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE_AND_MEMBER_ID ));
 
         // 임시 비밀번호 생성과 암호화
@@ -52,7 +50,7 @@ public class SendEmailService {
                 "</body>" +
                 "</html>";
 
-        mailSendDTO.setAddress( request.getInputEmail() );
+        mailSendDTO.setAddress( inputEmail );
         mailSendDTO.setTitle( member.getMemberInfo().getInfoName() +"님의 Classy Groupware 임시비밀번호 안내 이메일 입니다.");
         mailSendDTO.setMessage( htmlContent );
 

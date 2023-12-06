@@ -5,8 +5,7 @@ import com.potatoes.cg.common.util.FileUploadUtils;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.*;
 import com.potatoes.cg.member.domain.repository.*;
-import com.potatoes.cg.member.domain.type.MemberStatus;
-import com.potatoes.cg.member.dto.request.MemberSearchIdRequest;
+import com.potatoes.cg.member.dto.request.MemberPwdRequest;
 import com.potatoes.cg.member.dto.request.MemberSignupRequest;
 import com.potatoes.cg.member.dto.request.MemberUpdateRequest;
 import com.potatoes.cg.member.dto.response.*;
@@ -15,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
@@ -114,9 +111,9 @@ public class MemberService {
 
     /* 아이디 찾기 */
     @Transactional(readOnly = true)
-    public MemberResponse searchId( final MemberSearchIdRequest searchRequest ) {
+    public MemberResponse searchId( final Long infoCode, final String infoName ) {
 
-        final Member member = memberRepository.findByMemberInfoInfoCodeAndMemberInfoInfoName( searchRequest.getInfoCode(), searchRequest.getInfoName() )
+        final Member member = memberRepository.findByMemberInfoInfoCodeAndMemberInfoInfoName( infoCode, infoName )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE_AND_INFO_NAME ));
 
         return MemberResponse.from( member );
@@ -131,23 +128,23 @@ public class MemberService {
 
     /* 현재 비밀번호 검증 */
     @Transactional(readOnly = true)
-    public Boolean pwdSearch( final String memberPwd, final Long memberCode ) {
+    public Boolean pwdSearch(final MemberPwdRequest pwdSearchRequest, final Long memberCode ) {
 
         Member member = memberRepository.findById( memberCode )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_CODE ));
 
-        return passwordEncoder.matches(memberPwd, member.getMemberPassword());
+        return passwordEncoder.matches( pwdSearchRequest.getMemberPassword(), member.getMemberPassword());
     }
 
 
     /* 비밀번호 변경(마이페이지) */
-    public void pwdUpdate( final String memberPwd, final Long memberCode ) {
+    public void pwdUpdate( final MemberPwdRequest pwdSearchRequest, final Long memberCode ) {
 
         Member member = memberRepository.findById( memberCode )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_CODE ));
 
         member.updatePwd(
-                passwordEncoder.encode( memberPwd )
+                passwordEncoder.encode( pwdSearchRequest.getMemberPassword() )
         );
 
     }

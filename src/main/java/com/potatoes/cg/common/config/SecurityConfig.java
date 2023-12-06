@@ -65,7 +65,7 @@ public class SecurityConfig {
 
                 // 이런 경로의 요청은 다 허락하겠다. 비로그인 상태에서도 볼수 있다.
                 .antMatchers(HttpMethod.GET, "/member/login/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/cg-api/v1/member/info/search").permitAll()
+                .antMatchers(HttpMethod.GET, "/cg-api/v1/non/**").permitAll()
 //                .antMatchers("/**").permitAll()       // 임시 작동
 
 
