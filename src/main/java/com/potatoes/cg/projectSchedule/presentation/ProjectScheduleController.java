@@ -47,7 +47,7 @@ public class ProjectScheduleController {
     public ResponseEntity<Void> update(@PathVariable @Valid final Long projectCode,
                                      @PathVariable @Valid final Long scheduleCode,
                                      @RequestBody @Valid final ProjectScheduleUpdateRequest scheduleRequest) {
-        int memberCode = 1;
+        int memberCode = 2;
 
         projectScheduleService.update(projectCode, scheduleCode, scheduleRequest);
 
