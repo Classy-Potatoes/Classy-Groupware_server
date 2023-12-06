@@ -1,7 +1,6 @@
 package com.potatoes.cg.project.service;
 
 import com.potatoes.cg.common.exception.NotFoundException;
-import com.potatoes.cg.common.exception.type.ExceptionCode;
 import com.potatoes.cg.member.domain.Member;
 
 import com.potatoes.cg.member.domain.MemberInfo;
@@ -11,7 +10,6 @@ import com.potatoes.cg.project.domain.ProjectParticipant;
 import com.potatoes.cg.project.domain.ProjectParticipantId;
 import com.potatoes.cg.project.domain.repository.ProjectParticipantRepository;
 import com.potatoes.cg.project.domain.repository.ProjectRepository;
-import com.potatoes.cg.project.domain.repository.ProjectmemberRepository;
 import com.potatoes.cg.project.dto.request.ProjectInviteMemberRequest;
 import com.potatoes.cg.project.dto.response.MemberDeptResponse;
 import com.potatoes.cg.project.dto.response.ProjectMemberResponse;
@@ -20,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
