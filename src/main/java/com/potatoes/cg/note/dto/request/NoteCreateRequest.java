@@ -13,9 +13,9 @@ public class NoteCreateRequest {
 
     @Min(value = 1)
     private final Long noteCode;
-
-    @NotBlank
-    private final Member noteSender;
+//
+//    @NotBlank
+//    private final Member noteSender;
 
     @NotBlank
     private final Member noteReceiver;

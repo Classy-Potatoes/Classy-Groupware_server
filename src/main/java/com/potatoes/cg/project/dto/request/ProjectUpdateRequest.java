@@ -25,8 +25,8 @@ public class ProjectUpdateRequest {
     @Min(value = 1)
     private final Long deptCode;
 
-    @Min(value = 1)
-    private final Long memberCode;
-
-    private final ProjectStatusType status;
+//    @Min(value = 1)
+//    private final Long memberCode;
+//
+//    private final ProjectStatusType status;
 }

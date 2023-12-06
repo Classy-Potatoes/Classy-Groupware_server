@@ -12,7 +12,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.potatoes.cg.project.domain.type.ProjectStatusType.USABLE;
@@ -46,9 +45,6 @@ public class ProjectPost {
     @Column(nullable = false)
     private LocalDateTime postModifyDate;
 
-    @Column(nullable = false)
-    private LocalDateTime postDeleteDate;
-
     @Enumerated(value = STRING)
     @Column(nullable = false)
     private ProjectStatusType postStatus = USABLE;
@@ -57,29 +53,32 @@ public class ProjectPost {
     @JoinColumn(name = "memberCode")
     private MemberInfo member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "projectCode")
-    private Project project;
+    @Column
+    private Long projectCode;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "postCode")
-    private List<PostFile> fileEntity;
+    private List<ProjectFile> fileEntity;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "postCode")
+    private List<ProjectReply> replies;
 
 //    @OneToMany(mappedBy = "projectPost", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<PostFile> fileEntity = new ArrayList<>();
 
 
-    public ProjectPost(String postTitle, String postBody,  MemberInfo member, Project project,
-                       List<PostFile> fileEntity) {
+    public ProjectPost(String postTitle, String postBody,  MemberInfo memberCode, Long projectCode,
+                       List<ProjectFile> fileEntity) {
         this.postTitle = postTitle;
         this.postBody = postBody;
-        this.member = member;
-        this.project = project;
+        this.member = memberCode;
+        this.projectCode = projectCode;
         this.fileEntity = fileEntity;
     }
 
-    public static ProjectPost of(final Project project, final MemberInfo member,
-                                 final String postTitle, final String postBody, final List<PostFile> fileEntity) {
+    public static ProjectPost of(final Long project, final MemberInfo member,
+                                 final String postTitle, final String postBody, final List<ProjectFile> fileEntity) {
 
         return new ProjectPost(
                 postTitle,
@@ -90,4 +89,8 @@ public class ProjectPost {
         );
     }
 
+    public void update(String postTitle, String postBody) {
+        this.postTitle = postTitle;
+        this.postBody = postBody;
+    }
 }

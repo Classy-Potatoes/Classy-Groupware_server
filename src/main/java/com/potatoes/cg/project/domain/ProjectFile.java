@@ -1,17 +1,11 @@
 package com.potatoes.cg.project.domain;
 
-import com.potatoes.cg.approval.domain.type.ApprovalFileType;
 import com.potatoes.cg.project.domain.type.ProjectFileType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
-import static com.potatoes.cg.approval.domain.type.ApprovalFileType.APPROVAL;
 import static com.potatoes.cg.project.domain.type.ProjectFileType.POST;
 import static javax.persistence.EnumType.STRING;
 
@@ -19,7 +13,7 @@ import static javax.persistence.EnumType.STRING;
 @Table(name = "tbl_file")
 @NoArgsConstructor
 @Getter
-public class PostFile {
+public class ProjectFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,12 +33,13 @@ public class PostFile {
     private ProjectFileType projectFileType;
 
 
-    public PostFile(String replaceFileName, String filePathName, String randomName, String fileExtension) {
+    public ProjectFile(String replaceFileName, String filePathName, String randomName, String fileExtension, ProjectFileType projectFileType) {
         this.fileName = replaceFileName;
         this.filePathName = filePathName;
         this.fileSaveName = randomName;
         this.fileExtName = fileExtension;
-        this.projectFileType = POST;
-
+        this.projectFileType = projectFileType;
     }
+
+
 }

@@ -7,7 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface ProjectParticipantRepository extends JpaRepository<ProjectParticipant, Long> {
+
+    /* 프로젝트 내 인원 조회 */
+    List<ProjectParticipant> findAllByProjectProjectCode(Long projectCode);
 
 //    @Query("SELECT COUNT(pp) FROM ProjectParticipant pp WHERE pp.project.projectCode = :projectCode")
 //    long countParticipantsByProjectCode(@Param("projectCode") Long projectCode);

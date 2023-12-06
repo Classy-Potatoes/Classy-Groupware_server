@@ -26,7 +26,7 @@ public class ProjectParticipant implements Serializable {
     private Project project;
 
     @ManyToOne
-    @JoinColumn(name = "member_code", insertable = false, updatable = false)
+    @JoinColumn(name = "info_code", insertable = false, updatable = false)
     private MemberInfo member;
 
     public ProjectParticipant(Project project, MemberInfo member) {
