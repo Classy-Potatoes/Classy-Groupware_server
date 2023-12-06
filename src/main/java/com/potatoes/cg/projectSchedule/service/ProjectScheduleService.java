@@ -12,8 +12,8 @@ import com.potatoes.cg.project.domain.repository.ProjectRepository;
 import com.potatoes.cg.project.dto.request.ProjectInviteMemberRequest;
 import com.potatoes.cg.project.service.ProjectMemberService;
 import com.potatoes.cg.project.service.ProjectService;
-import com.potatoes.cg.projectManager.domain.ProjectManager;
-import com.potatoes.cg.projectManager.domain.repository.ProjectManagerRepository;
+import com.potatoes.cg.projectManagers.domain.ProjectManagers;
+import com.potatoes.cg.projectManagers.domain.repository.ProjectManagersRepository;
 import com.potatoes.cg.projectSchedule.domain.ProjectSchedule;
 import com.potatoes.cg.projectSchedule.domain.repository.ProjectScheduleRepository;
 import com.potatoes.cg.projectSchedule.dto.request.ProjectManagerCreateRequest;
@@ -45,7 +45,7 @@ public class ProjectScheduleService {
     private final ProjectScheduleRepository projectScheduleRepository;
     private final ProjectParticipantRepository projectParticipantRepository;
     private final ProjectMemberService projectMemberService;
-    private final ProjectManagerRepository projectManagerRepository;
+    private final ProjectManagersRepository projectManagersRepository;
     private final ProjectRepository projectRepository;
     private final InfoRepository infoRepository;
 
@@ -67,9 +67,9 @@ public class ProjectScheduleService {
     /* 일정글 등록 */
     public Long save(Long projectCode, ProjectScheduleCreatRequest scheduleRequest, int memberCode) {
 
-        final List<ProjectManager> projectManagerList = memberRepository
+        final List<ProjectManagers> projectManagerList = memberRepository
                 .findAllById(scheduleRequest.getAttendants()).stream().map(
-                        member -> ProjectManager.of(member)
+                        member -> ProjectManagers.of(member)
                 ).collect(Collectors.toList());
 
         LocalDate setStartDate = scheduleRequest.getScheduleStartedDate();
@@ -105,10 +105,10 @@ public class ProjectScheduleService {
         ProjectSchedule projectSchedule = projectScheduleRepository.findByScheduleCodeAndScheduleStatusNot(scheduleCode, DELETED)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_SCHEDULE_CODE));
 
-        projectManagerRepository.deleteAll(projectSchedule.getProjectManagerList());
-        final List<ProjectManager> projectManagerList = memberRepository
+        projectManagersRepository.deleteAll(projectSchedule.getProjectManagerList());
+        final List<ProjectManagers> projectManagerList = memberRepository
                 .findAllById(scheduleRequest.getAttendants()).stream().map(
-                        member -> ProjectManager.of(member)
+                        member -> ProjectManagers.of(member)
                 ).collect(Collectors.toList());
 
         LocalDate setStartDate = scheduleRequest.getScheduleStartedDate();
@@ -138,7 +138,7 @@ public class ProjectScheduleService {
         ProjectSchedule projectSchedule = projectScheduleRepository.findByScheduleCode(scheduleCode)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_SCHEDULE_CODE));
 
-        projectManagerRepository.deleteAll(projectSchedule.getProjectManagerList());
+        projectManagersRepository.deleteAll(projectSchedule.getProjectManagerList());
         projectScheduleRepository.deleteById(scheduleCode);
     }
 }
