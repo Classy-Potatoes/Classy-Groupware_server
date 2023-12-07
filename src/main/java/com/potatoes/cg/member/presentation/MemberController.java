@@ -4,10 +4,8 @@ import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
 import com.potatoes.cg.jwt.CustomUser;
-import com.potatoes.cg.member.dto.request.MemberPwdRequest;
-import com.potatoes.cg.member.dto.request.MemberSignupRequest;
+import com.potatoes.cg.member.dto.request.*;
 import com.potatoes.cg.member.dto.MailSendDTO;
-import com.potatoes.cg.member.dto.request.MemberUpdateRequest;
 import com.potatoes.cg.member.dto.response.*;
 import com.potatoes.cg.member.service.MemberService;
 import com.potatoes.cg.member.service.SendEmailService;
@@ -33,18 +31,18 @@ public class MemberController {
 
 
     /* 사번 검증 */
-    @GetMapping("/non/member/info/search")
-    public ResponseEntity<SearchInfoResponse> infoSearch(@RequestParam final Long infoCode) {
+    @PostMapping("/non/member/info/search")
+    public ResponseEntity<SearchInfoResponse> infoSearch( @RequestBody @Valid final InfoCodeCheckRequest request ) {
 
-        SearchInfoResponse searchInfoResponse = memberService.infoSearch( infoCode );
+        SearchInfoResponse searchInfoResponse = memberService.infoSearch( request );
 
         return ResponseEntity.ok( searchInfoResponse );
     }
 
     /* 계정 가입 */
     @PostMapping("/non/member/regist")
-    public ResponseEntity<Void> regist(@RequestPart @Valid final MemberSignupRequest memberRequest,
-                                       @RequestPart final MultipartFile profileImg) {
+    public ResponseEntity<Void> regist( @RequestPart @Valid final MemberSignupRequest memberRequest,
+                                       @RequestPart final MultipartFile profileImg ) {
 
         memberService.regist( memberRequest, profileImg );
 
@@ -52,31 +50,26 @@ public class MemberController {
     }
 
     /* 아이디 찾기 */
-    @GetMapping("/non/member/search")
-    public ResponseEntity<MemberResponse> searchId(@RequestParam final Long infoCode,
-                                                   @RequestParam final String infoName) {
+    @PostMapping("/non/member/search")
+    public ResponseEntity<MemberResponse> searchId( @RequestBody @Valid final MemberIdCheckRequest request ) {
 
-        MemberResponse memberResponse = memberService.searchId( infoCode, infoName );
+        MemberResponse memberResponse = memberService.searchId( request );
 
         return ResponseEntity.ok( memberResponse );
     }
 
     /* 아이디 중복 검사 */
-    @GetMapping("/non/member/duplicateId")
-    public Boolean duplicateId(@RequestParam final String inputMemberId) {
+    @PostMapping("/non/member/duplicateId")
+    public Boolean duplicateId( @RequestBody @Valid final MemberDuplicateIdRequest request ) {
 
-        return memberService.duplicateId( inputMemberId );
+        return memberService.duplicateId( request );
     }
 
     /* 비밀번호 찾기(이메일 전송) */
-    @GetMapping("/non/member/pwdSearch/sendEmail")
-    public @ResponseBody void sendEmail(@RequestParam final String inputMemberId,
-                                        @RequestParam final Long inputInfoCode,
-                                        @RequestParam final String inputEmail) {
+    @PostMapping("/non/member/pwdSearch/sendEmail")
+    public @ResponseBody void sendEmail( @RequestBody @Valid final MemberSearchPwdRequest request ) {
 
-        MailSendDTO mailSendDTO = sendEmailService.createMailAndChangePwd( inputMemberId, inputInfoCode, inputEmail );
-
-        sendEmailService.mailSend( mailSendDTO );
+        sendEmailService.createMailAndChangePwd( request );
     }
 
     /* ----------------------- 마이페이지, 로그인 후 -------------------------- */

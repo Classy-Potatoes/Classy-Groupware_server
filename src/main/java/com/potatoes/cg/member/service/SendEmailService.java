@@ -4,13 +4,18 @@ import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.member.domain.repository.MemberRepository;
 import com.potatoes.cg.member.dto.MailSendDTO;
+import com.potatoes.cg.member.dto.request.MemberSearchPwdRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.NOT_FOUND_INFO_CODE_AND_MEMBER_ID;
 
@@ -24,40 +29,46 @@ public class SendEmailService {
 
     private final JavaMailSender mailSender;
     private final PasswordEncoder passwordEncoder;
-    private static final String FROM_ADDRESS = "classyGroupware";
 
+    public void createMailAndChangePwd( final MemberSearchPwdRequest request ) {
 
-    public MailSendDTO createMailAndChangePwd( final String inputMemberId, final Long inputInfoCode, final String inputEmail ) {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper;
 
-
-        Member member = memberRepository.findByMemberInfoInfoCodeAndMemberId( inputInfoCode, inputMemberId )
+        Member member = memberRepository.findByMemberInfoInfoCodeAndMemberId( request.getInfoCode(), request.getMemberId() )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE_AND_MEMBER_ID ));
 
         // 임시 비밀번호 생성과 암호화
         String str = getTempPwd();
         String authNum = passwordEncoder.encode( str );
 
-        MailSendDTO mailSendDTO = new MailSendDTO();
-
-        String htmlContent = "<html>" + "<body>" +
-                "<div style='max-width: 700px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;'>" +
-                "<h1 style='color: #333;'>안녕하세요</h1>" +
-                "<h1 style='color: #333;'> Classy Groupware 관련 안내 이메일입니다.</h1>" +
-                "<p style='color: #555;'>[<span style='color: #007BFF;'>" + member.getMemberInfo().getInfoName() + "</span>] 님의 임시 비밀번호는 " +
-                "<span style='font-weight: bold; color: #28A745;'>" + str + "</span> 입니다. </p>" +
-                "<p>임시 비밀번호로 로그인하셔서 원하시는 비밀번호로 변경바랍니다.</p>" +
-                "</div>" +
-                "</body>" +
-                "</html>";
-
-        mailSendDTO.setAddress( inputEmail );
-        mailSendDTO.setTitle( member.getMemberInfo().getInfoName() +"님의 Classy Groupware 임시비밀번호 안내 이메일 입니다.");
-        mailSendDTO.setMessage( htmlContent );
-
         // 임시비밀번호로 DB 업데이트
         member.updatePwdEmail( authNum );
 
-        return mailSendDTO;
+        try {
+            helper = new MimeMessageHelper( message, true );
+
+            String htmlContent =
+                    "<div style=\"font-family: 'Nanum Gothic', Arial, sans-serif; color: white; text-align: center; background-color: #f0f0f0; padding:20px; padding-bottom: 50px;\">" +
+                            "<h1 style='color: #333; font-size: 24px; margin-bottom: 10px;'>Classy Groupware 임시 비밀번호 안내</h1>" +
+                            "<p style='color: #333; font-size: 16px;'>안녕하세요. Classy Groupware에서 임시 비밀번호를 안내드립니다.</p>" +
+                            "<p style='color: #333; font-size: 16px;'>로그인 후 반드시 비밀번호를 변경해주세요.<br></p>" +
+                            "<div style='color: white; background-color: rgb(0, 0, 0, 60%); border-radius: 10px; padding: 20px; width: 400px; margin: 0 auto;'>" +
+                            "<h2 style='color: white; margin-bottom: 20px; font-size: 20px; font-weight: 300;'>임시 비밀번호: " + str + "</h2>" +
+                            "<a href='http://localhost:3000/member/login' style='text-decoration: none;'>" +
+                            "<button style='background-color: #2B456D; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;'>로그인하러 가기</button></a></div></div>";
+
+
+            helper.setTo( request.getInfoEmail() );
+            helper.setSubject( member.getMemberInfo().getInfoName() +"님의 Classy Groupware 임시비밀번호 안내 이메일 입니다." );
+            helper.setText( htmlContent, true );
+
+            mailSender.send( message );
+
+        } catch ( MessagingException e ) {
+            throw new RuntimeException( e );
+        }
+
     }
 
 
@@ -77,24 +88,6 @@ public class SendEmailService {
         }
 
         return authNum;
-    }
-
-
-    // 메일 전송
-    public void mailSend( MailSendDTO mailSendDTO ) {
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        // 받는사람 주소
-        message.setTo( mailSendDTO.getAddress() );
-        // 보내는 사람 주소(설정하지 않으면 디폴트 값인 yml에 작성한 username)
-        message.setFrom( SendEmailService.FROM_ADDRESS );
-        //메일 제목
-        message.setSubject( mailSendDTO.getTitle() );
-        // 메일 내용
-        message.setText( mailSendDTO.getMessage()) ;
-
-        // 메일 전송
-        mailSender.send( message );
     }
 
 
