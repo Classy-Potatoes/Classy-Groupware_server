@@ -12,6 +12,8 @@ public class ProjectMemberResponse {
 
     private final String memberName;
 
+
+
     public static ProjectMemberResponse from(Long infoCode, String infoName) {
         return new ProjectMemberResponse(
                 infoCode,

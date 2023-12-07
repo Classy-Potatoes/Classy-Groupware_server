@@ -8,18 +8,30 @@ import lombok.RequiredArgsConstructor;
 import static lombok.AccessLevel.PRIVATE;
 
 @Getter
-@RequiredArgsConstructor(access = PRIVATE)
+@RequiredArgsConstructor
 public class ProjectsResponse {
 
     private final Long projectCode;
     private final String projectTitle;
     private final String deptName;
+    private Long participantCount;
 
-    public static ProjectsResponse from(final Project project) {
+    public ProjectsResponse(Long projectCode, String projectTitle, String deptName, Long participantCount) {
+        this.projectCode = projectCode;
+        this.projectTitle = projectTitle;
+        this.deptName = deptName;
+        this.participantCount = participantCount;
+    }
+
+    public static ProjectsResponse from(final Project project, Long participantCount) {
         return new ProjectsResponse(
                 project.getProjectCode(),
                 project.getProjectTitle(),
-                project.getDept().getDeptName()
+                project.getDept().getDeptName(),
+                participantCount
+
         );
     }
 }
+
+

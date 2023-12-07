@@ -4,6 +4,7 @@ import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
 import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.project.domain.Project;
 import com.potatoes.cg.project.domain.ProjectParticipantId;
 import com.potatoes.cg.project.dto.request.*;
 import com.potatoes.cg.project.dto.response.*;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -78,32 +80,47 @@ public class ProjectController {
             @RequestParam(defaultValue = "1") final Integer page,
             @AuthenticationPrincipal final CustomUser customUser) {
 
-        final Page<ProjectsResponse> projets = projectService.getMyProjects(page, customUser);
-        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(projets);
-        final PagingResponse pagingResponse = PagingResponse.of(projets.getContent(), pagingButtonInfo);
+        final Page<ProjectsResponse> projects = projectService.getMyProjects(page, customUser);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(projects);
+        final PagingResponse pagingResponse = PagingResponse.of(projects.getContent(), pagingButtonInfo);
 
         return ResponseEntity.ok(pagingResponse);
     }
 
 
     /* 프로젝트에 참여한 멤버 수 조회 */
+//    @GetMapping("/projects/{projectCode}/participantCount")
+//    public ResponseEntity<Long> getParticipantCount(@PathVariable final Long projectCode) {
+//        try {
+//            // 프로젝트에 참여한 멤버 수 조회
+//            long participantCount = projectService.countParticipantsByProjectCode(projectCode);
+//
+//            // 클라이언트에게 멤버 수 반환
+//            return ResponseEntity.ok(participantCount);
+//        } catch (EntityNotFoundException e) {
+//            // 프로젝트가 없는 경우 404 에러 반환
+//            return ResponseEntity.notFound().build();
+//        } catch (Exception e) {
+//            // 다른 예외가 발생한 경우 500 에러 반환
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
-    @GetMapping("/projects/{projectCode}/participantCount")
-    public ResponseEntity<Long> getParticipantCount(@PathVariable final Long projectCode) {
-        try {
-            // 프로젝트에 참여한 멤버 수 조회
-            long participantCount = projectService.countParticipantsByProjectCode(projectCode);
+//    /* 내 프로젝트와 그 프로젝트의 참여자 수 조회 */
+//    @GetMapping("/projects/myProjectsAndMemberCount")
+//    public ResponseEntity<PagingResponse> getMyProjectsAndParticipantCount(
+//            @RequestParam(defaultValue = "1") final Integer page,
+//            @AuthenticationPrincipal final CustomUser customUser) {
+//
+//        final Page<ProjectsResponse> projects = projectService.getMyProjects(page, customUser);
+//
+//
+//        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(projects);
+//        final PagingResponse pagingResponse = PagingResponse.of(projects.getContent(), pagingButtonInfo);
+//
+//        return ResponseEntity.ok(pagingResponse);
+//    }
 
-            // 클라이언트에게 멤버 수 반환
-            return ResponseEntity.ok(participantCount);
-        } catch (EntityNotFoundException e) {
-            // 프로젝트가 없는 경우 404 에러 반환
-            return ResponseEntity.notFound().build();
-        } catch (Exception e) {
-            // 다른 예외가 발생한 경우 500 에러 반환
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 
     /* 프로젝트 디테일 */
     @GetMapping("/projects/{projectCode}")
@@ -178,7 +195,21 @@ public class ProjectController {
         final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
 
         return ResponseEntity.ok(pagingResponse);
+    }
 
+
+    /* 부서별 회원 검색 */
+    @GetMapping("/dept/{deptCode}/search")
+    public ResponseEntity<PagingResponse> getDeptSearch(
+            @RequestParam(defaultValue = "1") final Integer page, @PathVariable final Long deptCode,
+            @RequestParam final String infoName
+    )    {
+
+        final Page<MemberDeptResponse> members = projectMemberService.getDeptSearch(page, deptCode, infoName);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(members);
+        final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
     }
 
 
@@ -327,7 +358,6 @@ public class ProjectController {
         return ResponseEntity.created(URI.create("/task/" + taskCode)).build();
     }
 
-    /* 프로젝트 업무 조회 */
 
     /* 프로젝트 업무 수정 */
     @PutMapping("/task/{taskCode}")
