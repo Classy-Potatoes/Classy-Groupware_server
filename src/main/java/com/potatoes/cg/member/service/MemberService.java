@@ -5,9 +5,7 @@ import com.potatoes.cg.common.util.FileUploadUtils;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.*;
 import com.potatoes.cg.member.domain.repository.*;
-import com.potatoes.cg.member.dto.request.MemberPwdRequest;
-import com.potatoes.cg.member.dto.request.MemberSignupRequest;
-import com.potatoes.cg.member.dto.request.MemberUpdateRequest;
+import com.potatoes.cg.member.dto.request.*;
 import com.potatoes.cg.member.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,9 +47,9 @@ public class MemberService {
 
     /* infoCode(사번) 검증 */
     @Transactional(readOnly = true)
-    public SearchInfoResponse infoSearch(Long infoCode) {
+    public SearchInfoResponse infoSearch( final InfoCodeCheckRequest request ) {
 
-        final MemberInfo searchInfo = infoRepository.findById( infoCode )
+        final MemberInfo searchInfo = infoRepository.findById( request.getInfoCode() )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE ));
 
         return SearchInfoResponse.from( searchInfo );
@@ -111,9 +109,10 @@ public class MemberService {
 
     /* 아이디 찾기 */
     @Transactional(readOnly = true)
-    public MemberResponse searchId( final Long infoCode, final String infoName ) {
+    public MemberResponse searchId( final MemberIdCheckRequest request ) {
 
-        final Member member = memberRepository.findByMemberInfoInfoCodeAndMemberInfoInfoName( infoCode, infoName )
+        final Member member =
+                memberRepository.findByMemberInfoInfoCodeAndMemberInfoInfoName( request.getInfoCode(), request.getInfoName() )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE_AND_INFO_NAME ));
 
         return MemberResponse.from( member );
@@ -121,9 +120,9 @@ public class MemberService {
 
     /* 아이디 중복 검사 */
     @Transactional(readOnly = true)
-    public Boolean duplicateId( final String memberId ) {
+    public Boolean duplicateId( final MemberDuplicateIdRequest request ) {
 
-        return memberRepository.existsByMemberId( memberId );
+        return memberRepository.existsByMemberId( request.getMemberId() );
     }
 
     /* 현재 비밀번호 검증 */
