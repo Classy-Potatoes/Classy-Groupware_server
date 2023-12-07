@@ -49,20 +49,20 @@ public class ProjectScheduleService {
     private final ProjectRepository projectRepository;
     private final InfoRepository infoRepository;
 
-    /* 프로젝트 번호로 인원 조회 */
-    @Transactional(readOnly = true)
-    public List<ProjectMemberResponse> getMemberList(Long projectCode) {
-
-        List<ProjectParticipant> projectParticipantList = projectParticipantRepository.findAllByProjectProjectCode(projectCode);
-
-        List<ProjectMemberResponse> projectMemberResponseList = projectParticipantList.stream()
-                .map(projectParticipant -> ProjectMemberResponse.from(
-                        projectParticipant.getMember().getInfoCode(),
-                        projectParticipant.getMember().getInfoName()
-                )).collect(Collectors.toList());
-
-        return projectMemberResponseList;
-    }
+//    /* 프로젝트 번호로 인원 조회 */
+//    @Transactional(readOnly = true)
+//    public List<ProjectMemberResponse> getMemberList(Long projectCode) {
+//
+//        List<ProjectParticipant> projectParticipantList = projectParticipantRepository.findAllByProjectProjectCode(projectCode);
+//
+//        List<ProjectMemberResponse> projectMemberResponseList = projectParticipantList.stream()
+//                .map(projectParticipant -> ProjectMemberResponse.from(
+//                        projectParticipant.getMember().getInfoCode(),
+//                        projectParticipant.getMember().getInfoName()
+//                )).collect(Collectors.toList());
+//
+//        return projectMemberResponseList;
+//    }
 
     /* 일정글 등록 */
     public Long save(Long projectCode, ProjectScheduleCreatRequest scheduleRequest, int memberCode) {
