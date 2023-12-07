@@ -21,14 +21,14 @@ public class ProjectScheduleController {
 
     private final ProjectScheduleService projectScheduleService;
 
-    /* 프로젝트 인원 조회(이름) */
-    @GetMapping("/{projectCode}/searchMember")
-    public ResponseEntity<List<ProjectMemberResponse>> getMemberList(@PathVariable final Long projectCode) {
-
-        List<ProjectMemberResponse> projectMemberResponseList = projectScheduleService.getMemberList(projectCode);
-
-        return ResponseEntity.status(HttpStatus.OK).body(projectMemberResponseList);
-    }
+//    /* 프로젝트 인원 조회(이름) */
+//    @GetMapping("/{projectCode}/searchMember")
+//    public ResponseEntity<List<ProjectMemberResponse>> getMemberList(@PathVariable final Long projectCode) {
+//
+//        List<ProjectMemberResponse> projectMemberResponseList = projectScheduleService.getMemberList(projectCode);
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(projectMemberResponseList);
+//    }
 
 
     /* 일정글 등록 */

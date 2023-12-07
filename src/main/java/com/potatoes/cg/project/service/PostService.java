@@ -48,7 +48,7 @@ public class PostService {
     private final FileEntityRepository fileEntityRepository;
     private final ProjectReplyRepository projectReplyRepository;
 
-    @Value("${file.projectpost-dir}")
+//    @Value("${file.projectpost-dir}")
     private String PROJECTPOST_DIR;
 
     private String getRandomName() {
