@@ -23,7 +23,7 @@ public class ReplyCreateRequest {
     private  final Long scheduleCode;
 
     @Min(value = 1)
-    private  final Long taskCtodoListCodeode;
+    private  final Long todoListCode;
 
 
 }

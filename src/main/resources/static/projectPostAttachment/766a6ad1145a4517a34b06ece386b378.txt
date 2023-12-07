@@ -1,0 +1,20 @@
+-- sys 계정으로 접속해서
+-- 계정 root / 비번 mysql
+
+
+-- 1) 새로운 계정 만들기
+-- CREATE USER '계정명'@localhost IDENTIFIED BY '비밀번호';
+-- CREATE USER '계정명'@'%'IDENTIFIED BY '비밀번호';
+-- 'localhost' 대신 '%'를 쓰면 외부 ip로 접속 가능하다.
+CREATE USER 'classy'@'%' IDENTIFIED BY 'Classy1222#';
+
+-- 2) 데이터베이스(스키마) 생성
+-- CREATE DATABASE 데이터베이스명;
+-- CREATE SCHEMA 스키마명;
+-- MySQL은 개념적으로 database와 schema를 구분하지 않는다. (CREATE DATABASE와 CREATE SCHEMA가 같은 개념이다.)
+CREATE DATABASE classy;
+-- CREATE SCHEMA classy;
+
+-- 3) 계정에 권한 부여
+-- GRANT ALL PRIVILEGES ON 데이터베이스명.* TO '계정명'@'%';
+GRANT ALL PRIVILEGES ON classy.* TO 'classy'@'%';

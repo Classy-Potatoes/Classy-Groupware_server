@@ -63,7 +63,7 @@ public class ProjectService {
                 projectRequest.getProjectStartDate(),
                 projectRequest.getProjectEndDate(),
                 dept,
-                customUser.getMemberCode()
+                customUser.getInfoCode()
         );
 
         final Project project = projectRepository.save(newProject);
@@ -74,7 +74,7 @@ public class ProjectService {
     /* 내 부서 프로젝트 조회 */
 
     private Pageable getPageable(final Integer page) {
-        return PageRequest.of(page - 1, 5, Sort.by("projectCode").descending());
+        return PageRequest.of(page - 1, 4, Sort.by("projectCode").descending());
     }
 
     public Page<ProjectsResponse> getMyDeptProjects(final Integer page, final CustomUser customUser) {
@@ -83,7 +83,13 @@ public class ProjectService {
 
         Page<Project> projects = projectRepository.findByDeptDeptCodeAndProjectStatus(getPageable(page), info.getDept().getDeptCode(), USABLE);
 
-        return projects.map(project -> ProjectsResponse.from(project));
+        return projects.map(project -> {
+            // 프로젝트에 참여한 멤버 수 조회
+            long participantCount = projectRepository.countParticipantsByProjectCode(project.getProjectCode());
+
+            // ProjectsResponse 생성자를 이용하여 새로운 ProjectsResponse 인스턴스 생성
+            return ProjectsResponse.from(project, participantCount);
+        });
     }
 
 
@@ -91,16 +97,24 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public Page<ProjectsResponse> getMyProjects(final Integer page, final CustomUser customUser) {
 
-        Page<Project> projects = projectRepository.findMyProjects(getPageable(page), customUser.getMemberCode());
+        Page<Project> projects = projectRepository.findMyProjects(getPageable(page), customUser.getInfoCode());
 
-        return projects.map(project -> ProjectsResponse.from(project));
+
+        return projects.map(project -> {
+            // 프로젝트에 참여한 멤버 수 조회
+            long participantCount = projectRepository.countParticipantsByProjectCode(project.getProjectCode());
+
+            // ProjectsResponse 생성자를 이용하여 새로운 ProjectsResponse 인스턴스 생성
+            return ProjectsResponse.from(project, participantCount);
+        });
     }
 
-    /* 프로젝트에 참여인원 조회 */
-    public long countParticipantsByProjectCode(final Long projectCode) {
-
-        return projectRepository.countParticipantsByProjectCode(projectCode);
-    }
+//
+//    /* 프로젝트에 참여인원 조회 */
+//    public long countParticipantsByProjectCode(final Long projectCode) {
+//
+//        return projectRepository.countParticipantsByProjectCode(projectCode);
+//    }
 
     /* 프로젝트 디테일 조회 */
     @Transactional(readOnly = true)

@@ -53,6 +53,7 @@ public class ProjectMemberService {
 
     /* 프로젝트에 회원 초대 */
     public List<ProjectParticipantId> inviteMembers(List<ProjectInviteMemberRequest> projectInviteMemberRequests) {
+
         List<ProjectParticipantId> invitedMembers = new ArrayList<>();
 
         for (ProjectInviteMemberRequest request : projectInviteMemberRequests) {
@@ -113,5 +114,13 @@ public class ProjectMemberService {
 
         return members.map(Member -> ProjectMemberResponse.fromMember(Member));
 
+    }
+
+    /* 부서별 회원 검색*/
+    public Page<MemberDeptResponse> getDeptSearch(Integer page, Long deptCode, String infoName) {
+
+        Page<Member> members = projectMemberRepository.findByMemberInfoDeptDeptCodeAndMemberInfoInfoNameContainsAndMemberStatus(getPageable(page), deptCode, infoName, ACTIVE);
+
+        return members.map(Member -> MemberDeptResponse.from(Member));
     }
 }
