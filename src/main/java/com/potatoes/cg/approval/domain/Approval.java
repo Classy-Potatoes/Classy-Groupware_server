@@ -1,5 +1,6 @@
 package com.potatoes.cg.approval.domain;
 
+import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineTurnType;
 import com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType;
 import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 import com.potatoes.cg.member.domain.Member;
@@ -71,8 +72,10 @@ public class Approval {
     @JoinColumn(name = "approvalCode")
     private List<ApprovalFile> attachment;
 
+
     public Approval(String documentTitle, List<ApprovalLine> approvalLine, List<Reference> referenceLine,
-                    DocumentType documentType, Member member, List<ApprovalFile> attachment) {
+                    DocumentType documentType, Member member, List<ApprovalFile> attachment ) {
+
         this.documentTitle = documentTitle;
         this.approvalLine = approvalLine;
         this.referenceLine = referenceLine;
