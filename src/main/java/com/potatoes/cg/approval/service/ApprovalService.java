@@ -2,6 +2,7 @@ package com.potatoes.cg.approval.service;
 
 import com.potatoes.cg.approval.domain.*;
 import com.potatoes.cg.approval.domain.repository.*;
+import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineTurnType;
 import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
 import com.potatoes.cg.approval.dto.request.VacationCreateRequest;
@@ -90,10 +91,21 @@ public class ApprovalService {
                         .stream()
                         .map(memberCode -> Reference.of(memberCode))
                         .collect(Collectors.toList());
-        /* 결재자 memberCode*/
-        final List<ApprovalLine> approvalLine =
-                letterRequest.getApprovalLine().stream().map(memberCode -> ApprovalLine.of(memberCode)).collect(Collectors.toList());
 
+
+        /* 결재자 memberCode, 결재 순서 */;
+        final List<ApprovalLine> approvalLine = new ArrayList<>();
+        for (Map<String, String> approvalLineRequest : letterRequest.getApprovalLine()) {
+            String turn = approvalLineRequest.get("turn");
+            Long memberCode = Long.parseLong(approvalLineRequest.get("memberCode"));
+            ApprovalLine newApprovalLine  = ApprovalLine.of(
+                    memberCode,
+                    turn
+            );
+
+            approvalLine.add(newApprovalLine);
+
+        }
 
         final Approval newApproval = Approval.of(
                 letterRequest.getDocumentTitle(),
@@ -146,10 +158,19 @@ public class ApprovalService {
                         .map(memberCode -> Reference.of(memberCode))
                         .collect(Collectors.toList());
 
-        /* 결재자 memberCode */
-        final List<ApprovalLine> approvalLine =
-                expenseRequest.getApprovalLine().stream().map(memberCode -> ApprovalLine.of(memberCode)).collect(Collectors.toList());
+        /* 결재자 memberCode, 결재 순서 */;
+        final List<ApprovalLine> approvalLine = new ArrayList<>();
+        for (Map<String, String> approvalLineRequest : expenseRequest.getApprovalLine()) {
+            String turn = approvalLineRequest.get("turn");
+            Long memberCode = Long.parseLong(approvalLineRequest.get("memberCode"));
+            ApprovalLine newApprovalLine  = ApprovalLine.of(
+                    memberCode,
+                    turn
+            );
 
+            approvalLine.add(newApprovalLine);
+
+        }
         /* expenseDetail 데이터 (계정과목,지출날짜,금액,적요) */
         final List<ExpenseDetail> expenseDetail = new ArrayList<>();
         for (Map<String, String> detailRequest : expenseRequest.getExpenseDetails()) {
@@ -206,10 +227,19 @@ public class ApprovalService {
                         .map(memberCode -> Reference.of(memberCode))
                         .collect(Collectors.toList());
 
-        /* 결재자 memberCode */
-        final List<ApprovalLine> approvalLine =
-                vacationRequest.getApprovalLine().stream().map(memberCode -> ApprovalLine.of(memberCode)).collect(Collectors.toList());
+        /* 결재자 memberCode, 결재 순서 */;
+        final List<ApprovalLine> approvalLine = new ArrayList<>();
+        for (Map<String, String> approvalLineRequest : vacationRequest.getApprovalLine()) {
+            String turn = approvalLineRequest.get("turn");
+            Long memberCode = Long.parseLong(approvalLineRequest.get("memberCode"));
+            ApprovalLine newApprovalLine  = ApprovalLine.of(
+                    memberCode,
+                    turn
+            );
 
+            approvalLine.add(newApprovalLine);
+
+        }
         final Approval newApproval = Approval.from(
                 vacationRequest.getDocumentTitle(),
                 referenceLine,

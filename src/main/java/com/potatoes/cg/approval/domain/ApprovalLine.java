@@ -32,9 +32,9 @@ public class ApprovalLine {
 
     private Long memberCode;
 
-    @Enumerated(value = STRING)
+
     @Column(nullable = false)
-    private ApprovalLineTurnType turn;
+    private String turn;
 
     @Enumerated(value = STRING)
     @Column(nullable = true)
@@ -46,25 +46,28 @@ public class ApprovalLine {
 
     @Column(nullable = true)
     private LocalDateTime approvalLineDate;
-    /* 결재순서(turn)를 정해야하는데 결재순서는 리액트에서 다뤄서 동적으로 가져온다*/
-    public ApprovalLine(Long memberCode) {
+
+
+    public ApprovalLine(Long memberCode, String turn) {
             this.memberCode = memberCode;
-            this.turn = ApprovalLineTurnType.FIRST;
+            this.turn = turn;
             setApprovalLineWaitingStatus();
     }
 
+
     private void setApprovalLineWaitingStatus() {
-        if ("first".equals(turn)) {
+        if ("1".equals(turn)) {
             this.approvalLineWaitingStatus = ApprovalLineWaitingStatusType.REQUEST;
         } else {
             this.approvalLineWaitingStatus = ApprovalLineWaitingStatusType.WAIT;
         }
     }
 
-    public static ApprovalLine of(Long memberCode) {
+    public static ApprovalLine of(Long memberCode, String turn) {
 
         return new ApprovalLine(
-                memberCode
+                memberCode,
+                turn
         );
 
     }
