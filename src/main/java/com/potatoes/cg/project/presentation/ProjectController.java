@@ -53,6 +53,17 @@ public class ProjectController {
         return ResponseEntity.created(URI.create("/projects/" + projectCode)).build();
     }
 
+    /* 회원 초대하기 */
+    @PostMapping("/invite")
+    public ResponseEntity<List<ProjectParticipantId>> inviteMembers(
+            @RequestBody @Valid final List<ProjectInviteMemberRequest> projectInviteMemberRequests
+    ) {
+
+        List<ProjectParticipantId> invitedMembers = projectMemberService.inviteMembers(projectInviteMemberRequests);
+
+        return ResponseEntity.created(URI.create("/invite")).body(invitedMembers);
+    }
+
     /* 내 부서 프로젝트 조회 */
     @GetMapping("/projects/myDept")
     public ResponseEntity<PagingResponse> getMyDeptProjects(
@@ -152,15 +163,25 @@ public class ProjectController {
 
     /* 부서별 회원 조회 */
     @GetMapping("/dept/{deptCode}/member")
-    public ResponseEntity<PagingResponse> getDeptMember(
-            @RequestParam(defaultValue = "1") final Integer page, @PathVariable final Long deptCode
+    public ResponseEntity<List<MemberDeptResponse>> getDeptMember(@PathVariable final Long deptCode) {
+
+        List<MemberDeptResponse> projectMemberResponseList = projectMemberService.getDeptMember(deptCode);
+
+        return ResponseEntity.status(HttpStatus.OK).body(projectMemberResponseList);
+    }
+
+    /* 부서별 회원 검색 */
+    @GetMapping("/dept/{deptCode}/search")
+    public ResponseEntity<List<MemberDeptResponse>> getDeptSearch(
+            @PathVariable final Long deptCode,
+            @RequestParam final String infoName
     )    {
 
-        final Page<MemberDeptResponse> members = projectMemberService.getDeptMember(page, deptCode);
-        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(members);
-        final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
+        List<MemberDeptResponse> members = projectMemberService.getDeptSearch(deptCode, infoName);
 
-        return ResponseEntity.ok(pagingResponse);
+
+        return ResponseEntity.status(HttpStatus.OK).body(members);
+
     }
 
     /* 프로젝트 회원 초대하기 */
@@ -175,15 +196,6 @@ public class ProjectController {
 //
 //    }
 
-    /* 회원 초대하기 */
-    @PostMapping("/invite")
-    public ResponseEntity<List<ProjectParticipantId>> inviteMembers(
-            @RequestBody @Valid final List<ProjectInviteMemberRequest> projectInviteMemberRequests
-    ) {
-        List<ProjectParticipantId> invitedMembers = projectMemberService.inviteMembers(projectInviteMemberRequests);
-
-        return ResponseEntity.created(URI.create("/invite")).body(invitedMembers);
-    }
 
     /* 회원 검색 (초대) */
     @GetMapping("/invite/search")
@@ -197,20 +209,6 @@ public class ProjectController {
         return ResponseEntity.ok(pagingResponse);
     }
 
-
-    /* 부서별 회원 검색 */
-    @GetMapping("/dept/{deptCode}/search")
-    public ResponseEntity<PagingResponse> getDeptSearch(
-            @RequestParam(defaultValue = "1") final Integer page, @PathVariable final Long deptCode,
-            @RequestParam final String infoName
-    )    {
-
-        final Page<MemberDeptResponse> members = projectMemberService.getDeptSearch(page, deptCode, infoName);
-        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(members);
-        final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
-
-        return ResponseEntity.ok(pagingResponse);
-    }
 
 
     /* 프로젝트 인원 조회(이름) */

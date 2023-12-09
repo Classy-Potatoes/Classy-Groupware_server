@@ -176,8 +176,10 @@ public class ApprovalService {
         for (Map<String, String> detailRequest : expenseRequest.getExpenseDetails()) {
             String expenseAccount = detailRequest.get("expenseAccount");
             String expenseBriefs = detailRequest.get("expenseBriefs");
-            LocalDate expenseDate = LocalDate.parse(detailRequest.get("expenseDate"));
-            Long expensePrice = Long.parseLong(detailRequest.get("expensePrice"));
+            String expenseDateStr = detailRequest.get("expenseDate");
+            LocalDate expenseDate = (expenseDateStr != null) ? LocalDate.parse(expenseDateStr) : null; //null 체크
+            String priceStr = detailRequest.get("expensePrice");
+            Long expensePrice = (priceStr != null) ? Long.parseLong(priceStr) : null; // null 체크
 
             ExpenseDetail expenseDetails = ExpenseDetail.of(
                     expenseAccount,

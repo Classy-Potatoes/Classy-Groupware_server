@@ -44,11 +44,38 @@ public class ProjectMemberService {
     }
 
     /* 부서별 회원 조회 */
-    public Page<MemberDeptResponse> getDeptMember(final Integer page, final Long deptCode) {
+    @Transactional(readOnly = true)
+    public List<MemberDeptResponse> getDeptMember(final Long deptCode) {
 
-        Page<Member> members = projectMemberRepository.findByMemberInfoDeptDeptCodeAndMemberStatus(getPageable(page), deptCode, ACTIVE);
+        List<Member> members = projectMemberRepository.findByMemberInfoDeptDeptCodeAndMemberStatus(deptCode, ACTIVE);
 
-        return members.map(Member -> MemberDeptResponse.from(Member));
+        List<MemberDeptResponse> projectMemberResponseList = members.stream()
+                .map(member -> MemberDeptResponse.from(
+                        member.getMemberInfo(),
+                        member.getMemberInfo().getInfoName(),
+                        member.getMemberInfo().getDept().getDeptCode(),
+                        member.getMemberInfo().getDept().getDeptName()
+
+                )).collect(Collectors.toList());
+
+        return projectMemberResponseList;
+    }
+
+    /* 부서별 회원 검색*/
+    public List<MemberDeptResponse> getDeptSearch(Long deptCode, String infoName) {
+
+        List<Member> members = projectMemberRepository.findByMemberInfoDeptDeptCodeAndMemberInfoInfoNameContainsAndMemberStatus(deptCode, infoName, ACTIVE);
+
+        List<MemberDeptResponse> projectMemberResponseList = members.stream()
+                .map(member -> MemberDeptResponse.from(
+                        member.getMemberInfo(),
+                        member.getMemberInfo().getInfoName(),
+                        member.getMemberInfo().getDept().getDeptCode(),
+                        member.getMemberInfo().getDept().getDeptName()
+
+                )).collect(Collectors.toList());
+
+        return projectMemberResponseList;
     }
 
     /* 프로젝트에 회원 초대 */
@@ -114,13 +141,5 @@ public class ProjectMemberService {
 
         return members.map(Member -> ProjectMemberResponse.fromMember(Member));
 
-    }
-
-    /* 부서별 회원 검색*/
-    public Page<MemberDeptResponse> getDeptSearch(Integer page, Long deptCode, String infoName) {
-
-        Page<Member> members = projectMemberRepository.findByMemberInfoDeptDeptCodeAndMemberInfoInfoNameContainsAndMemberStatus(getPageable(page), deptCode, infoName, ACTIVE);
-
-        return members.map(Member -> MemberDeptResponse.from(Member));
     }
 }
