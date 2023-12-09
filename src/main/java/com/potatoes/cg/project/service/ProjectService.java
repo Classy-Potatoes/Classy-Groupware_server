@@ -9,6 +9,7 @@ import com.potatoes.cg.member.domain.Dept;
 import com.potatoes.cg.member.domain.MemberInfo;
 import com.potatoes.cg.member.domain.repository.InfoRepository;
 import com.potatoes.cg.project.domain.Project;
+import com.potatoes.cg.project.domain.ProjectParticipant;
 import com.potatoes.cg.project.domain.ProjectParticipantId;
 import com.potatoes.cg.project.domain.ProjectPost;
 import com.potatoes.cg.project.domain.repository.*;
@@ -66,10 +67,28 @@ public class ProjectService {
                 customUser.getInfoCode()
         );
 
+        // 프로젝트 저장
         final Project project = projectRepository.save(newProject);
+
+        // 생성자를 참여자로 추가
+        addParticipant(project, customUser.getInfoCode());
 
         return project.getProjectCode();
     }
+
+    /* 참여자 추가 메서드 */
+    private void addParticipant(Project project, Long infoCode) {
+        MemberInfo member = infoRepository.getReferenceById(infoCode);
+
+        final ProjectParticipant newProjectParticipant = ProjectParticipant.of(
+                project,
+                member
+        );
+
+        projectParticipantRepository.save(newProjectParticipant);
+    }
+
+
 
     /* 내 부서 프로젝트 조회 */
 
