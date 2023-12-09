@@ -11,16 +11,16 @@ import static lombok.AccessLevel.PRIVATE;
 @RequiredArgsConstructor(access = PRIVATE)
 public class SearchInfoResponse {
 
-    private final Long infoCode;
-    private final Long deptCode;
-    private final Long jobCode;
+    private final String infoName;
+    private final String deptName;
+    private final String jobName;
 
     public static SearchInfoResponse from( final MemberInfo info ) {
 
         return new SearchInfoResponse(
-                info.getInfoCode(),
-                info.getDept().getDeptCode(),
-                info.getJob().getJobCode()
+                info.getInfoName(),
+                info.getDept().getDeptName(),
+                info.getJob().getJobName()
         );
 
     }

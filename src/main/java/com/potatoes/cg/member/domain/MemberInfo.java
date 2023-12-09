@@ -79,12 +79,9 @@ public class MemberInfo {
     }
 
 
-    public void update(String infoName, Dept dept, Job job, String infoEmail, String infoPhone,
-                       Long infoZipcode, String infoAddress, String infoAddressAdd) {
+    public void update(String infoEmail, String infoPhone, Long infoZipcode,
+                       String infoAddress, String infoAddressAdd) {
 
-        this.infoName = infoName;
-        this.dept = dept;
-        this.job = job;
         this.infoEmail = infoEmail;
         this.infoPhone = infoPhone;
         this.infoZipcode = infoZipcode;

@@ -82,13 +82,7 @@ public class MemberService {
         MemberInfo info = infoRepository.findById( memberRequest.getInfoCode() )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE ) );
 
-        Dept dept = deptRepository.getReferenceById( memberRequest.getDeptCode() );
-        Job job = jobRepository.getReferenceById( memberRequest.getJobCode() );
-
         info.update(
-                memberRequest.getInfoName(),
-                dept,
-                job,
                 memberRequest.getInfoEmail(),
                 memberRequest.getInfoPhone(),
                 memberRequest.getInfoZipcode(),
@@ -214,14 +208,7 @@ public class MemberService {
         final MemberInfo memberInfo = infoRepository.findById( customUser.getInfoCode() )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE ));
 
-        Dept dept = deptRepository.getReferenceById( memberUpdateRequest.getDeptCode() );
-        Job job = jobRepository.getReferenceById( memberUpdateRequest.getJobCode() );
-
         memberInfo.update(
-                memberUpdateRequest.getInfoName(),
-                // dept, job을 변화될때만 히스토리에 insert 시키고 싶다...
-                dept,
-                job,
                 memberUpdateRequest.getInfoEmail(),
                 memberUpdateRequest.getInfoPhone(),
                 memberUpdateRequest.getInfoZipcode(),

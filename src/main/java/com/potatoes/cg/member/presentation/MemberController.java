@@ -10,6 +10,7 @@ import com.potatoes.cg.member.dto.response.*;
 import com.potatoes.cg.member.service.MemberService;
 import com.potatoes.cg.member.service.SendEmailService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.net.URI;
 
+@Slf4j
 @RestController
 @RequestMapping({"/cg-api/v1", "/cg-api/v1/member"})
 @RequiredArgsConstructor
