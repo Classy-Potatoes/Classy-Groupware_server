@@ -60,7 +60,7 @@ public class SecurityConfig {
                 // 이 때 OPTIONS 메서드를 서버에 사전 요청을 보내 권한을 확인함
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 // 이미지 허가
-                .antMatchers(HttpMethod.GET, "/imgs/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/files/**").permitAll()
 
 
                 // 이런 경로의 요청은 다 허락하겠다. 비로그인 상태에서도 볼수 있다.
