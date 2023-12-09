@@ -6,11 +6,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ProjectMemberRepository extends JpaRepository<Member, Long> {
-    Page<Member> findByMemberInfoDeptDeptCodeAndMemberStatus(Pageable pageable, Long deptCode, MemberStatus memberStatus);
 
     Page<Member> findByMemberInfoInfoNameContainsAndMemberStatus(Pageable pageable, String infoName, MemberStatus memberStatus);
 
     /* 부서별 회원 검색 */
-    Page<Member> findByMemberInfoDeptDeptCodeAndMemberInfoInfoNameContainsAndMemberStatus(Pageable pageable, Long deptCode, String infoName, MemberStatus memberStatus);
+    List<Member> findByMemberInfoDeptDeptCodeAndMemberInfoInfoNameContainsAndMemberStatus(Long deptCode, String infoName, MemberStatus memberStatus);
+
+    /* 부서별 회원 조회 */
+    List<Member> findByMemberInfoDeptDeptCodeAndMemberStatus(Long deptCode, MemberStatus memberStatus);
 }

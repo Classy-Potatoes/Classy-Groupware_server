@@ -14,7 +14,7 @@ public class MyTaskResponse {
 
     private final Long taskCode;
     private final String taskTitle;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDateTime taskRequestDate;
 
     public static MyTaskResponse from(ProjectTask projectTask) {

@@ -74,7 +74,7 @@ public class ProjectService {
     /* 내 부서 프로젝트 조회 */
 
     private Pageable getPageable(final Integer page) {
-        return PageRequest.of(page - 1, 4, Sort.by("projectCode").descending());
+        return PageRequest.of(page - 1, 5, Sort.by("projectCode").descending());
     }
 
     public Page<ProjectsResponse> getMyDeptProjects(final Integer page, final CustomUser customUser) {
@@ -97,7 +97,7 @@ public class ProjectService {
     @Transactional(readOnly = true)
     public Page<ProjectsResponse> getMyProjects(final Integer page, final CustomUser customUser) {
 
-        Page<Project> projects = projectRepository.findMyProjects(getPageable(page), customUser.getInfoCode());
+        Page<Project> projects = projectRepository.findMyProjectsAndProjectStatus(getPageable(page), customUser.getInfoCode(), USABLE);
 
 
         return projects.map(project -> {

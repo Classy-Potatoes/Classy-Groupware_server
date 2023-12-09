@@ -13,11 +13,13 @@ public interface ProjectTaskRepository extends JpaRepository<ProjectTask, Long> 
     /* 내 업무 조회 */
     @Query(value = "SELECT t FROM ProjectTask t " +
             "JOIN t.projectManagers pm " +
-            "WHERE pm.memberCode = :infoCode",
+            "JOIN pm.memberCode m " +
+            "WHERE m.infoCode = :memberCode",
             countQuery = "SELECT COUNT(t) FROM ProjectTask t " +
                     "JOIN t.projectManagers pm " +
-                    "WHERE pm.memberCode = :infoCode")
-    Page<ProjectTask> findByMyTask(Pageable pageable, @Param("infoCode") Long infoCode);
+                    "JOIN pm.memberCode m " +
+                    "WHERE m.infoCode = :memberCode")
+    Page<ProjectTask> findByMyTask(Pageable pageable, @Param("memberCode") Long infoCode);
 
     /* 업무 조회 */
     Page<ProjectTask> findByProjectCodeAndTaskDeleteStatus(Long projectCode, Pageable pageable, ProjectStatusType projectStatusType);

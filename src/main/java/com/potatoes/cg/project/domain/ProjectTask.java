@@ -51,7 +51,7 @@ public class ProjectTask {
     private String taskPriority;
 
     @ManyToOne
-    @JoinColumn(name = "memberCode")
+    @JoinColumn(name = "memberCode", referencedColumnName = "infoCode")
     private MemberInfo member;
 
     @CreatedDate

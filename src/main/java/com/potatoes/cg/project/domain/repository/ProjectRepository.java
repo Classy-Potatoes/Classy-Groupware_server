@@ -21,11 +21,15 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
         /* 내가 참여한 프로젝트 조회 */
         @Query(value = "SELECT p FROM Project p " +
                 "JOIN ProjectParticipant pp ON p.projectCode = pp.id.projectCode " +
-                "WHERE pp.id.memberCode = :memberCode",
+                "WHERE pp.id.memberCode = :memberCode AND p.projectStatus = :projectStatus",
                 countQuery = "SELECT COUNT(p) FROM Project p " +
                         "JOIN ProjectParticipant pp ON p.projectCode = pp.id.projectCode " +
-                        "WHERE pp.id.memberCode = :memberCode")
-        Page<Project> findMyProjects(Pageable pageable, @Param("memberCode") Long memberCode);
+                        "WHERE pp.id.memberCode = :memberCode AND p.projectStatus = :projectStatus")
+        Page<Project> findMyProjectsAndProjectStatus(
+                Pageable pageable,
+                @Param("memberCode") Long memberCode,
+                @Param("projectStatus") ProjectStatusType projectStatus
+        );
 
         /* 프로젝트 디테일 조회 */
         Optional<Project> findByProjectCodeAndProjectStatus(Long projectCode, ProjectStatusType projectStatusType);

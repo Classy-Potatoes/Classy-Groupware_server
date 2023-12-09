@@ -21,7 +21,7 @@ public class ProjectManager {
     private Long projectManagerCode;
 
     @ManyToOne
-    @JoinColumn(name = "memberCode")
+    @JoinColumn(name = "memberCode", referencedColumnName = "infoCode")
     private MemberInfo memberCode;
 
 //    @Column
