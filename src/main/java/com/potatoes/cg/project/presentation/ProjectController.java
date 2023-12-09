@@ -53,6 +53,17 @@ public class ProjectController {
         return ResponseEntity.created(URI.create("/projects/" + projectCode)).build();
     }
 
+    /* 회원 초대하기 */
+    @PostMapping("/invite")
+    public ResponseEntity<List<ProjectParticipantId>> inviteMembers(
+            @RequestBody @Valid final List<ProjectInviteMemberRequest> projectInviteMemberRequests
+    ) {
+
+        List<ProjectParticipantId> invitedMembers = projectMemberService.inviteMembers(projectInviteMemberRequests);
+
+        return ResponseEntity.created(URI.create("/invite")).body(invitedMembers);
+    }
+
     /* 내 부서 프로젝트 조회 */
     @GetMapping("/projects/myDept")
     public ResponseEntity<PagingResponse> getMyDeptProjects(
@@ -185,15 +196,6 @@ public class ProjectController {
 //
 //    }
 
-    /* 회원 초대하기 */
-    @PostMapping("/invite")
-    public ResponseEntity<List<ProjectParticipantId>> inviteMembers(
-            @RequestBody @Valid final List<ProjectInviteMemberRequest> projectInviteMemberRequests
-    ) {
-        List<ProjectParticipantId> invitedMembers = projectMemberService.inviteMembers(projectInviteMemberRequests);
-
-        return ResponseEntity.created(URI.create("/invite")).body(invitedMembers);
-    }
 
     /* 회원 검색 (초대) */
     @GetMapping("/invite/search")
