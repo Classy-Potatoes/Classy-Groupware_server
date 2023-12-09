@@ -21,12 +21,6 @@ public class MemberSignupRequest {
     /* 회원정보 */
     private final Long infoCode;
     @NotBlank
-    private final String infoName;
-    @Min(value = 1)
-    private final Long deptCode;
-    @Min(value = 1)
-    private final Long jobCode;
-    @NotBlank
     private final String infoEmail;
     @NotBlank
     private final String infoPhone;
