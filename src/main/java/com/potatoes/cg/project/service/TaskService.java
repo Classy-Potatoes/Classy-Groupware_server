@@ -128,7 +128,7 @@ public class TaskService {
     }
 
     private Pageable getPageable(final Integer page) {
-        return PageRequest.of(page - 1, 10, Sort.by("taskCode").descending());
+        return PageRequest.of(page - 1, 5, Sort.by("taskRequestDate").descending());
     }
 
     /* 내 업무 조회 */
