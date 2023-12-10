@@ -1,7 +1,6 @@
 package com.potatoes.cg.approval.domain;
 
 import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineResultType;
-import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineTurnType;
 import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineWaitingStatusType;
 import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
@@ -17,14 +16,15 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "tbl_approval_line")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class ApprovalLine {
+public class ApprovalLine_GET {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long approvalLineCode;
 
-
-    private Long memberCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberCode")
+    private Member member;
 
 
     @Column(nullable = false)
@@ -42,30 +42,6 @@ public class ApprovalLine {
     private LocalDateTime approvalLineDate;
 
 
-    public ApprovalLine(Long memberCode, String turn) {
-            this.memberCode = memberCode;
-            this.turn = turn;
-            setApprovalLineWaitingStatus();
-    }
-
-
-
-    private void setApprovalLineWaitingStatus() {
-        if ("1".equals(turn)) {
-            this.approvalLineWaitingStatus = ApprovalLineWaitingStatusType.REQUEST;
-        } else {
-            this.approvalLineWaitingStatus = ApprovalLineWaitingStatusType.WAIT;
-        }
-    }
-
-    public static ApprovalLine of(Long memberCode, String turn) {
-
-        return new ApprovalLine(
-                memberCode,
-                turn
-        );
-
-    }
-
 
 }
+
