@@ -73,6 +73,19 @@ public class Approval {
     private List<ApprovalFile> attachment;
 
 
+    /* 상세 페이지 출력용 */
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "approvalCode")
+    private List<ApprovalLine_GET> approvalLine_GET;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "approvalCode")
+    private List<ReferenceLine_GET> referenceLine_GET;
+
+
+
+
+
     public Approval(String documentTitle, List<ApprovalLine> approvalLine, List<Reference> referenceLine,
                     DocumentType documentType, Member member, List<ApprovalFile> attachment ) {
 

@@ -25,7 +25,7 @@ public enum ExceptionCode {
     NOT_FOUND_INFO_CODE_AND_MEMBER_ID(1428, "해당하는 사번과 아이디가 일치하지 않습니다."),
 
     /* JH(준) */
-
+    NOT_FOUND_APPROVAL_CODE(7001, "해당하는 문서가 없습니다."),
 
     /* IS */
     NOT_PROJECT_CODE(3000, "프로젝트코드에 해당하는 프로젝트가 존재하지 않습니다."),

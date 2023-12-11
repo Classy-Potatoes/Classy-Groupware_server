@@ -10,7 +10,8 @@ import javax.persistence.*;
 @Table(name = "tbl_reference")
 @Getter
 @NoArgsConstructor
-public class Reference {
+public class ReferenceLine_GET {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,19 +19,10 @@ public class Reference {
 
     private Long approvalCode;
 
-    private Long memberCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberCode")
+    private Member member;
 
 
-//    public Reference(Member member) {
-//        this.member = member;
-//    }
 
-    public Reference(Long memberCode) {
-        this.memberCode = memberCode;
-    }
-    public static Reference of(Long memberCode) {
-
-        return new Reference(memberCode);
-
-    }
 }
