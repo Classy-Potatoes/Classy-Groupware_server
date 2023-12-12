@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static com.potatoes.cg.member.domain.type.MemberStatus.ACTIVE;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor

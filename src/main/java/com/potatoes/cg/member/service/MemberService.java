@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
-import static com.potatoes.cg.member.domain.type.MemberStatus.ACTIVE;
-import static com.potatoes.cg.member.domain.type.MemberStatus.DELETE;
+import static com.potatoes.cg.member.domain.type.MemberStatus.*;
 
 @Slf4j
 @Service
@@ -40,6 +39,9 @@ public class MemberService {
     private final HistoryRepository historyRepository;
     private final ProfileImageRepository profileImageRepository;
 
+
+    @Value("${image.memberImage-url}")
+    private String MEMBERIMAGE_URL;
 
     @Value("${image.memberImage-dir}")
     private String MEMBERIMAGE_DIR;
@@ -73,7 +75,7 @@ public class MemberService {
         final List<ProfileImage> profileImages = new ArrayList<>();
         profileImages.add( ProfileImage.of(
                 profileImg.getOriginalFilename(),
-                MEMBERIMAGE_DIR,
+                MEMBERIMAGE_URL + replaceFileName,
                 replaceFileName,
                 getFileExtension( replaceFileName )
         ));
