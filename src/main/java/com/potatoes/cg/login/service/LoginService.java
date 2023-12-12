@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
+import static com.potatoes.cg.member.domain.type.MemberStatus.ACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class LoginService implements UserDetailsService {
                     .password( member.getMemberPassword() )
                     .roles( member.getMemberRole().name() )
                     // 계정 비활성화시 Exception 처리
-                    .disabled( !member.getMemberStatus().equals( MemberStatus.ACTIVE ) )
+                    .disabled( !member.getMemberStatus().equals( ACTIVE ) )
                     .build();
 
 
