@@ -1,12 +1,9 @@
 package com.potatoes.cg.note.dto.request;
 
-import com.potatoes.cg.member.domain.Member;
-import com.potatoes.cg.note.domain.type.NoteStatus;
+import com.potatoes.cg.note.domain.type.NoteStatusType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -21,6 +18,6 @@ public class NoteMoveRequest {
     private final String noteDivision; //쪽지 상태(받은 쪽지인지 보낸 쪽지인지)
 
     @NotNull
-    private final NoteStatus noteStatus; //어떤 상태로 변화할 것인지(기본, 중요, 삭제)
+    private final NoteStatusType noteStatusType; //어떤 상태로 변화할 것인지(기본, 중요, 삭제)
 
 }

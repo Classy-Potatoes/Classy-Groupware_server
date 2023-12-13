@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 
 @RequiredArgsConstructor
 @Getter
@@ -19,6 +20,8 @@ public class NoteCreateRequest {
 
     @NotBlank
     private final Member noteReceiver;
+
+    private final LocalDate noteSentDate;
 
     @NotBlank
     private final String noteBody;

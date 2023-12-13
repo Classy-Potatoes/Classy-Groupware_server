@@ -16,7 +16,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/cg-api/v1/note/")
@@ -35,9 +37,10 @@ public class NoteController {
             @AuthenticationPrincipal CustomUser customUser
     ) {
 
-        LocalDateTime noteSentDate = LocalDateTime.now();
+        LocalDate noteSentDate = LocalDate.now();
+        LocalDateTime search = LocalDateTime.of(noteSentDate, LocalTime.MAX); //조회기준 : 현재 날짜의 23:59:59
 
-        final Page<NotesResponse> notes = noteService.getSentNotes(page, customUser, noteSentDate);
+        final Page<NotesResponse> notes = noteService.getSentNotes(page, customUser, search);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -88,9 +91,10 @@ public class NoteController {
             @AuthenticationPrincipal CustomUser customUser
             ) {
 
-        LocalDateTime noteSentDate = LocalDateTime.now();
+        LocalDate noteSentDate = LocalDate.now();
+        LocalDateTime search = LocalDateTime.of(noteSentDate, LocalTime.MAX);
 
-        final Page<NotesResponse> notes = noteService.getReceivedNotes(page, customUser, noteSentDate);
+        final Page<NotesResponse> notes = noteService.getReceivedNotes(page, customUser, search);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -141,9 +145,10 @@ public class NoteController {
             @AuthenticationPrincipal CustomUser customUser
     ) {
 
-        LocalDateTime noteDate = LocalDateTime.now();
+        LocalDate noteSentDate = LocalDate.now();
+        LocalDateTime search = LocalDateTime.of(noteSentDate, LocalTime.MAX);
 
-        final Page<NotesResponse> notes = noteService.getImportantNotes(page, customUser, noteDate);
+        final Page<NotesResponse> notes = noteService.getImportantNotes(page, customUser, search);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
