@@ -29,10 +29,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /* 회원 목록 조회 */
     Page<Member> findByMemberStatus(PageRequest memberJoinDate, MemberStatus memberStatus);
 
-    /* 미분류 회원 목록 조회 */
-    Page<Member> findByMemberStatusNot(Pageable pageable, MemberStatus memberStatus);
-
-
 
 
 }

@@ -34,10 +34,22 @@ public class AdminController {
     }
 
     /* 미분류 회원 목록 조회 */
-    @GetMapping("/memberStatus")
-    public ResponseEntity<PagingResponse> getNonMembers( @RequestParam(defaultValue = "1") final Integer page ) {
+    @GetMapping("/nonMembers")
+    public ResponseEntity<PagingResponse> getNonMembers(@RequestParam(defaultValue = "1") final Integer page ) {
 
         final Page<NonMembersResponse> nonMembers = adminService.getNonMembers( page );
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( nonMembers );
+        final PagingResponse pagingResponse = PagingResponse.of( nonMembers.getContent(), pagingButtonInfo );
+
+        return ResponseEntity.ok( pagingResponse );
+    }
+
+    /* 미분류 회원 목록 조회(search) */
+    @GetMapping("/nonMembers/search")
+    public ResponseEntity<PagingResponse> getNonMembersByInfoName(
+            @RequestParam final String infoName, @RequestParam(defaultValue = "1") final Integer page ) {
+
+        final Page<NonMembersResponse> nonMembers = adminService.getNonMembersByInfoName( page, infoName );
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( nonMembers );
         final PagingResponse pagingResponse = PagingResponse.of( nonMembers.getContent(), pagingButtonInfo );
 

@@ -1,5 +1,6 @@
 package com.potatoes.cg.member.domain;
 
+import com.potatoes.cg.member.domain.type.MemberInfoStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +8,8 @@ import javax.persistence.*;
 
 import java.util.List;
 
+import static com.potatoes.cg.member.domain.type.MemberInfoStatus.NONREGIST;
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -30,6 +33,10 @@ public class MemberInfo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "jobCode")
     private Job job;
+
+    @Column(nullable = false)
+    @Enumerated(value = STRING)
+    private MemberInfoStatus infoStatus = NONREGIST;
 
     @Column(nullable = false)
     private String infoEmail;
@@ -79,9 +86,10 @@ public class MemberInfo {
     }
 
 
-    public void update(String infoEmail, String infoPhone, Long infoZipcode,
+    public void update(MemberInfoStatus infoStatus, String infoEmail, String infoPhone, Long infoZipcode,
                        String infoAddress, String infoAddressAdd) {
 
+        this.infoStatus = infoStatus;
         this.infoEmail = infoEmail;
         this.infoPhone = infoPhone;
         this.infoZipcode = infoZipcode;
