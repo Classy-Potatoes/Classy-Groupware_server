@@ -1,18 +1,16 @@
 package com.potatoes.cg.login.service;
 
-import com.potatoes.cg.common.exception.ExceptionResponse;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.member.domain.repository.MemberRepository;
-import com.potatoes.cg.member.domain.type.MemberStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
+import static com.potatoes.cg.member.domain.type.MemberStatus.ACTIVE;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +32,7 @@ public class LoginService implements UserDetailsService {
                     .password( member.getMemberPassword() )
                     .roles( member.getMemberRole().name() )
                     // 계정 비활성화시 Exception 처리
-                    .disabled( !member.getMemberStatus().equals( MemberStatus.ACTIVE ) )
+                    .disabled( !member.getMemberStatus().equals( ACTIVE ) )
                     .build();
 
 
