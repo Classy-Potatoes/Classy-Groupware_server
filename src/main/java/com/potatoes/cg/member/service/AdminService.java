@@ -3,6 +3,7 @@ package com.potatoes.cg.member.service;
 import com.potatoes.cg.member.domain.*;
 import com.potatoes.cg.member.domain.repository.*;
 import com.potatoes.cg.member.dto.request.InfoRegistRequest;
+import com.potatoes.cg.member.dto.response.AdminMembersResponse;
 import com.potatoes.cg.member.dto.response.NonMembersResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +32,12 @@ public class AdminService {
     private final DeptRepository deptRepository;
 
 
-    private Pageable getPageable(final Integer page) {
+    private Pageable getPageableNon(final Integer page) {
         return PageRequest.of(page - 1, 8, Sort.by("infoCode").descending());
+    }
+
+    private Pageable getPageable(final Integer page) {
+        return PageRequest.of(page - 1, 8, Sort.by("memberInfo.infoName"));
     }
 
     /* 사전 회원정보 등록 */
@@ -67,34 +72,43 @@ public class AdminService {
 
     }
 
+    /* 회원 목록 조회(관리자) */
+    @Transactional(readOnly = true)
+    public Page<AdminMembersResponse> getAdminMembers( Integer page ) {
 
-//    /* 회원 목록 조회(관리자) */
-//    @Transactional(readOnly = true)
-//    public Page<NonMembersResponse> getNonMembers( Integer page ) {
-//
-//        Page<MemberInfo> NonMemberList = infoRepository.findByInfoStatus( getPageable( page ), NONREGIST );
-//
-//        return NonMemberList.map( nonMember -> NonMembersResponse.from( nonMember ) );
-//    }
+        Page<Member> memberList = memberRepository.findAll( getPageable( page ) );
+
+        return memberList.map( member -> AdminMembersResponse.from( member ) );
+    }
+
+
+    /* 회원 목록 조회(관리자, search) */
+    @Transactional(readOnly = true)
+    public Page<AdminMembersResponse> getAdminMembersByInfoName( Integer page, String infoName ) {
+
+        Page<Member> memberList = memberRepository.findByMemberInfoInfoNameContains( getPageable( page ), infoName );
+
+        return memberList.map( member -> AdminMembersResponse.from( member ) );
+    }
 
 
     /* 미분류 회원 목록 조회 */
     @Transactional(readOnly = true)
     public Page<NonMembersResponse> getNonMembers( Integer page ) {
 
-        Page<MemberInfo> NonMemberList = infoRepository.findByInfoStatus( getPageable( page ), NONREGIST );
+        Page<MemberInfo> nonMemberList = infoRepository.findByInfoStatus( getPageableNon( page ), NONREGIST );
 
-        return NonMemberList.map( nonMember -> NonMembersResponse.from( nonMember ) );
+        return nonMemberList.map( nonMember -> NonMembersResponse.from( nonMember ) );
     }
 
 
     /* 미분류 회원 목록 조회(search) */
     @Transactional(readOnly = true)
-    public Page<NonMembersResponse> getNonMembersByInfoName(Integer page, String infoName) {
+    public Page<NonMembersResponse> getNonMembersByInfoName( Integer page, String infoName ) {
 
-        Page<MemberInfo> NonMemberList = infoRepository.findByInfoNameContainsAndInfoStatus( getPageable( page ), infoName, NONREGIST );
+        Page<MemberInfo> nonMemberList = infoRepository.findByInfoNameContainsAndInfoStatus( getPageableNon( page ), infoName, NONREGIST );
 
-        return NonMemberList.map( nonMember -> NonMembersResponse.from( nonMember ) );
+        return nonMemberList.map( nonMember -> NonMembersResponse.from( nonMember ) );
     }
 
 

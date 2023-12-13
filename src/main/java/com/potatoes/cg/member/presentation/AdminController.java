@@ -5,6 +5,7 @@ import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.dto.request.InfoRegistRequest;
+import com.potatoes.cg.member.dto.response.AdminMembersResponse;
 import com.potatoes.cg.member.dto.response.HistoryResponse;
 import com.potatoes.cg.member.dto.response.NonMembersResponse;
 import com.potatoes.cg.member.service.AdminService;
@@ -33,6 +34,31 @@ public class AdminController {
         return ResponseEntity.status( HttpStatus.CREATED ).build();
     }
 
+
+    /* 회원 목록 조회 */
+    @GetMapping("/members")
+    public ResponseEntity<PagingResponse> getAdminMembers(@RequestParam(defaultValue = "1") final Integer page ) {
+
+        final Page<AdminMembersResponse> members = adminService.getAdminMembers( page );
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( members );
+        final PagingResponse pagingResponse = PagingResponse.of( members.getContent(), pagingButtonInfo );
+
+        return ResponseEntity.ok( pagingResponse );
+    }
+
+    /* 회원 목록 조회(search) */
+    @GetMapping("/members/search")
+    public ResponseEntity<PagingResponse> getAdminMembersByInfoName(@RequestParam final String infoName,
+                                                                    @RequestParam(defaultValue = "1") final Integer page ) {
+
+        final Page<AdminMembersResponse> members = adminService.getAdminMembersByInfoName( page, infoName);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( members );
+        final PagingResponse pagingResponse = PagingResponse.of( members.getContent(), pagingButtonInfo );
+
+        return ResponseEntity.ok( pagingResponse );
+    }
+
+
     /* 미분류 회원 목록 조회 */
     @GetMapping("/nonMembers")
     public ResponseEntity<PagingResponse> getNonMembers(@RequestParam(defaultValue = "1") final Integer page ) {
@@ -46,8 +72,8 @@ public class AdminController {
 
     /* 미분류 회원 목록 조회(search) */
     @GetMapping("/nonMembers/search")
-    public ResponseEntity<PagingResponse> getNonMembersByInfoName(
-            @RequestParam final String infoName, @RequestParam(defaultValue = "1") final Integer page ) {
+    public ResponseEntity<PagingResponse> getNonMembersByInfoName(@RequestParam final String infoName,
+                                                                  @RequestParam(defaultValue = "1") final Integer page ) {
 
         final Page<NonMembersResponse> nonMembers = adminService.getNonMembersByInfoName( page, infoName );
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( nonMembers );
