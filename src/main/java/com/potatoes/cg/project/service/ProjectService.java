@@ -103,6 +103,7 @@ public class ProjectService {
         Page<Project> projects = projectRepository.findByDeptDeptCodeAndProjectStatus(getPageable(page), info.getDept().getDeptCode(), USABLE);
 
         return projects.map(project -> {
+
             // 프로젝트에 참여한 멤버 수 조회
             long participantCount = projectRepository.countParticipantsByProjectCode(project.getProjectCode());
 

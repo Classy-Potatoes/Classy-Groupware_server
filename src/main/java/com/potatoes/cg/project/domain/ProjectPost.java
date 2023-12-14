@@ -53,7 +53,7 @@ public class ProjectPost {
     @JoinColumn(name = "memberCode")
     private MemberInfo member;
 
-    @Column
+    @Column(name = "projectCode")
     private Long projectCode;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
@@ -77,14 +77,14 @@ public class ProjectPost {
         this.fileEntity = fileEntity;
     }
 
-    public static ProjectPost of(final Long project, final MemberInfo member,
+    public static ProjectPost of(final Long projectCode, final MemberInfo member,
                                  final String postTitle, final String postBody, final List<ProjectFile> fileEntity) {
 
         return new ProjectPost(
                 postTitle,
                 postBody,
                 member,
-                project,
+                projectCode,
                 fileEntity
         );
     }
