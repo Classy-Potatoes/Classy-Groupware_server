@@ -2,13 +2,18 @@ package com.potatoes.cg.projectTodolist.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.potatoes.cg.calendar.domain.type.StatusType;
-import com.potatoes.cg.projectManagers.domain.ProjectManagers;
+import com.potatoes.cg.project.domain.ProjectReply;
+import com.potatoes.cg.projectManagers.domain.ProjectManagersTodo;
+import com.potatoes.cg.projectTodolist.dto.request.ProjectTodolistUpdateRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.potatoes.cg.calendar.domain.type.StatusType.UNFINISHED;
 import static javax.persistence.EnumType.STRING;
@@ -17,7 +22,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Table(name = "tbl_project_todolist")
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 public class ProjectTodolist {
@@ -40,27 +45,34 @@ public class ProjectTodolist {
     @Column(nullable = false)
     private StatusType tofoStatus = UNFINISHED;
 
-    @OneToOne(mappedBy = "todoList", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ProjectManagers projectManager;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "todoList")
+    @PrimaryKeyJoinColumn
+    private ProjectManagersTodo projectManager;
 
-    public ProjectTodolist(String todoBody, LocalDate todoEndDate, ProjectManagers projectManager) {
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "todoListCode")
+    private List<ProjectReply> replies;
+
+    public ProjectTodolist(String todoBody, LocalDate todoEndDate, ProjectManagersTodo projectManagersTodo) {
         this.todoBody = todoBody;
         this.todoEndDate = todoEndDate;
-        this.projectManager = projectManager;
+        this.projectManager = projectManagersTodo;
     }
 
-    public static ProjectTodolist of(String todoBody, LocalDate endDates, ProjectManagers projectManager) {
+    public static ProjectTodolist of(String todoBody, LocalDate endDates, ProjectManagersTodo projectManagersTodo) {
         return new ProjectTodolist(
                 todoBody,
                 endDates,
-                projectManager
+                projectManagersTodo
         );
     }
 
-    public void update(String todoBody, LocalDate endDates, ProjectManagers projectManager) {
-        this.todoBody = todoBody;
-        this.todoEndDate = endDates;
-        this.projectManager = projectManager;
+    public void update(List<ProjectTodolistUpdateRequest> todoRequest) {
+
+    }
+
+    public void checked(StatusType newStatus) {
+        this.tofoStatus = newStatus;
     }
 }
 
