@@ -25,7 +25,7 @@ public class ReportDetail_LetterResponse {
     private final String documentTitle;
     private final LocalDateTime approvalRegistDate;
     private final String approvalTurnbackReason;
-    private final List<Map<String,Object>> attachment;
+    private final List<Map<String,Object>> attachments;
     private final DocumentType documentType;
 
     /*품의서 정보*/

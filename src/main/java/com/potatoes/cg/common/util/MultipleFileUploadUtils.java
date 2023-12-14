@@ -32,7 +32,8 @@ public class MultipleFileUploadUtils {
                     Files.createDirectories(uploadPath);
                 }
 
-                String fileName = UUID.randomUUID().toString().replace("-", "");
+                String fileNameWithExtension = multipartFile.getOriginalFilename();
+                String fileName = FilenameUtils.removeExtension(fileNameWithExtension);
                 String fileExtension = FilenameUtils.getExtension(multipartFile.getOriginalFilename());
                 String replaceFileName = fileName + "." + fileExtension;
 
