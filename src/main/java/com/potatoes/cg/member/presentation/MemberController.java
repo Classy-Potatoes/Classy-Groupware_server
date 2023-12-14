@@ -77,23 +77,12 @@ public class MemberController {
 
     /* ----------------------- 마이페이지, 로그인 후 -------------------------- */
 
-
-    /* 현재 비밀번호 검증(마이페이지) */
-    @PostMapping("/member/pwdSearch")
-    public Boolean pwdSearch(@RequestBody final MemberPwdRequest pwdSearchRequest,
-                             @AuthenticationPrincipal CustomUser customUser) {
-
-        return memberService.pwdSearch( pwdSearchRequest, customUser.getMemberCode() );
-    }
-
     /* 비밀번호 변경(마이페이지) */
     @PutMapping("/member/pwdUpdate")
-    public ResponseEntity<Void> pwdUpdate(@RequestBody final MemberPwdRequest pwdSearchRequest,
+    public Boolean pwdUpdate(@RequestBody final MemberPwdRequest pwdSearchRequest,
                                           @AuthenticationPrincipal CustomUser customUser) {
 
-        memberService.pwdUpdate( pwdSearchRequest, customUser.getMemberCode() );
-
-        return ResponseEntity.created( URI.create("/cg-api/v1/dashboard") ).build();
+        return memberService.pwdUpdate( pwdSearchRequest, customUser.getMemberCode() );
     }
 
 

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberPwdRequest {
 
+    private final String currentPwd;
     private final String memberPassword;
 
 }

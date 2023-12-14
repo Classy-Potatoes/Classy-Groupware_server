@@ -126,26 +126,24 @@ public class MemberService {
         return memberRepository.existsByMemberId( request.getMemberId() );
     }
 
-    /* 현재 비밀번호 검증 */
-    @Transactional(readOnly = true)
-    public Boolean pwdSearch(final MemberPwdRequest pwdSearchRequest, final Long memberCode ) {
-
-        Member member = memberRepository.findById( memberCode )
-                .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_CODE ));
-
-        return passwordEncoder.matches( pwdSearchRequest.getMemberPassword(), member.getMemberPassword());
-    }
-
 
     /* 비밀번호 변경(마이페이지) */
-    public void pwdUpdate( final MemberPwdRequest pwdSearchRequest, final Long memberCode ) {
+    public Boolean pwdUpdate( final MemberPwdRequest pwdSearchRequest, final Long memberCode ) {
 
         Member member = memberRepository.findById( memberCode )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_CODE ));
 
-        member.updatePwd(
-                passwordEncoder.encode( pwdSearchRequest.getMemberPassword() )
-        );
+        // 현재 비밀번호 검증
+        if ( passwordEncoder.matches( pwdSearchRequest.getCurrentPwd(), member.getMemberPassword() ) ) {
+
+            member.updatePwd(
+                    passwordEncoder.encode( pwdSearchRequest.getMemberPassword() )
+            );
+
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
