@@ -2,15 +2,13 @@ package com.potatoes.cg.projectTodolist.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @Getter
-public class ProjectTodolistCreateRequest {
+public class ProjectTodolistUpdateRequest {
 
     private final String todoBody;
 

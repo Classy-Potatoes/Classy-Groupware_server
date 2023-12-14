@@ -2,10 +2,13 @@ package com.potatoes.cg.projectSchedule.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.potatoes.cg.calendar.domain.type.StatusType;
+import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.project.domain.Project;
-import com.potatoes.cg.projectManagers.domain.ProjectManagers;
+import com.potatoes.cg.project.domain.ProjectReply;
+import com.potatoes.cg.projectManagers.domain.ProjectManagersSchedule;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -55,11 +58,11 @@ public class ProjectSchedule {
     @Column(nullable = false)
     private LocalDateTime scheduleModifyDate;
 
-    //    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "memberCode")
-//    private Member member;
-    @Column
-    private int memberCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberCode")
+    private Member member;
+//    @Column
+//    private int memberCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectCode")
@@ -69,31 +72,37 @@ public class ProjectSchedule {
     @Column(nullable = false)
     private StatusType scheduleStatus = PROGRESS;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "scheduleCode")
-    private List<ProjectManagers> projectManagerList;
+    private List<ProjectManagersSchedule> projectManagerList;
 
-    public ProjectSchedule(String scheduleTitle, String scheduleBody, LocalDateTime scheduleStartDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManagers> projectManagerList) {
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "scheduleCode")
+    private List<ProjectReply> replies;
+
+    public ProjectSchedule(String scheduleTitle, String scheduleBody, LocalDateTime scheduleStartDate, LocalDateTime scheduleEndDate, Member member, Project project, List<ProjectManagersSchedule> projectManagerList) {
         this.scheduleTitle = scheduleTitle;
         this.scheduleBody = scheduleBody;
         this.scheduleStartDate = scheduleStartDate;
         this.scheduleEndDate = scheduleEndDate;
+        this.member = member;
         this.project = project;
         this.projectManagerList = projectManagerList;
     }
 
-    public static ProjectSchedule of(String scheduleTitle, String scheduleContent, LocalDateTime scheduleStartedDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManagers> projectManagerList) {
+    public static ProjectSchedule of(String scheduleTitle, String scheduleContent, LocalDateTime scheduleStartedDate, LocalDateTime scheduleEndDate, Member member, Project project, List<ProjectManagersSchedule> projectManagerList) {
         return new ProjectSchedule(
                 scheduleTitle,
                 scheduleContent,
                 scheduleStartedDate,
                 scheduleEndDate,
+                member,
                 project,
                 projectManagerList
                 );
     }
 
-    public void update(String scheduleTitle, String scheduleContent, LocalDateTime scheduleStartedDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManagers> attendants) {
+    public void update(String scheduleTitle, String scheduleContent, LocalDateTime scheduleStartedDate, LocalDateTime scheduleEndDate, Project project, List<ProjectManagersSchedule> attendants) {
         this.scheduleTitle = scheduleTitle;
         this.scheduleBody = scheduleContent;
         this.scheduleStartDate = scheduleStartedDate;
