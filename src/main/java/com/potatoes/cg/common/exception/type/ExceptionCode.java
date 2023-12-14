@@ -45,7 +45,9 @@ public enum ExceptionCode {
     NOT_FOUND_MEMBERCODE(4009, "해당하는 멤버가 없습니다."),
     NOT_FOUND_SCHEDULE_CODE(4010, "등록된 프로젝트 일정이 없습니다."),
     NOT_FOUND_TODO_CODE(4011, "등록된 프로젝트 할일이 없습니다."),
-    NOT_FOUND_PROJECT_CODE(4011, "등록된 프로젝트번호가 없습니다.");
+    NOT_FOUND_PROJECT_CODE(4011, "등록된 프로젝트번호가 없습니다."),
+    NOT_FOUND_MEMBER(4012, "참석자가 한명은 등록되어야합니다."),
+    NOT_FOUND_REPLY_BODY(4013, "작성된 댓글 내용이 없습니다.");
 
 
 

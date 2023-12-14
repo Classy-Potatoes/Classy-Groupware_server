@@ -1,6 +1,7 @@
 package com.potatoes.cg.projectTodo.dto.request;
 
 import com.potatoes.cg.projectTodolist.dto.request.ProjectTodolistCreateRequest;
+import com.potatoes.cg.projectTodolist.dto.request.ProjectTodolistUpdateRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,5 +15,5 @@ public class ProjectTodoUpdateRequest {
     @NotBlank
     private final String todoTitle;
 
-    private final List<ProjectTodolistCreateRequest> projectTodolistCreateRequestList;
+    private final List<ProjectTodolistUpdateRequest> projectTodolistUpdateRequestList;
 }

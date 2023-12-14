@@ -5,6 +5,7 @@ import com.potatoes.cg.calendar.dto.request.CalendarUpdateRequest;
 import com.potatoes.cg.calendar.dto.response.ScheduleResponse;
 import com.potatoes.cg.calendar.dto.response.ScheduleDetailResponse;
 import com.potatoes.cg.calendar.service.CalendarService;
+import com.potatoes.cg.jwt.CustomUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -29,11 +30,9 @@ public class CalendarController {
 
     /* 1. 전체 일정 조회 */
     @GetMapping("/calendar")
-    public ResponseEntity<List<ScheduleResponse>> getAllSchedules() {
+    public ResponseEntity<List<ScheduleResponse>> getAllSchedules(@AuthenticationPrincipal final CustomUser customUser) {
 
-       int memberCode = 1;
-
-        List<ScheduleResponse> allScheduleList = calendarService.getAllSchedule(memberCode);
+        List<ScheduleResponse> allScheduleList = calendarService.getAllSchedule(customUser);
 
         return ResponseEntity.status(HttpStatus.OK).body(allScheduleList);
     }
@@ -41,22 +40,18 @@ public class CalendarController {
 
     /* 2. 개인 일정 조회 */
     @GetMapping("/calendar-personal")
-    public ResponseEntity<List<ScheduleResponse>> getPersonalCalendar() {
+    public ResponseEntity<List<ScheduleResponse>> getPersonalCalendar(@AuthenticationPrincipal final CustomUser customUser) {
 
-        int memberCode = 1;
-
-        List<ScheduleResponse> personalList = calendarService.getPersonalCalendar(memberCode);
+        List<ScheduleResponse> personalList = calendarService.getPersonalCalendar(customUser);
 
         return ResponseEntity.status(HttpStatus.OK).body(personalList);
     }
 
     /* 3. 프로젝트 내 일정 조회 */
     @GetMapping("/calendar-project")
-    public ResponseEntity<List<ScheduleResponse>> getProjectCalendar() {
+    public ResponseEntity<List<ScheduleResponse>> getProjectCalendar(@AuthenticationPrincipal final CustomUser customUser) {
 
-        int memberCode = 1;
-
-        List<ScheduleResponse> projectList = calendarService.getProjectCalendar(memberCode);
+        List<ScheduleResponse> projectList = calendarService.getProjectCalendar(customUser);
 
         return ResponseEntity.status(HttpStatus.OK).body(projectList);
     }
@@ -72,14 +67,14 @@ public class CalendarController {
 
     /* 5. 개인 일정 추가 */
     @PostMapping("/calendar")
-    public ResponseEntity<Void> save(@RequestBody @Valid final CalendarCreateRequest calendarRequest) {
-        int memberCode = 1;
+    public ResponseEntity<Void> save(@RequestBody @Valid final CalendarCreateRequest calendarRequest,
+                                     @AuthenticationPrincipal final CustomUser customUser) {
         log.info("qwe : {}",calendarRequest);
         /* 응답 헤더 설정 */
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 
-        final Long calendarCode = calendarService.save(calendarRequest, memberCode);
+        final Long calendarCode = calendarService.save(calendarRequest, customUser);
 
         return ResponseEntity.created(URI.create("/calendar-management/" + calendarCode)).build();
     }

@@ -2,6 +2,8 @@ package com.potatoes.cg.calendar.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.potatoes.cg.calendar.domain.type.StatusType;
+import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -57,22 +59,22 @@ public class Calendar {
     @Column(nullable = false)
     private LocalDateTime calendarEndDate;
 
-    //    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "memberCode")
-//    private Member member;
+        @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberCode")
+    private Member member;
 
-    @Column(nullable = false)
-    private int memberCode;
+//    @Column(nullable = false)
+//    private int memberCode;
 
-    public Calendar(String calendarTitle, String calendarContent, LocalDateTime calendarStartedDate, LocalDateTime calendarEndDate, Integer memberCode) {
+    public Calendar(String calendarTitle, String calendarContent, LocalDateTime calendarStartedDate, LocalDateTime calendarEndDate, Member memberCode) {
         this.calendarTitle = calendarTitle;
         this.calendarContent = calendarContent;
         this.calendarStartedDate = calendarStartedDate;
         this.calendarEndDate = calendarEndDate;
-        this.memberCode = memberCode;
+        this.member = memberCode;
     }
 
-    public static Calendar of(String calendarTitle, String calendarContent, LocalDateTime calendarStartedDate, LocalDateTime calendarEndDate, Integer memberCode) {
+    public static Calendar of(String calendarTitle, String calendarContent, LocalDateTime calendarStartedDate, LocalDateTime calendarEndDate, Member memberCode) {
 
         return new Calendar(
                 calendarTitle,

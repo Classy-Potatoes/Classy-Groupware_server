@@ -26,7 +26,7 @@ public class ReportDetail_ExpenseResponse {
     private final String documentTitle;
     private final LocalDateTime approvalRegistDate;
     private final String approvalTurnbackReason;
-    private final List<Map<String,Object>> attachment;
+    private final List<Map<String,Object>> attachments;
     private final DocumentType documentType;
 
     /*지출 결의서 정보*/

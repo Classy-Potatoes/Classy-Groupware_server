@@ -1,12 +1,13 @@
+
 package com.potatoes.cg.approval.service;
 
 import com.potatoes.cg.approval.domain.*;
 import com.potatoes.cg.approval.domain.repository.*;
-import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineTurnType;
 import com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType;
 import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
+import com.potatoes.cg.approval.dto.request.ReportApprovalStatusUpdateRequest;
 import com.potatoes.cg.approval.dto.request.VacationCreateRequest;
 import com.potatoes.cg.approval.dto.response.*;
 import com.potatoes.cg.common.exception.NotFoundException;
@@ -14,10 +15,7 @@ import com.potatoes.cg.common.exception.type.ExceptionCode;
 import com.potatoes.cg.common.util.MultipleFileUploadUtils;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Member;
-import com.potatoes.cg.member.domain.MemberInfo;
-import com.potatoes.cg.member.domain.repository.InfoRepository;
 import com.potatoes.cg.member.domain.repository.MemberRepository;
-import com.potatoes.cg.member.dto.response.ProfileResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,12 +95,13 @@ public class ApprovalService {
                         .collect(Collectors.toList());
 
 
-        /* 결재자 memberCode, 결재 순서 */;
+        /* 결재자 memberCode, 결재 순서 */
+        ;
         final List<ApprovalLine> approvalLine = new ArrayList<>();
         for (Map<String, String> approvalLineRequest : letterRequest.getApprovalLine()) {
             String turn = approvalLineRequest.get("turn");
             Long memberCode = Long.parseLong(approvalLineRequest.get("memberCode"));
-            ApprovalLine newApprovalLine  = ApprovalLine.of(
+            ApprovalLine newApprovalLine = ApprovalLine.of(
                     memberCode,
                     turn
             );
@@ -129,6 +128,7 @@ public class ApprovalService {
 
         return letter.getApproval().getApprovalCode();
     }
+
     @Transactional
     public Long expenseSave(ExpenseCreateRequest expenseRequest, List<MultipartFile> attachment, CustomUser customUser) {
 
@@ -162,12 +162,13 @@ public class ApprovalService {
                         .map(memberCode -> Reference.of(memberCode))
                         .collect(Collectors.toList());
 
-        /* 결재자 memberCode, 결재 순서 */;
+        /* 결재자 memberCode, 결재 순서 */
+        ;
         final List<ApprovalLine> approvalLine = new ArrayList<>();
         for (Map<String, String> approvalLineRequest : expenseRequest.getApprovalLine()) {
             String turn = approvalLineRequest.get("turn");
             Long memberCode = Long.parseLong(approvalLineRequest.get("memberCode"));
-            ApprovalLine newApprovalLine  = ApprovalLine.of(
+            ApprovalLine newApprovalLine = ApprovalLine.of(
                     memberCode,
                     turn
             );
@@ -218,6 +219,7 @@ public class ApprovalService {
         return expense.getApproval().getApprovalCode();
 
     }
+
     @Transactional
     public Long vacationSave(VacationCreateRequest vacationRequest, CustomUser customUser) {
 
@@ -233,12 +235,13 @@ public class ApprovalService {
                         .map(memberCode -> Reference.of(memberCode))
                         .collect(Collectors.toList());
 
-        /* 결재자 memberCode, 결재 순서 */;
+        /* 결재자 memberCode, 결재 순서 */
+        ;
         final List<ApprovalLine> approvalLine = new ArrayList<>();
         for (Map<String, String> approvalLineRequest : vacationRequest.getApprovalLine()) {
             String turn = approvalLineRequest.get("turn");
             Long memberCode = Long.parseLong(approvalLineRequest.get("memberCode"));
-            ApprovalLine newApprovalLine  = ApprovalLine.of(
+            ApprovalLine newApprovalLine = ApprovalLine.of(
                     memberCode,
                     turn
             );
@@ -289,12 +292,11 @@ public class ApprovalService {
                 .collect(Collectors.toList());
 
 
-
         return new AllMemberAndLoginMemberResponse(responseForLoginUser, responsesForAllMembers);
     }
 
     private Pageable getPageable(final Integer page) {
-        return PageRequest.of(page - 1, 5, Sort.by("approvalRegistDate").descending());
+        return PageRequest.of(page - 1, 7, Sort.by("approvalRegistDate").descending());
     }
 
     /* 상신함 조회 - 결재대기 */
@@ -306,6 +308,7 @@ public class ApprovalService {
 
         return approvalReport.map(approval -> ReportResponse.from(approval));
     }
+
     /* 상신함 조회 - 결재중 */
     @Transactional(readOnly = true)
     public Page<ReportResponse> getReport_paying(Integer page, CustomUser customUser) {
@@ -314,6 +317,7 @@ public class ApprovalService {
 
         return approvalReport.map(approval -> ReportResponse.from(approval));
     }
+
     /* 상신함 조회 - 승인 */
     @Transactional(readOnly = true)
     public Page<ReportResponse> getReport_approve(Integer page, CustomUser customUser) {
@@ -321,6 +325,7 @@ public class ApprovalService {
 
         return approvalReport.map(approval -> ReportResponse.from(approval));
     }
+
     /* 상신함 조회 - 반려 */
     @Transactional(readOnly = true)
     public Page<ReportResponse> getReport_turnback(Integer page, CustomUser customUser) {
@@ -328,6 +333,7 @@ public class ApprovalService {
 
         return approvalReport.map(approval -> ReportResponse.from(approval));
     }
+
     /* 상신함 조회 - 회수 */
     @Transactional(readOnly = true)
     public Page<ReportResponse> getReport_recall(Integer page, CustomUser customUser) {
@@ -336,7 +342,8 @@ public class ApprovalService {
         return approvalReport.map(approval -> ReportResponse.from(approval));
     }
 
-
+    /* 기안서 양식이 무엇인지에 따라 상세 페이지 조회 */
+    @Transactional(readOnly = true)
     public DocumentType getDocumentType(Long approvalCode) {
 
         return approvalRepository.findDocumentTypeValueByApprovalCode(approvalCode);
@@ -347,7 +354,7 @@ public class ApprovalService {
     public ReportDetail_LetterResponse getLetterDetail(Long approvalCode) {
 
 
-        Letter approvalLetter = letterRepository.findByApprovalApprovalCodeAndApprovalDocumentType(approvalCode,DocumentType.LETTER);
+        Letter approvalLetter = letterRepository.findByApprovalApprovalCodeAndApprovalDocumentType(approvalCode, DocumentType.LETTER);
 
         return ReportDetail_LetterResponse.from(approvalLetter);
     }
@@ -356,31 +363,90 @@ public class ApprovalService {
     @Transactional(readOnly = true)
     public ReportDetail_VacationResponse getVacationDetail(Long approvalCode) {
 
-        Vacation approvalVacation = vacationRepository.findByApprovalApprovalCodeAndApprovalDocumentType(approvalCode,DocumentType.VACATION);
+        Vacation approvalVacation = vacationRepository.findByApprovalApprovalCodeAndApprovalDocumentType(approvalCode, DocumentType.VACATION);
 
 
         return ReportDetail_VacationResponse.from(approvalVacation);
 
 
     }
+
     /* 상신함 상세페이지 - 지출결의서*/
     @Transactional(readOnly = true)
     public ReportDetail_ExpenseResponse getExpenseDetail(Long approvalCode) {
 
-        Expense approvalExpense = expenseRepository.findByApprovalApprovalCodeAndApprovalDocumentType(approvalCode,DocumentType.EXPENSE);
+        Expense approvalExpense = expenseRepository.findByApprovalApprovalCodeAndApprovalDocumentType(approvalCode, DocumentType.EXPENSE);
 
 
         return ReportDetail_ExpenseResponse.from(approvalExpense);
     }
-
+    /* 상신함 - 결재대기 검색 */
+    @Transactional(readOnly = true)
     public Page<ReportResponse> getSearchReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
 
         LocalDateTime startOfDay = startDate.atStartOfDay();
         LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
 
-        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetween(getPageable(page), documentTitle, startOfDay, endOfDay);
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.WAITING);
 
         return approvals.map(approval -> ReportResponse.from(approval));
 
     }
+    /* 상신함 - 결재중 검색 */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> getSearchPayingReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
+
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.PAYING);
+
+        return approvals.map(approval -> ReportResponse.from(approval));
+    }
+    /* 상신함 - 승인 검색 */
+    public Page<ReportResponse> getSearchApproveReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.APPROVE);
+
+        return approvals.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 상신함 - 반려 검색 */
+    public Page<ReportResponse> getSearchTurnbackReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.TURNBACK);
+
+        return approvals.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 상신함 - 회수 검색 */
+    public Page<ReportResponse> getSearchRecallReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.RECALL);
+
+        return approvals.map(approval -> ReportResponse.from(approval));
+    }
+
+
+
+    /* 회수 처리 */
+    @Transactional
+    public void reportApprovalStatusTypeUpdate(ReportApprovalStatusUpdateRequest approvalCode) {
+
+        List<Long> approvalCodes = approvalCode.getApprovalCode();
+
+        approvalRepository.updateApprovalStatusByApprovalCodeIn(approvalCodes, ApprovalStatusType.RECALL);
+
+
+
+
+    }
+
 }
+

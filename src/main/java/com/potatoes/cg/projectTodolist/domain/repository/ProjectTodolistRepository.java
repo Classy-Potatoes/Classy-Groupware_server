@@ -1,5 +1,6 @@
 package com.potatoes.cg.projectTodolist.domain.repository;
 
+import com.potatoes.cg.calendar.domain.type.StatusType;
 import com.potatoes.cg.projectTodolist.domain.ProjectTodolist;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,5 +13,13 @@ public interface ProjectTodolistRepository extends JpaRepository<ProjectTodolist
     List<ProjectTodolist> findAllByProjectManager(ProjectTodolist projectTodolist);
 
     /* 삭제 */
+    void deleteAllByTodoCode(Long code);
 
+    /* 할일리스트 조회 */
+    List<ProjectTodolist> findAllByTodoCode(Long collect);
+
+    Long findByTodoBody(String todoBody);
+
+    /* 3정보 조회 */
+    List<ProjectTodolist> findAllByTofoStatusAndProjectManagerMemberMemberCodeOrderByTodoListCodeDesc(StatusType statusType, Long memberCode);
 }

@@ -7,11 +7,13 @@ import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface ApprovalRepository extends JpaRepository<Approval, Long> {
@@ -25,5 +27,9 @@ public interface ApprovalRepository extends JpaRepository<Approval, Long> {
     DocumentType findDocumentTypeValueByApprovalCode(@Param("approvalCode")Long approvalCode);
 
 
-    Page<Approval> findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetween(Pageable pageable, String documentTitle, LocalDateTime startOfDay, LocalDateTime endOfDay);
+    Page<Approval> findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(Pageable pageable, String documentTitle, LocalDateTime startOfDay, LocalDateTime endOfDay,ApprovalStatusType ApprovalStatus);
+
+    @Modifying
+    @Query("UPDATE Approval a SET a.approvalStatus = ?2 WHERE a.approvalCode IN ?1")
+    void updateApprovalStatusByApprovalCodeIn(List<Long> approvalCodes, ApprovalStatusType approvalStatusType);
 }

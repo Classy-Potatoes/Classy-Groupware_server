@@ -1,8 +1,10 @@
+
 package com.potatoes.cg.approval.presentation;
 
 import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
 import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
+import com.potatoes.cg.approval.dto.request.ReportApprovalStatusUpdateRequest;
 import com.potatoes.cg.approval.dto.request.VacationCreateRequest;
 import com.potatoes.cg.approval.dto.response.*;
 import com.potatoes.cg.approval.service.ApprovalService;
@@ -19,11 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.UriUtils;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -40,6 +40,7 @@ public class ApprovalController {
     public ResponseEntity<Void> letterSave(@RequestPart(required = false) @Valid final LetterCreateRequest letterRequest,
                                            @AuthenticationPrincipal CustomUser customUser,
                                            @RequestPart(required = false) final List<MultipartFile> attachment) {
+
 
         final Long letterCode = approvalService.letterSave(letterRequest, attachment, customUser);
 
@@ -61,7 +62,7 @@ public class ApprovalController {
                                             @AuthenticationPrincipal CustomUser customUser,
                                             @RequestPart(required = false) final List<MultipartFile> attachment) {
 
-        log.info("expenseRequest : {}",expenseRequest);
+
 
         final Long expenseCode = approvalService.expenseSave(expenseRequest, attachment , customUser);
 
@@ -84,7 +85,7 @@ public class ApprovalController {
     /*상신함 조회- 결재대기 */
     @GetMapping("/report-waiting")
     public ResponseEntity<PagingResponse> getReport_Waiting(@AuthenticationPrincipal final CustomUser customUser,
-                                                    @RequestParam(defaultValue = "1") final  Integer page) {
+                                                            @RequestParam(defaultValue = "1") final  Integer page) {
 
         final Page<ReportResponse> report = approvalService.getReport_Waiting(page,customUser);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(report);
@@ -95,7 +96,7 @@ public class ApprovalController {
     /*상신함 조회- 결재중 */
     @GetMapping("/report-paying")
     public ResponseEntity<PagingResponse> getReport_paying(@AuthenticationPrincipal final CustomUser customUser,
-                                                    @RequestParam(defaultValue = "1") final  Integer page) {
+                                                           @RequestParam(defaultValue = "1") final  Integer page) {
 
         final Page<ReportResponse> report = approvalService.getReport_paying(page,customUser);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(report);
@@ -106,7 +107,7 @@ public class ApprovalController {
     /*상신함 조회- 승인 */
     @GetMapping("/report-approve")
     public ResponseEntity<PagingResponse> getReport_approve(@AuthenticationPrincipal final CustomUser customUser,
-                                                           @RequestParam(defaultValue = "1") final  Integer page) {
+                                                            @RequestParam(defaultValue = "1") final  Integer page) {
 
         final Page<ReportResponse> report = approvalService.getReport_approve(page,customUser);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(report);
@@ -118,7 +119,7 @@ public class ApprovalController {
     /*상신함 조회- 반려 */
     @GetMapping("/report-turnback")
     public ResponseEntity<PagingResponse> getReport_turnback(@AuthenticationPrincipal final CustomUser customUser,
-                                                           @RequestParam(defaultValue = "1") final  Integer page) {
+                                                             @RequestParam(defaultValue = "1") final  Integer page) {
 
         final Page<ReportResponse> report = approvalService.getReport_turnback(page,customUser);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(report);
@@ -159,8 +160,8 @@ public class ApprovalController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 문서를 찾을 수 없습니다.");
         }
     }
-    /* 상신함 검색 기능 */
-    @GetMapping("/report/search")
+    /* 상신함 검색 - 결재대기 */
+    @GetMapping("/report/search-waiting")
     public ResponseEntity<PagingResponse> searchReport(@RequestParam(defaultValue = "1") final Integer page,
                                                        @RequestParam(required = false) final  String documentTitle,
                                                        @RequestParam(required = false) final @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -173,7 +174,72 @@ public class ApprovalController {
 
         return ResponseEntity.ok(pagingResponse);
     }
-        }
+    /* 상신함 검색 - 결재중 */
+    @GetMapping("/report/search-paying")
+    public ResponseEntity<PagingResponse> searchPayingReport(@RequestParam(defaultValue = "1") final Integer page,
+                                                       @RequestParam(required = false) final  String documentTitle,
+                                                       @RequestParam(required = false) final @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                       @RequestParam(required = false) final  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        final Page<ReportResponse> report = approvalService.getSearchPayingReport(page,documentTitle,startDate,endDate);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(report);
+        final PagingResponse pagingResponse = PagingResponse.of(report.getContent(), pagingButtonInfo);
+
+
+        return ResponseEntity.ok(pagingResponse);
+    }
+    /* 상신함 검색 - 승인 */
+    @GetMapping("/report/search-approve")
+    public ResponseEntity<PagingResponse> searchApproveReport(@RequestParam(defaultValue = "1") final Integer page,
+                                                             @RequestParam(required = false) final  String documentTitle,
+                                                             @RequestParam(required = false) final @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                             @RequestParam(required = false) final  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        final Page<ReportResponse> report = approvalService.getSearchApproveReport(page,documentTitle,startDate,endDate);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(report);
+        final PagingResponse pagingResponse = PagingResponse.of(report.getContent(), pagingButtonInfo);
+
+
+        return ResponseEntity.ok(pagingResponse);
+    }
+    /* 상신함 검색 - 반려 */
+    @GetMapping("/report/search-turnback")
+    public ResponseEntity<PagingResponse> searchTurnbackReport(@RequestParam(defaultValue = "1") final Integer page,
+                                                              @RequestParam(required = false) final  String documentTitle,
+                                                              @RequestParam(required = false) final @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                              @RequestParam(required = false) final  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        final Page<ReportResponse> report = approvalService.getSearchTurnbackReport(page,documentTitle,startDate,endDate);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(report);
+        final PagingResponse pagingResponse = PagingResponse.of(report.getContent(), pagingButtonInfo);
+
+
+        return ResponseEntity.ok(pagingResponse);
+    }
+    /* 상신함 검색 - 회수  */
+    @GetMapping("/report/search-recall")
+    public ResponseEntity<PagingResponse> searchRecallReport(@RequestParam(defaultValue = "1") final Integer page,
+                                                              @RequestParam(required = false) final  String documentTitle,
+                                                              @RequestParam(required = false) final @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                              @RequestParam(required = false) final  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+
+        final Page<ReportResponse> report = approvalService.getSearchRecallReport(page,documentTitle,startDate,endDate);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(report);
+        final PagingResponse pagingResponse = PagingResponse.of(report.getContent(), pagingButtonInfo);
+
+
+        return ResponseEntity.ok(pagingResponse);
+    }
+
+    /* 상신함 회수 처리 */
+    @PutMapping("/report-waiting")
+    public ResponseEntity<Void> reportApprovalStatusUpdate(@RequestBody final ReportApprovalStatusUpdateRequest approvalCode) {
+
+        approvalService.reportApprovalStatusTypeUpdate(approvalCode);
+
+        return ResponseEntity.created(URI.create("/report-waiting")).build();
+    }
+}
 
 
 
