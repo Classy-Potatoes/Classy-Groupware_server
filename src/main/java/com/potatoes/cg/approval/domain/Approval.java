@@ -14,6 +14,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType.RECALL;
 import static com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType.WAITING;
 import static com.potatoes.cg.approval.domain.type.approvalType.DocumentType.LETTER;
 import static javax.persistence.EnumType.STRING;
@@ -109,6 +110,9 @@ public class Approval {
         this.approvalStatus = WAITING;
     }
 
+
+
+
     public static Approval of(final String documentTitle, final List<Reference> referenceLine, final List<ApprovalLine> approvalLine
                               ,final DocumentType documentType,final Member member, final List<ApprovalFile> attachment) {
 
@@ -135,4 +139,7 @@ public class Approval {
                 findByLoginmember
         );
     }
-}
+
+
+    }
+
