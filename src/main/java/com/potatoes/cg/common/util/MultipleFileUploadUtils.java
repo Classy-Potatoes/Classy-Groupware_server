@@ -44,7 +44,7 @@ public class MultipleFileUploadUtils {
             } catch (IOException e) {
                 throw new ServerInternalException(FAIL_TO_UPLOAD_FILE);
             }
-            }
+        }
 
         return fileNames;
     }
@@ -60,5 +60,3 @@ public class MultipleFileUploadUtils {
         }
     }
 }
-
-

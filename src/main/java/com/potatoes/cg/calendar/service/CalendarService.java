@@ -8,6 +8,10 @@ import com.potatoes.cg.calendar.dto.response.ScheduleResponse;
 import com.potatoes.cg.calendar.dto.response.ScheduleDetailResponse;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.common.exception.ServerInternalException;
+import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.MemberInfo;
+import com.potatoes.cg.member.domain.repository.MemberRepository;
 import com.potatoes.cg.projectSchedule.domain.ProjectSchedule;
 import com.potatoes.cg.projectSchedule.domain.repository.ProjectScheduleRepository;
 
@@ -20,7 +24,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,16 +40,18 @@ public class CalendarService {
 
     private final ProjectScheduleRepository projectScheduleRepository;
 
+    private final MemberRepository memberRepository;
+
     /* 1. 전체 일정 조회 */
     @Transactional(readOnly = true)
-    public List<ScheduleResponse> getAllSchedule(Integer memberCode) {
+    public List<ScheduleResponse> getAllSchedule(CustomUser customUser) {
 
         List<ScheduleResponse> allSchedules = new ArrayList<>();
 
-        List<ScheduleResponse> personalSchedules = getPersonalCalendar(memberCode);
+        List<ScheduleResponse> personalSchedules = getPersonalCalendar(customUser);
         allSchedules.addAll(personalSchedules);
 
-        List<ScheduleResponse> projectSchedules = getProjectCalendar(memberCode);
+        List<ScheduleResponse> projectSchedules = getProjectCalendar(customUser);
         allSchedules.addAll(projectSchedules);
 
         return allSchedules;
@@ -54,9 +59,9 @@ public class CalendarService {
 
     /* 2. 개인 일정 조회 */
     @Transactional(readOnly = true)
-    public List<ScheduleResponse> getPersonalCalendar(Integer memberCode) {
+    public List<ScheduleResponse> getPersonalCalendar(CustomUser customUser) {
 
-        List<Calendar> calendarList = calendarRepository.findAllByStatusNot(DELETED);
+        List<Calendar> calendarList = calendarRepository.findAllByStatusNotAndMemberMemberCode(DELETED, customUser.getMemberCode());
 
         List<ScheduleResponse> scheduleResponseList = calendarList.stream()
                 .map(calendar -> ScheduleResponse.from(
@@ -75,9 +80,9 @@ public class CalendarService {
 
     /* 3. 프로젝트 내 일정 조회 */
     @Transactional(readOnly = true)
-    public List<ScheduleResponse> getProjectCalendar(Integer memberCode) {
+    public List<ScheduleResponse> getProjectCalendar(CustomUser customUser) {
 
-        List<ProjectSchedule> calendarList = projectScheduleRepository.findAllByScheduleStatusNot(DELETED);
+        List<ProjectSchedule> calendarList = projectScheduleRepository.findAllByScheduleStatusNotAndMemberMemberCode(DELETED, customUser.getMemberCode());
 
         List<ScheduleResponse> scheduleResponseList = calendarList.stream()
                 .map(calendar -> ScheduleResponse.from(
@@ -105,7 +110,7 @@ public class CalendarService {
     }
 
     /* 5. 개인 일정 추가 */
-    public Long save(CalendarCreateRequest calendarRequest, Integer memberCode) {
+    public Long save(CalendarCreateRequest calendarRequest, CustomUser customUser) {
 
         String calendarTitle = calendarRequest.getCalendarTitle();
         String calendarContent = calendarRequest.getCalendarContent();
@@ -145,12 +150,14 @@ public class CalendarService {
             throw new ServerInternalException(NOT_VALID_DATE);
         }
 
+        Member member = memberRepository.getReferenceById(customUser.getMemberCode());
+
         final Calendar newCalendar = Calendar.of(
                 calendarTitle,
                 calendarContent,
                 calendarStartedDate,
                 calendarEndDate,
-                memberCode
+                member
         );
 
         final Calendar calendar = calendarRepository.save(newCalendar);

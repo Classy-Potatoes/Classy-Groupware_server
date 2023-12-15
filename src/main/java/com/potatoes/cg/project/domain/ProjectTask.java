@@ -88,7 +88,7 @@ public class ProjectTask {
 
 
     public ProjectTask(String taskTitle, String taskBody, Date taskStartDate, Date taskEndDate,
-                       String taskPriority, MemberInfo member,  Long project, List<ProjectFile> fileEntity,
+                       String taskPriority, MemberInfo member,  Long projectCode, List<ProjectFile> fileEntity,
                        List<ProjectManager> projectManagers) {
         this.taskTitle = taskTitle;
         this.taskBody = taskBody;
@@ -96,14 +96,14 @@ public class ProjectTask {
         this.taskEndDate = taskEndDate;
         this.taskPriority = taskPriority;
         this.member = member;
-        this.projectCode = project;
+        this.projectCode = projectCode;
         this.fileEntity = fileEntity;
         this.projectManagers = projectManagers;
     }
 
 
     /* 생성 */
-    public static ProjectTask of(Long project, MemberInfo member, String taskTitle,
+    public static ProjectTask of(Long projectCode, MemberInfo member, String taskTitle,
                                  String taskBody, Date taskStartDate, Date taskEndDate,
                                  String taskPriority, List<ProjectFile> files, List<ProjectManager> managers) {
 
@@ -114,7 +114,7 @@ public class ProjectTask {
                 taskEndDate,
                 taskPriority,
                 member,
-                project,
+                projectCode,
                 files,
                 managers
         );

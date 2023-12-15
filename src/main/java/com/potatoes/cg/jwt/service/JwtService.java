@@ -226,8 +226,8 @@ public class JwtService {
 
         UserDetails userDetails = User.builder()
                 .username( member.getMemberId() )
-                .password( member.getMemberPassword() )
-                .roles( member.getMemberRole().name() )
+                .password( member.getMemberPassword())
+                .roles( member.getMemberRole().name())
                 .build();
 
 

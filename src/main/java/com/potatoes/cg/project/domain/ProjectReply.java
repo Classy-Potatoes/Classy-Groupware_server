@@ -1,5 +1,6 @@
 package com.potatoes.cg.project.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.potatoes.cg.member.domain.MemberInfo;
 import com.potatoes.cg.project.domain.type.ProjectStatusType;
 import com.potatoes.cg.project.domain.type.ProjectOptionType;
@@ -37,6 +38,7 @@ public class ProjectReply {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime replyCreatedDate;
 
     @LastModifiedDate
