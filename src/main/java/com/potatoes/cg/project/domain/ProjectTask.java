@@ -105,7 +105,7 @@ public class ProjectTask {
     /* 생성 */
     public static ProjectTask of(Long projectCode, MemberInfo member, String taskTitle,
                                  String taskBody, Date taskStartDate, Date taskEndDate,
-                                 String taskPriority, List<ProjectFile> files, List<ProjectManager> managers) {
+                                 String taskPriority, List<ProjectFile> fileEntity, List<ProjectManager> managers) {
 
         return new ProjectTask(
                 taskTitle,
@@ -115,7 +115,7 @@ public class ProjectTask {
                 taskPriority,
                 member,
                 projectCode,
-                files,
+                fileEntity,
                 managers
         );
     }

@@ -14,6 +14,9 @@ public interface ProjectParticipantRepository extends JpaRepository<ProjectParti
     /* 프로젝트 내 인원 조회 */
     List<ProjectParticipant> findAllByProjectProjectCode(Long projectCode);
 
+    List<ProjectParticipant> findParticipantsByProjectProjectCode(Long projectCode);
+
+
 //    @Query("SELECT COUNT(pp) FROM ProjectParticipant pp WHERE pp.project.projectCode = :projectCode")
 //    long countParticipantsByProjectCode(@Param("projectCode") Long projectCode);
 

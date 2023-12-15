@@ -17,4 +17,5 @@ public interface ProjectMemberRepository extends JpaRepository<Member, Long> {
 
     /* 부서별 회원 조회 */
     List<Member> findByMemberInfoDeptDeptCodeAndMemberStatus(Long deptCode, MemberStatus memberStatus);
+
 }

@@ -40,15 +40,18 @@ public class ProjectPostResponse {
 
     public static ProjectPostResponse from(ProjectPost post, List<ProjectReply> replies,List<ProjectFile> files, CustomUser customUser) {
 
-        List<Map<String, Object>> repliesMap = replies.stream().map(reply -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("memberName", reply.getMember().getInfoName());
-            map.put("replyBody", reply.getReplyBody());
-            map.put("replyCreatedDate", reply.getReplyCreatedDate());
-            map.put("memberCode", reply.getMember().getInfoCode());
-            map.put("replyCode", reply.getReplyCode());
-            return map;
-        }).collect(Collectors.toList());
+        List<Map<String, Object>> repliesMap = replies.stream()
+                .filter(reply -> !ProjectStatusType.DELETED.equals(reply.getReplyState())) // 삭제된 댓글 제외
+                .map(reply -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("memberName", reply.getMember().getInfoName());
+                    map.put("replyBody", reply.getReplyBody());
+                    map.put("replyCreatedDate", reply.getReplyCreatedDate());
+                    map.put("memberCode", reply.getMember().getInfoCode());
+                    map.put("replyCode", reply.getReplyCode());
+                    return map;
+                })
+                .collect(Collectors.toList());
 
         // 첨부파일
         List<Map<String, Object>> filesMap = files.stream().map(file -> {

@@ -172,22 +172,34 @@ public class ProjectController {
     }
 
     /* 부서별 회원 조회 */
-    @GetMapping("/dept/{deptCode}/member")
-    public ResponseEntity<List<MemberDeptResponse>> getDeptMember(@PathVariable final Long deptCode) {
+//    @GetMapping("/dept/{deptCode}/member")
+//    public ResponseEntity<List<MemberDeptResponse>> getDeptMember(
+//            @PathVariable final Long deptCode) {
+//
+//        List<MemberDeptResponse> projectMemberResponseList = projectMemberService.getDeptMember(deptCode);
+//
+//        return ResponseEntity.status(HttpStatus.OK).body(projectMemberResponseList);
+//    }
+    @GetMapping("/dept/{deptCode}/project/{projectCode}/member")
+    public ResponseEntity<List<MemberDeptResponse>> getDeptMember(
+            @PathVariable final Long deptCode,
+            @PathVariable final Long projectCode) {
 
-        List<MemberDeptResponse> projectMemberResponseList = projectMemberService.getDeptMember(deptCode);
+        List<MemberDeptResponse> projectMemberResponseList = projectMemberService.getDeptMember(deptCode,projectCode);
 
         return ResponseEntity.status(HttpStatus.OK).body(projectMemberResponseList);
     }
 
+
     /* 부서별 회원 검색 */
-    @GetMapping("/dept/{deptCode}/search")
+    @GetMapping("/dept/{deptCode}/project/{projectCode}/search")
     public ResponseEntity<List<MemberDeptResponse>> getDeptSearch(
             @PathVariable final Long deptCode,
+            @PathVariable final Long projectCode,
             @RequestParam final String infoName
     )    {
 
-        List<MemberDeptResponse> members = projectMemberService.getDeptSearch(deptCode, infoName);
+        List<MemberDeptResponse> members = projectMemberService.getDeptSearch(deptCode, infoName, projectCode);
 
 
         return ResponseEntity.status(HttpStatus.OK).body(members);
@@ -246,6 +258,7 @@ public class ProjectController {
 
         return ResponseEntity.created(URI.create("/post/" + postCode)).build();
     }
+
 
     /* 프로젝트 일반 게시글 수정 */
     @PutMapping("/post/{postCode}")
@@ -434,6 +447,9 @@ public class ProjectController {
 
         return ResponseEntity.ok(pagingResponse);
     }
+
+//    /* 업무 요청 확인하기 */
+//    @PutMapping("/")
 
 
 }

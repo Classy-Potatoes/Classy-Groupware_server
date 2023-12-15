@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,36 +46,65 @@ public class ProjectMemberService {
     }
 
     /* 부서별 회원 조회 */
-    @Transactional(readOnly = true)
-    public List<MemberDeptResponse> getDeptMember(final Long deptCode) {
+//    @Transactional(readOnly = true)
+//    public List<MemberDeptResponse> getDeptMember(final Long deptCode) {
+//
+//        List<Member> members = projectMemberRepository.findByMemberInfoDeptDeptCodeAndMemberStatus(deptCode, ACTIVE);
+//
+//        List<MemberDeptResponse> projectMemberResponseList = members.stream()
+//                .map(member -> MemberDeptResponse.from(
+//                        member.getMemberInfo(),
+//                        member.getMemberInfo().getInfoName(),
+//                        member.getMemberInfo().getDept().getDeptCode(),
+//                        member.getMemberInfo().getDept().getDeptName()
+//
+//                )).collect(Collectors.toList());
+//
+//        return projectMemberResponseList;
+//    }
 
+    @Transactional(readOnly = true)
+    public List<MemberDeptResponse> getDeptMember(final Long deptCode, final Long projectCode) {
+
+        // 해당 프로젝트의 참석자들을 조회
+//        List<ProjectParticipant> projectParticipants = projectParticipantRepository.findAllByProjectProjectCode(projectCode);
+      List<ProjectParticipant> projectParticipants = projectParticipantRepository.findParticipantsByProjectProjectCode(projectCode);
+
+        // 부서별 회원 조회
         List<Member> members = projectMemberRepository.findByMemberInfoDeptDeptCodeAndMemberStatus(deptCode, ACTIVE);
 
+        // 해당 프로젝트에 참석자로 등록되지 않은 회원만 필터링
         List<MemberDeptResponse> projectMemberResponseList = members.stream()
+                .filter(member -> projectParticipants.stream()
+                        .noneMatch(participant -> participant.getMember().getInfoCode().equals(member.getMemberInfo().getInfoCode())))
                 .map(member -> MemberDeptResponse.from(
                         member.getMemberInfo(),
                         member.getMemberInfo().getInfoName(),
                         member.getMemberInfo().getDept().getDeptCode(),
                         member.getMemberInfo().getDept().getDeptName()
-
-                )).collect(Collectors.toList());
+                ))
+                .collect(Collectors.toList());
 
         return projectMemberResponseList;
     }
 
     /* 부서별 회원 검색*/
-    public List<MemberDeptResponse> getDeptSearch(Long deptCode, String infoName) {
+    public List<MemberDeptResponse> getDeptSearch(Long deptCode, String infoName, Long projectCode) {
+
+        List<ProjectParticipant> projectParticipants = projectParticipantRepository.findParticipantsByProjectProjectCode(projectCode);
 
         List<Member> members = projectMemberRepository.findByMemberInfoDeptDeptCodeAndMemberInfoInfoNameContainsAndMemberStatus(deptCode, infoName, ACTIVE);
 
         List<MemberDeptResponse> projectMemberResponseList = members.stream()
+                .filter(member -> projectParticipants.stream()
+                        .noneMatch(participant -> participant.getMember().getInfoCode().equals(member.getMemberInfo().getInfoCode())))
                 .map(member -> MemberDeptResponse.from(
                         member.getMemberInfo(),
                         member.getMemberInfo().getInfoName(),
                         member.getMemberInfo().getDept().getDeptCode(),
                         member.getMemberInfo().getDept().getDeptName()
-
-                )).collect(Collectors.toList());
+                ))
+                .collect(Collectors.toList());
 
         return projectMemberResponseList;
     }
@@ -143,4 +173,5 @@ public class ProjectMemberService {
         return members.map(Member -> ProjectMemberResponse.fromMember(Member));
 
     }
+
 }
