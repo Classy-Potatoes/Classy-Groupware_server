@@ -94,6 +94,11 @@ public class Member {
         this.memberPassword = memberPassword;
     }
 
+    // 회원 상태 변경
+    public void updateStatus( MemberStatus memberStatus ) {
+        this.memberStatus = memberStatus;
+    }
+
     // 회원반납
     public void returnUser( MemberStatus memberStatus, String memberToken ) {
         this.memberStatus = memberStatus;

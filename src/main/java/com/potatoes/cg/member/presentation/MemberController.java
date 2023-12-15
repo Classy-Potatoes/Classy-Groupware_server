@@ -77,23 +77,12 @@ public class MemberController {
 
     /* ----------------------- 마이페이지, 로그인 후 -------------------------- */
 
-
-    /* 현재 비밀번호 검증(마이페이지) */
-    @PostMapping("/member/pwdSearch")
-    public Boolean pwdSearch(@RequestBody final MemberPwdRequest pwdSearchRequest,
-                             @AuthenticationPrincipal CustomUser customUser) {
-
-        return memberService.pwdSearch( pwdSearchRequest, customUser.getMemberCode() );
-    }
-
     /* 비밀번호 변경(마이페이지) */
     @PutMapping("/member/pwdUpdate")
-    public ResponseEntity<Void> pwdUpdate(@RequestBody final MemberPwdRequest pwdSearchRequest,
+    public Boolean pwdUpdate(@RequestBody final MemberPwdRequest pwdSearchRequest,
                                           @AuthenticationPrincipal CustomUser customUser) {
 
-        memberService.pwdUpdate( pwdSearchRequest, customUser.getMemberCode() );
-
-        return ResponseEntity.created( URI.create("/cg-api/v1/dashboard") ).build();
+        return memberService.pwdUpdate( pwdSearchRequest, customUser.getMemberCode() );
     }
 
 
@@ -103,7 +92,6 @@ public class MemberController {
 
         memberService.returnUser( customUser );
 
-        // 탈퇴되고 나서 연결할 링크와 로그아웃이 필요함 추후
         return ResponseEntity.created( URI.create("/") ).build();
     }
 
@@ -111,20 +99,11 @@ public class MemberController {
     @GetMapping("/member/myProfile")
     public ResponseEntity<ProfileResponse> profile( @AuthenticationPrincipal CustomUser customUser ) {
 
-        ProfileResponse profileResponse = memberService.getProfile( customUser.getMemberCode() );
+        ProfileResponse profileResponse = memberService.getProfile( customUser );
 
         return ResponseEntity.ok( profileResponse );
     }
 
-
-    /* 회원프로필 이미지 조회(마이페이지) */
-//    @GetMapping("/member/myProfile")
-//    public ResponseEntity<ProfileResponse> profile( @AuthenticationPrincipal CustomUser customUser ) {
-//
-//        ProfileResponse profileResponse = memberService.getProfile( customUser.getMemberCode() );
-//
-//        return ResponseEntity.ok( profileResponse );
-//    }
 
 
     /* 회원상세 수정(마이페이지) */
@@ -135,22 +114,9 @@ public class MemberController {
 
         memberService.profileUpdate( memberUpdateRequest, profileImage, customUser );
 
-        // 추후에 마이페이지 조회페이지로 이동하도록 수정
         return ResponseEntity.created( URI.create( "/" ) ).build();
     }
 
-
-    /* 회원이력 조회(마이페이지) */
-    @GetMapping("/member/myHistory")
-    public ResponseEntity<PagingResponse> myHistory( @RequestParam(defaultValue = "1") final Integer page,
-                                            @AuthenticationPrincipal CustomUser customUser ) {
-
-        final Page<HistoryResponse> historys = memberService.myHistory( page, customUser );
-        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( historys );
-        final PagingResponse pagingResponse = PagingResponse.of( historys.getContent(), pagingButtonInfo );
-
-        return ResponseEntity.ok( pagingResponse );
-    }
 
     /* 회원 목록 조회 */
     @GetMapping("/member/list")
@@ -162,7 +128,6 @@ public class MemberController {
 
         return ResponseEntity.ok( pagingResponse );
     }
-
 
 
     /* ----------------------- 부서, 직급 조회 -------------------------- */
