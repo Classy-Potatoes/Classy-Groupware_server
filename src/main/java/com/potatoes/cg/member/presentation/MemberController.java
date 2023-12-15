@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -115,6 +116,7 @@ public class MemberController {
         return ResponseEntity.ok( profileResponse );
     }
 
+
     /* 회원프로필 이미지 조회(마이페이지) */
 //    @GetMapping("/member/myProfile")
 //    public ResponseEntity<ProfileResponse> profile( @AuthenticationPrincipal CustomUser customUser ) {
@@ -165,26 +167,23 @@ public class MemberController {
 
     /* ----------------------- 부서, 직급 조회 -------------------------- */
 
+
     /* 부서 리스트 조회 */
     @GetMapping("/deptList")
-    public ResponseEntity<PagingResponse> deptList( @RequestParam(defaultValue = "1") final Integer page ) {
+    public ResponseEntity<List<DeptResponse>> deptList() {
 
-        final Page<DeptResponse> deptList = memberService.deptList( page );
-        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( deptList );
-        final PagingResponse pagingResponse = PagingResponse.of( deptList.getContent(), pagingButtonInfo );
+        final List<DeptResponse> deptList = memberService.deptList();
 
-        return ResponseEntity.ok( pagingResponse );
+        return ResponseEntity.ok( deptList );
     }
 
     /* 직급 리스트 조회 */
     @GetMapping("/jobList")
-    public ResponseEntity<PagingResponse> jobList( @RequestParam(defaultValue = "1") final Integer page ) {
+    public ResponseEntity<List<JobResponse>> jobList() {
 
-        final Page<JobResponse> jobList = memberService.jobList( page );
-        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( jobList );
-        final PagingResponse pagingResponse = PagingResponse.of( jobList.getContent(), pagingButtonInfo );
+        final List<JobResponse> jobList = memberService.jobList();
 
-        return ResponseEntity.ok( pagingResponse );
+        return ResponseEntity.ok( jobList );
     }
 
 

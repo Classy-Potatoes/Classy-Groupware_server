@@ -1,6 +1,7 @@
 package com.potatoes.cg.project.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.project.domain.ProjectManager;
 import com.potatoes.cg.project.domain.ProjectReply;
 import com.potatoes.cg.project.domain.ProjectTask;
@@ -39,8 +40,10 @@ public class ProjectTaskResponse {
 
     private final List<Map<String, Object>> replies;
 
+    private final CustomUser customUser;
 
-    public static ProjectTaskResponse from(ProjectTask task, List<ProjectReply> replies, List<ProjectManager> managers) {
+
+    public static ProjectTaskResponse from(ProjectTask task, List<ProjectReply> replies, List<ProjectManager> managers, CustomUser customUser) {
 
         List<Map<String, Object>> repliesMap = replies.stream().map(reply -> {
             Map<String, Object> map = new HashMap<>();
@@ -69,7 +72,8 @@ public class ProjectTaskResponse {
                 task.getTaskDeleteStatus(),
                 task.getProjectCode(),
                 managersMap,
-                repliesMap
+                repliesMap,
+                customUser
         );
     }
 }

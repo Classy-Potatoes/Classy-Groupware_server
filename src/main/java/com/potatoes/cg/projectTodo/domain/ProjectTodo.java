@@ -1,10 +1,12 @@
 package com.potatoes.cg.projectTodo.domain;
 
 import com.potatoes.cg.calendar.domain.type.StatusType;
+import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.project.domain.Project;
 import com.potatoes.cg.projectTodolist.domain.ProjectTodolist;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -42,11 +44,9 @@ public class ProjectTodo {
     @Column(nullable = false)
     private LocalDateTime todoModifyDate;
 
-    //    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "memberCode")
-//    private Member member;
-    @Column
-    private int memberCode;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberCode")
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectCode")
@@ -56,20 +56,22 @@ public class ProjectTodo {
     @Column(nullable = false)
     private StatusType todoStatus = PROGRESS;
 
-    @OneToMany(cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "todoCode")
     private List<ProjectTodolist> projectTodolist;
 
 
-    public ProjectTodo(String todoTitle, Project project, List<ProjectTodolist> projectTodolist) {
+    public ProjectTodo(String todoTitle, Member member, Project project, List<ProjectTodolist> projectTodolist) {
         this.todoTitle = todoTitle;
+        this.member = member;
         this.project = project;
         this.projectTodolist = projectTodolist;
     }
 
-    public static ProjectTodo of(String todoTitle, Project project, List<ProjectTodolist> projectTodolists) {
+    public static ProjectTodo of(String todoTitle, Member member, Project project, List<ProjectTodolist> projectTodolists) {
         return new ProjectTodo(
                 todoTitle,
+                member,
                 project,
                 projectTodolists
         );

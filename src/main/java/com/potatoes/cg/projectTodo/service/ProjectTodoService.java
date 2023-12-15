@@ -1,32 +1,57 @@
 package com.potatoes.cg.projectTodo.service;
 
+import com.potatoes.cg.calendar.domain.type.StatusType;
 import com.potatoes.cg.common.exception.NotFoundException;
+import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.MemberInfo;
+import com.potatoes.cg.member.domain.repository.InfoRepository;
 import com.potatoes.cg.member.domain.repository.MemberRepository;
 import com.potatoes.cg.project.domain.Project;
+import com.potatoes.cg.project.domain.ProjectReply;
 import com.potatoes.cg.project.domain.repository.ProjectParticipantRepository;
+import com.potatoes.cg.project.domain.repository.ProjectReplyRepository;
 import com.potatoes.cg.project.domain.repository.ProjectRepository;
+import com.potatoes.cg.project.domain.type.ProjectStatusType;
 import com.potatoes.cg.project.service.ProjectMemberService;
 import com.potatoes.cg.project.service.ProjectService;
-import com.potatoes.cg.projectManagers.domain.ProjectManagers;
-import com.potatoes.cg.projectManagers.domain.repository.ProjectManagersRepository;
+import com.potatoes.cg.projectManagers.domain.ProjectManagersSchedule;
+import com.potatoes.cg.projectManagers.domain.ProjectManagersTodo;
+import com.potatoes.cg.projectManagers.domain.repository.ProjectManagersTodoRepository;
+import com.potatoes.cg.projectSchedule.dto.request.SchReplyUpdate;
+import com.potatoes.cg.projectSchedule.dto.request.ScheduleReplyCreateRequest;
 import com.potatoes.cg.projectTodo.domain.ProjectTodo;
 import com.potatoes.cg.projectTodo.domain.repository.ProjectTodoRepository;
 import com.potatoes.cg.projectTodo.dto.request.ProjectTodoCreateRequest;
 import com.potatoes.cg.projectTodo.dto.request.ProjectTodoUpdateRequest;
+import com.potatoes.cg.projectTodo.dto.response.ProjectTodoListResponse;
+import com.potatoes.cg.projectTodo.dto.response.ProjectTodoResponse;
+import com.potatoes.cg.projectTodo.presentation.TodoListResponse;
 import com.potatoes.cg.projectTodolist.domain.ProjectTodolist;
 import com.potatoes.cg.projectTodolist.domain.repository.ProjectTodolistRepository;
 import com.potatoes.cg.projectTodolist.dto.request.ProjectTodolistCreateRequest;
+import com.potatoes.cg.projectTodolist.dto.request.ProjectTodolistUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.potatoes.cg.calendar.domain.type.StatusType.DELETED;
+import static com.potatoes.cg.calendar.domain.type.StatusType.*;
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
+import static com.potatoes.cg.project.domain.type.ProjectOptionType.SCHEDULE;
+import static com.potatoes.cg.project.domain.type.ProjectOptionType.TODO;
 
 @Service
 @Transactional
@@ -39,79 +64,101 @@ public class ProjectTodoService {
     private final ProjectTodoRepository projectScheduleRepository;
     private final ProjectParticipantRepository projectParticipantRepository;
     private final ProjectMemberService projectMemberService;
-    private final ProjectManagersRepository projectManagerRepository;
+    private final ProjectManagersTodoRepository projectManagerRepository;
     private final ProjectRepository projectRepository;
     private final ProjectTodoRepository projectTodoRepository;
     private final ProjectTodolistRepository projectTodolistRepository;
+    private final InfoRepository infoRepository;
+    private final ProjectReplyRepository projectReplyRepository;
 
     /* 할일 등록 */
-    public void save(Long projectCode, ProjectTodoCreateRequest todoRequest, int memberCode) {
+    public void save(Long projectCode, ProjectTodoCreateRequest todoRequest, CustomUser customUser) {
 
-        List<ProjectTodolistCreateRequest> todoReqList = todoRequest.getProjectTodolistCreateRequestList();
-        List<ProjectTodolist> projectTodolists = new ArrayList<>();
-        for (int i = 0; i < todoReqList.size(); i++) {
 
-            final ProjectTodolistCreateRequest todoListReq = todoReqList.get(i);
+        List<ProjectTodolist> projectTodolists = todoRequest.getProjectTodolistCreateRequestList().stream().map(
+                todoReq -> ProjectTodolist.of(
+                        todoReq.getTodoBody(),
+                        todoReq.getEndDates(),
+                        ProjectManagersTodo.of(memberRepository.getReferenceById(todoReq.getAttendant()
+                                )
+                        )
+                )).collect(Collectors.toList());
 
-            ProjectManagers projectManager = memberRepository.findById(todoListReq.getAttendant())
-                    .map(member -> ProjectManagers.of(member))
-                    .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBERCODE));
-
-            log.info("adsfsdkfsdjwejoweoiweo : {}", projectManager);
-            final ProjectTodolist newProjectTodolist = ProjectTodolist.of(
-                    todoListReq.getTodoBody(),
-                    todoListReq.getEndDates(),
-                    projectManager
-            );
-            projectTodolists.add(newProjectTodolist);
-
+        for (int i = 0; i < projectTodolists.size(); i++) {
+            LocalDate setEndDate = projectTodolists.get(i).getTodoEndDate();
+            if (setEndDate == null) {
+                throw new NotFoundException(NOT_FOUND_VALID_DATE);
+            }
         }
 
-        final Project project = projectRepository.findById(projectCode)
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_PROJECT_CODE));
+        if (todoRequest.getTodoTitle() == null || todoRequest.getTodoTitle().isEmpty()) {
+            throw new NotFoundException(NOT_FOUND_VALID_TITLE);
+        }
+
+
+        final Project project = projectRepository.getReferenceById(projectCode);
+
+        Member member = memberRepository.findById(customUser.getMemberCode())
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER_CODE));
 
         final ProjectTodo newProjectTodo = ProjectTodo.of(
                 todoRequest.getTodoTitle(),
+                member,
                 project,
                 projectTodolists
         );
 
-
-        log.info("123213213 : {}", todoReqList);
-
         projectTodoRepository.save(newProjectTodo);
 
+//        log.info("adfsfsd : {}", projectTodolists.get(0).getProjectManager());
+        for (int i = 0; i < projectTodolists.size(); i++) {
+            projectTodolists.get(i).getProjectManager().setTodoList(projectTodolists.get(i));
+        }
+
     }
+//        List<Long> todoListCode = projectTodo.getProjectTodolist()
+//                .stream().map(code -> code.getTodoListCode()).collect(Collectors.toList());
+//
+//        List<Long> managerCode = projectTodo.getProjectTodolist()
+//                .stream().map(a -> a.getProjectManager().getProjectManagerCode()).collect(Collectors.toList());
+//
+//        log.info("todoListCode : {}", todoListCode);
+//        log.info("managerCode : {}", managerCode);
+//        for (int i = 0; i < todoListCode.size(); i++) {
+//            ProjectManagersTodo managerTodo = projectManagerRepository.findById(managerCode.get(i)).orElseThrow();
+//            managerTodo.setTodoListCode(todoListCode.get(i));
+//        }
 
     /* 할일글 수정 */
     public void update(Long projectCode, Long todoCode, ProjectTodoUpdateRequest todoRequest) {
 
-        ProjectTodo projectTodo = projectTodoRepository.findByTodoCodeAndTodoStatusNot(todoCode, DELETED)
+        ProjectTodo projectTodo = projectTodoRepository.findByTodoCode(todoCode)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_TODO_CODE));
 
-        projectTodolistRepository.deleteAll(projectTodo.getProjectTodolist());
+        List<Long> todoListCode = projectTodo.getProjectTodolist().stream().map(
+                todo -> todo.getTodoListCode()
+        ).collect(Collectors.toList());
 
-        ProjectTodolist projectTodolist = projectTodolistRepository.findById(projectTodo.getTodoCode())
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_TODO_CODE));
+        projectTodolistRepository.deleteAllByTodoCode(todoCode);
+        projectManagerRepository.deleteAllByTodoListTodoListCodeIn(todoListCode);
 
-        projectManagerRepository.delete(projectTodolist.getProjectManager());
+        List<ProjectTodolist> newProjectTodolists = todoRequest.getProjectTodolistUpdateRequestList().stream().map(
+                todoReq -> ProjectTodolist.of(
+                        todoReq.getTodoBody(),
+                        todoReq.getEndDates(),
+                        ProjectManagersTodo.of(memberRepository.findById(todoReq.getAttendant())
+                                .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBERCODE)))
+                )).collect(Collectors.toList());
 
-        List<ProjectTodolistCreateRequest> todoReqList = todoRequest.getProjectTodolistCreateRequestList();
-        List<ProjectTodolist> projectTodolists = new ArrayList<>();
-        for (int i = 0; i < todoReqList.size(); i++) {
+        for (int i = 0; i < newProjectTodolists.size(); i++) {
+            LocalDate setEndDate = newProjectTodolists.get(i).getTodoEndDate();
+            if (setEndDate == null) {
+                throw new NotFoundException(NOT_FOUND_VALID_DATE);
+            }
+        }
 
-            final ProjectTodolistCreateRequest todoListReq = todoReqList.get(i);
-
-            ProjectManagers projectManager = memberRepository.findById(todoListReq.getAttendant())
-                    .map(member -> ProjectManagers.of(member))
-                    .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBERCODE));
-
-            projectTodolist.update(
-                    todoListReq.getTodoBody(),
-                    todoListReq.getEndDates(),
-                    projectManager
-            );
-            projectTodolists.add(projectTodolist);
+        if (todoRequest.getTodoTitle() == null || todoRequest.getTodoTitle().isEmpty()) {
+            throw new NotFoundException(NOT_FOUND_VALID_TITLE);
         }
 
         final Project project = projectRepository.findById(projectCode)
@@ -120,9 +167,13 @@ public class ProjectTodoService {
         projectTodo.update(
                 todoRequest.getTodoTitle(),
                 project,
-                projectTodolists
+                newProjectTodolists
         );
 
+//        log.info("asdfsfsdfsd : {}", newProjectTodolists.get(0).getProjectManager());
+        for (int i = 0; i < newProjectTodolists.size(); i++) {
+            newProjectTodolists.get(i).getProjectManager().setTodoList(newProjectTodolists.get(i));
+        }
     }
 
     /* 할일글 삭제 */
@@ -132,13 +183,108 @@ public class ProjectTodoService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_TODO_CODE));
 
         List<Long> todoListCode = projectTodo.getProjectTodolist().stream().map(
-                todo -> todo.getTodoCode()
+                todo -> todo.getTodoListCode()
         ).collect(Collectors.toList());
 
-        log.info("abcefdfdsfs :{}", todoListCode);
-//        List<ProjectTodolist> projectTodolists = projectTodoRepository.findAllByTodoCodeIn(todoListCode);
-
         projectTodoRepository.deleteById(todoCode);
-        projectTodolistRepository.deleteAll(projectTodo.getProjectTodolist());
+        projectTodolistRepository.deleteAllByTodoCode(todoCode);
+        projectManagerRepository.deleteAllByTodoListTodoListCodeIn(todoListCode);
+    }
+
+    private Pageable getPageable(final Integer page) {
+        return PageRequest.of(page - 1, 10, Sort.by("todoCode").descending());
+    }
+
+    /* 할일글 조회 */
+    @Transactional(readOnly = true)
+    public Page<ProjectTodoResponse> getTodo(Integer page, Long projectCode, CustomUser customUser) {
+
+        Page<ProjectTodo> projectTodos = projectTodoRepository.findByProjectProjectCodeAndTodoStatusNotAndMemberMemberCode(projectCode, getPageable(page), DELETED, customUser.getMemberCode());
+
+        return projectTodos.map(projectTodo -> {
+
+            List<ProjectTodoListResponse> projectTodolists = projectTodo.getProjectTodolist()
+                    .stream().map(projectTodolist -> {
+//                        log.info("sdfsefhseuif : {}", projectTodolist);
+                        List<ProjectReply> replies = projectTodolist.getReplies()
+                                .stream().filter(projectReply -> projectReply.getReplyOption() == TODO).collect(Collectors.toList());
+                        ;
+//                        log.info("abcdeddd : {}", projectTodolist.getProjectManager());
+                        return ProjectTodoListResponse.from(projectTodolist, replies);
+                    }).collect(Collectors.toList());
+            log.info("sdfsdfsdf : {}", projectTodo.getMember().getMemberCode());
+            return ProjectTodoResponse.from(projectTodo, projectTodolists);
+        });
+    }
+
+    /* 완료 여부 */
+    public void checked(Long projectCode, Long todoCode, Long todoListCode, CustomUser customUser) {
+        ProjectTodolist projectTodolist = projectTodolistRepository.findById(todoListCode)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_TODO_CODE));
+
+        StatusType curStatus = projectTodolist.getTofoStatus();
+
+        if (customUser.getMemberCode() == projectTodolist.getProjectManager().getMember().getMemberCode()) {
+            StatusType newStatus = (curStatus == UNFINISHED) ? FINISHED : UNFINISHED;
+            projectTodolist.checked(
+                    newStatus
+            );
+        }
+
+    }
+
+    /* 내 할일리스트 조회 */
+    @Transactional(readOnly = true)
+    public List<TodoListResponse> getTodoList(CustomUser customUser) {
+        log.info("sfsdfsdfsf : {}", customUser);
+        List<ProjectTodolist> todoListResponses = projectTodolistRepository.findAllByTofoStatusAndProjectManagerMemberMemberCodeOrderByTodoListCodeDesc(UNFINISHED, customUser.getMemberCode());
+
+        log.info("sfsdfsdf : {}", todoListResponses);
+        List<TodoListResponse> projectTodolists = todoListResponses.stream().map(
+                todoList -> TodoListResponse.from(
+                        todoList.getTodoListCode(),
+                        todoList.getTodoBody(),
+                        todoList.getTodoEndDate()
+                )
+        ).collect(Collectors.toList());
+
+        return projectTodolists;
+    }
+
+    /* 할일 댓글 등록 */
+    public Long todoReply(ScheduleReplyCreateRequest replyRequest, Long todoCode, CustomUser customUser) {
+
+        if (replyRequest.getReplyBody() == null || replyRequest.getReplyBody().isEmpty()) {
+            throw new NotFoundException(NOT_FOUND_REPLY_BODY);
+        }
+
+        MemberInfo member = infoRepository.getReferenceById(customUser.getInfoCode());
+
+        final ProjectReply newProjectReply = ProjectReply.of(
+                todoCode,
+                member,
+                replyRequest.getReplyBody(),
+                TODO
+        );
+
+
+        final ProjectReply projectReply = projectReplyRepository.save(newProjectReply);
+
+        return projectReply.getReplyCode();
+    }
+
+    /* 댓글 수정 */
+    public void replyUpdate(Long replyCode, SchReplyUpdate replyRequest) {
+
+        ProjectReply reply = projectReplyRepository.findByReplyCodeAndReplyStateNot(replyCode, ProjectStatusType.DELETED)
+                .orElseThrow(() -> new NotFoundException(NOT_FOUND_REPLY_CODE));
+
+        if (replyRequest.getReplyBody() == null || replyRequest.getReplyBody().isEmpty()) {
+            throw new NotFoundException(NOT_FOUND_REPLY_BODY);
+        }
+
+        reply.update(
+                replyRequest.getReplyBody()
+        );
     }
 }

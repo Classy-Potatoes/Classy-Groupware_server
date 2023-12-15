@@ -48,7 +48,9 @@ public class PostService {
     private final FileEntityRepository fileEntityRepository;
     private final ProjectReplyRepository projectReplyRepository;
 
-//    @Value("${file.projectpost-dir}")
+    @Value("${file.projectpost-url}")
+    private String PROJECTPOST_URL;
+    @Value("${file.projectpost-dir}")
     private String PROJECTPOST_DIR;
 
     private String getRandomName() {
@@ -64,34 +66,35 @@ public class PostService {
     public Long postSave(final ProjectPostCreateRequest projectPostRequest, final CustomUser customUser,
                          final List<MultipartFile> attachment) {
 
-        /* 전달 된 파일을 서버의 지정 경로에 저장 */
-        List<String> replaceFileNames = MultipleFileUploadUtils.saveFiles(PROJECTPOST_DIR, (attachment));
-
-        /*파일 정보 저장 */
         List<ProjectFile> files = new ArrayList<>();
-        for (String replaceFileName : replaceFileNames) {
-            ProjectFile fileEntity = new ProjectFile(
-                    replaceFileName,
-                    PROJECTPOST_DIR,
-                    getRandomName(),
-                    getFileExtension(replaceFileName),
-                    ProjectFileType.POST
-            );
-            files.add(fileEntity);
-        }
 
-        Project project = projectRepository.getReferenceById(projectPostRequest.getProjectCode());
+        // 파일이 제공되었는지 확인
+        if (attachment != null && !attachment.isEmpty()) {
+            /* 전달된 파일을 서버의 지정 경로에 저장 */
+            List<String> replaceFileNames = MultipleFileUploadUtils.saveFiles(PROJECTPOST_DIR, attachment);
+
+            /* 파일 정보 저장 */
+            for (String replaceFileName : replaceFileNames) {
+                ProjectFile fileEntity = new ProjectFile(
+                        replaceFileName,
+                        PROJECTPOST_URL + replaceFileName,
+                        getRandomName(),
+                        getFileExtension(replaceFileName),
+                        ProjectFileType.POST
+                );
+                files.add(fileEntity);
+            }
+        }
 
         MemberInfo member = infoRepository.getReferenceById(customUser.getInfoCode());
 
         final ProjectPost newProjectPost = ProjectPost.of(
-                project.getProjectCode(),
+                projectPostRequest.getProjectCode(),
                 member,
                 projectPostRequest.getPostTitle(),
                 projectPostRequest.getPostBody(),
                 files
         );
-
 
         final ProjectPost projectPost = projectPostRepository.save(newProjectPost);
 
@@ -99,35 +102,23 @@ public class PostService {
     }
 
     private Pageable getPageable(final Integer page) {
-        return PageRequest.of(page - 1, 10, Sort.by("postCode").descending());
+        return PageRequest.of(page - 1, 5, Sort.by("postCode").descending());
     }
 
-    /* 프로젝트 일반 글 디테일 조회 */
-//    @Transactional(readOnly = true)
-//    public ProjectPostResponse getPostDetail(final Long postCode) {
-//
-//        ProjectPost post = projectPostRepository.findByPostCodeAndPostStatus(postCode, USABLE)
-//                .orElseThrow(() -> new NotFoundException(NOT_FOUND_POST_CODE));
-//
-//        return ProjectPostResponse.from(post);
-//
-//    }
 
     /* 프로젝트 일반 글 조회 */
     @Transactional(readOnly = true)
-    public Page<ProjectPostResponse> getPostsDetail(final Integer page, final Long projectCode) {
+    public Page<ProjectPostResponse> getPostsDetail(final Integer page, final Long projectCode, final CustomUser customUser) {
 
         Page<ProjectPost> posts = projectPostRepository.findByProjectCodeAndPostStatus(projectCode, getPageable(page),  USABLE );
 
-//        return posts.map(post -> ProjectPostResponse.from(post));
+
         return posts.map(post -> {
             List<ProjectReply> replies = post.getReplies(); // 댓글을 즉시 가져오기
-            return ProjectPostResponse.from(post, replies);
+            List<ProjectFile> files = post.getFileEntity();
+            return ProjectPostResponse.from(post, replies, files, customUser);
         });
     }
-
-
-
 
     /* 프로젝트 일반 글 삭제 */
     public void postDelete(final Long postCode) {

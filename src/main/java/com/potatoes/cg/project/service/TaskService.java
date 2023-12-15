@@ -47,6 +47,8 @@ public class TaskService {
 
     @Value("${file.projecttask-dir}")
     private String PROJECTTASK_DIR;
+    @Value("${file.projecttask-url}")
+    private String PROJECTTASK_URL;
 
     private String getRandomName() {
         return UUID.randomUUID().toString().replace("-", "");
@@ -69,7 +71,7 @@ public class TaskService {
         for (String replaceFileName : replaceFileNames) {
             ProjectFile fileEntity = new ProjectFile(
                     replaceFileName,
-                    PROJECTTASK_DIR,
+                    PROJECTTASK_URL + replaceFileName,
                     getRandomName(),
                     getFileExtension(replaceFileName),
                     ProjectFileType.TASK
@@ -77,8 +79,6 @@ public class TaskService {
             );
             files.add(fileEntity);
         }
-
-        Project project = projectRepository.getReferenceById(projecttaskRequest.getProjectCode());
 
         MemberInfo member = infoRepository.getReferenceById(customUser.getInfoCode());
 
@@ -91,7 +91,7 @@ public class TaskService {
 
 
         final ProjectTask newProjectTask = ProjectTask.of(
-                project.getProjectCode(),
+                projecttaskRequest.getProjectCode(),
                 member,
                 projecttaskRequest.getTaskTitle(),
                 projecttaskRequest.getTaskBody(),
@@ -142,14 +142,14 @@ public class TaskService {
 
     /* 업무 조회 */
     @Transactional(readOnly = true)
-    public Page<ProjectTaskResponse> getTaskDetail(final Integer page, final Long projectCode) {
+    public Page<ProjectTaskResponse> getTaskDetail(final Integer page, final Long projectCode, final CustomUser customUser) {
 
         Page<ProjectTask> tasks = projectTaskRepository.findByProjectCodeAndTaskDeleteStatus(projectCode, getPageable(page),  USABLE );
 
         return tasks.map(task -> {
             List<ProjectReply> replies = task.getReplies(); // 댓글을 즉시 가져오기
             List<ProjectManager> managers = task.getProjectManagers();
-            return ProjectTaskResponse.from(task, replies, managers);
+            return ProjectTaskResponse.from(task, replies, managers, customUser);
         });
     }
 

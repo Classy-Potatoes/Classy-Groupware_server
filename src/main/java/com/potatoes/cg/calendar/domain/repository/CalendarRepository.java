@@ -13,6 +13,6 @@ public interface CalendarRepository extends JpaRepository<Calendar, Long> {
     Optional<Calendar> findByCalendarCodeAndStatusNot(Long calendarCode, StatusType statusType);
 
     /* 2. 캘린더 조회 (개인 일정) - deleted 제외 */
-    List<Calendar> findAllByStatusNot(StatusType statusType);
+    List<Calendar> findAllByStatusNotAndMemberMemberCode(StatusType statusType, Long memberCode);
 
 }

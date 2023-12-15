@@ -5,6 +5,7 @@ import com.potatoes.cg.common.util.FileUploadUtils;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.*;
 import com.potatoes.cg.member.domain.repository.*;
+import com.potatoes.cg.member.domain.type.MemberInfoStatus;
 import com.potatoes.cg.member.dto.request.*;
 import com.potatoes.cg.member.dto.response.*;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
+import static com.potatoes.cg.member.domain.type.MemberInfoStatus.NONREGIST;
+import static com.potatoes.cg.member.domain.type.MemberInfoStatus.REGIST;
 import static com.potatoes.cg.member.domain.type.MemberStatus.*;
 
 @Slf4j
@@ -85,6 +89,7 @@ public class MemberService {
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE ) );
 
         info.update(
+                REGIST,
                 memberRequest.getInfoEmail(),
                 memberRequest.getInfoPhone(),
                 memberRequest.getInfoZipcode(),
@@ -200,7 +205,7 @@ public class MemberService {
 
             profileImage.updateImage(
                     newProfileImg.getOriginalFilename(),
-                    MEMBERIMAGE_DIR,
+                    MEMBERIMAGE_URL + replaceFileName,
                     replaceFileName,
                     getFileExtension( replaceFileName )
             );
@@ -211,6 +216,7 @@ public class MemberService {
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE ));
 
         memberInfo.update(
+                REGIST,
                 memberUpdateRequest.getInfoEmail(),
                 memberUpdateRequest.getInfoPhone(),
                 memberUpdateRequest.getInfoZipcode(),
@@ -252,22 +258,21 @@ public class MemberService {
 
     /* 부서 리스트 조회 */
     @Transactional(readOnly = true)
-    public Page<DeptResponse> deptList( final Integer page ) {
+    public List<DeptResponse> deptList() {
 
-        final Page<Dept> deptList = deptRepository.findAll(
-                PageRequest.of(page - 1, 10, Sort.by("deptCode")));
+        final List<Dept> deptList = deptRepository.findAll();
 
-        return deptList.map( dept -> DeptResponse.from( dept ) );
+        return deptList.stream().map( dept -> DeptResponse.from( dept ) ).collect( Collectors.toList() );
+
     }
 
     /* 직급 리스트 조회 */
     @Transactional(readOnly = true)
-    public Page<JobResponse> jobList( final Integer page ) {
+    public List<JobResponse> jobList() {
 
-        final Page<Job> jobList = jobRepository.findAll(
-                PageRequest.of(page - 1, 10, Sort.by("jobCode")));
+        final List<Job> jobList = jobRepository.findAll();
 
-        return jobList.map( job -> JobResponse.from( job ) );
+        return jobList.stream().map( job -> JobResponse.from( job ) ).collect( Collectors.toList() );
     }
 
 

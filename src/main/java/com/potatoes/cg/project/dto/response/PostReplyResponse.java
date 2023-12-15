@@ -13,7 +13,7 @@ public class PostReplyResponse {
 
     private final Long replyCode;
     private final String replyBody;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDateTime replyCreatedDate;
     private final Long postCode;
     private final String memberName;

@@ -24,6 +24,8 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,8 +58,16 @@ public class ProjectController {
     /* 회원 초대하기 */
     @PostMapping("/invite")
     public ResponseEntity<List<ProjectParticipantId>> inviteMembers(
-            @RequestBody @Valid final List<ProjectInviteMemberRequest> projectInviteMemberRequests
+            @RequestBody Map<String, List<Map<String, Long>>> requestBody
     ) {
+        List<Map<String, Long>> membersData = requestBody.get("members");
+
+        List<ProjectInviteMemberRequest> projectInviteMemberRequests = membersData.stream()
+                .map(memberData -> new ProjectInviteMemberRequest(
+                        memberData.get("projectCode"),
+                        memberData.get("memberCode")
+                ))
+                .collect(Collectors.toList());
 
         List<ProjectParticipantId> invitedMembers = projectMemberService.inviteMembers(projectInviteMemberRequests);
 
@@ -272,10 +282,11 @@ public class ProjectController {
     @GetMapping("/projects/{projectCode}/post")
     public ResponseEntity<PagingResponse> getPost(
             @RequestParam(defaultValue = "1") final Integer page,
-            @PathVariable final Long projectCode
+            @PathVariable final Long projectCode,
+            @AuthenticationPrincipal final CustomUser customUser
            ) {
 
-        final Page<ProjectPostResponse> posts = postService.getPostsDetail(page, projectCode);
+        final Page<ProjectPostResponse> posts = postService.getPostsDetail(page, projectCode, customUser);
 
         // 페이징 정보 구성
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(posts);
@@ -299,6 +310,7 @@ public class ProjectController {
 
         return ResponseEntity.created(URI.create("/post/reply/" + replyCode)).build();
     }
+
 
     /* 프로젝트 일반 게시글 댓글 조회 */
     @GetMapping("/post/{postCode}/reply")
@@ -408,10 +420,11 @@ public class ProjectController {
     @GetMapping("/projects/{projectCode}/task")
     public ResponseEntity<PagingResponse> getTask(
             @RequestParam(defaultValue = "1") final Integer page,
-            @PathVariable final Long projectCode
+            @PathVariable final Long projectCode,
+            @AuthenticationPrincipal final CustomUser customUser
     ) {
 
-        final Page<ProjectTaskResponse> tasks = taskService.getTaskDetail(page, projectCode);
+        final Page<ProjectTaskResponse> tasks = taskService.getTaskDetail(page, projectCode, customUser);
 
         // 페이징 정보 구성
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(tasks);
