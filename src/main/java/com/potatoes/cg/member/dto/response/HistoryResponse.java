@@ -17,8 +17,8 @@ public class HistoryResponse {
     private final Long historyCode;
     private final String historyDate;
     private final String historyCategory;
-    private final String historyJobCode;
-    private final String historyDeptCode;
+    private final String historyJobName;
+    private final String historyDeptName;
     private final String historyNote;
 
 

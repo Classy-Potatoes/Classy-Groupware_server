@@ -97,4 +97,17 @@ public class MemberInfo {
         this.infoAddressAdd = infoAddressAdd;
     }
 
+    public void update2(String infoEmail, String infoPhone, String infoName, Dept dept, Job job, Long infoZipcode,
+                       String infoAddress, String infoAddressAdd) {
+
+        this.infoEmail = infoEmail;
+        this.infoPhone = infoPhone;
+        this.infoName = infoName;
+        this.dept = dept;
+        this.job = job;
+        this.infoZipcode = infoZipcode;
+        this.infoAddress = infoAddress;
+        this.infoAddressAdd = infoAddressAdd;
+    }
+
 }
