@@ -21,7 +21,7 @@ public class NoteResponse {
 
     private final String noteReceiver;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDateTime noteSentDate;
 
     private final String noteBody;

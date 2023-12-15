@@ -1,20 +1,20 @@
 package com.potatoes.cg.note.domain;
 
-import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.note.domain.type.NoteReceiptStatus;
-import com.potatoes.cg.note.domain.type.NoteStatus;
-import com.potatoes.cg.note.dto.request.NoteCreateRequest;
+import com.potatoes.cg.note.domain.type.NoteStatusType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static com.potatoes.cg.note.domain.type.NoteReceiptStatus.UNREAD;
-import static com.potatoes.cg.note.domain.type.NoteStatus.DEFAULT;
+import static com.potatoes.cg.note.domain.type.NoteStatusType.DEFAULT;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -33,11 +33,12 @@ public class Note {
     @Column(nullable = false)
     private String noteBody;
 
+    @CreatedDate
     @Column(nullable = false)
     private LocalDateTime noteSentDate;
 
     @Column
-    private LocalDateTime noteSenderDeleteDate;
+    private LocalDate noteSenderDeleteDate;
 
     @Enumerated(value = STRING)
     @Column(nullable = false)
@@ -45,7 +46,7 @@ public class Note {
 
     @Enumerated(value = STRING)
     @Column(nullable = false)
-    private NoteStatus noteSenderStatus = DEFAULT;
+    private NoteStatusType noteSenderStatus = DEFAULT;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "noteSender")
@@ -57,17 +58,36 @@ public class Note {
 
     @Enumerated(value = STRING)
     @Column(nullable = false)
-    private NoteStatus noteReceiverStatus = DEFAULT;
+    private NoteStatusType noteReceiverStatus = DEFAULT;
 
     @Column
-    private LocalDateTime noteReceiverDeleteDate;
+    private LocalDate noteReceiverDeleteDate;
 
-    public void setNoteSenderStatus(NoteStatus noteStatus) {
-        this.noteSenderStatus = noteStatus;
+    public void setNoteSenderStatus(NoteStatusType noteStatusType) {
+        this.noteSenderStatus = noteStatusType;
     }
 
-    public void setNoteReceiverStatus(NoteStatus noteStatus) {
-        this.noteReceiverStatus = noteStatus;
+    public void setNoteReceiverStatus(NoteStatusType noteStatusType) {
+        this.noteReceiverStatus = noteStatusType;
     }
 
+    public void setNoteStatusType(NoteStatusType noteStatusType) {
+        this.noteReceiverStatus = noteStatusType;
+    }
+
+    public Note(Member noteSender, Member noteReceiver, String noteBody) {
+        this.noteSender = noteSender;
+        this.noteReceiver = noteReceiver;
+        this.noteBody = noteBody;
+    }
+
+    public static Note of(Member noteSender, Member noteReceiver, String noteBody) {
+
+        return new Note(
+                noteSender,
+                noteReceiver,
+                noteBody
+        );
+
+    }
 }

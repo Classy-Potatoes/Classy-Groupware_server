@@ -2,31 +2,33 @@ package com.potatoes.cg.note.domain.repository;
 
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.note.domain.Note;
-import com.potatoes.cg.note.domain.type.NoteStatus;
+import com.potatoes.cg.note.domain.type.NoteStatusType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
     /********************************************* 보낸 쪽지함 *********************************************/
 
-    //전체 조회
-    Page<Note> findByNoteSenderMemberCodeAndNoteSentDateBeforeAndNoteSenderStatus(Pageable pageable, Long memberCode, LocalDateTime noteSentDate, NoteStatus noteStatus);
+    /* 1. 전체 조회 */
+    Page<Note> findByNoteSenderMemberCodeAndNoteSentDateBeforeAndNoteSenderStatus(
+            Pageable pageable, Long memberCode, LocalDateTime noteSentDate, NoteStatusType noteStatusType);
 
-    //검색 - 받는 사람
-    Page<Note> findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
+    /* 2. 검색 - 받는 사람 */
+    Page<Note> findByNoteSenderMemberInfoInfoNameContainsAndNoteSenderStatus(
+            Pageable pageable, String searchValue, NoteStatusType noteStatusType);
 
-    //검색 - 내용
-    Page<Note> findByNoteBodyContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
+    /* 3. 검색 - 내용 */
+    Page<Note> findByNoteBodyContainsAndNoteSenderStatus(Pageable pageable, String searchValue, NoteStatusType noteStatusType);
 
-    //검색 - 전체
+    /* 4. 검색 - 전체 */
     @EntityGraph(attributePaths = { "noteSender", "noteSender.memberInfo", "noteReceiver", "noteReceiver.memberInfo" }
     )
     @Query(value = "select n from Note n " +
@@ -35,21 +37,23 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     Page<Note> findByNoteSentSearchAll(Pageable pageable,
                                        @Param(value = "noteBody") String noteBody,
                                        @Param(value = "noteSender") String noteSender,
-                                       @Param(value = "noteSenderStatus") NoteStatus noteStatus);
+                                       @Param(value = "noteSenderStatus") NoteStatusType noteStatusType);
 
 
     /********************************************* 받은 쪽지함 *********************************************/
 
-    //전체 조회
-    Page<Note> findByNoteReceiverMemberCodeAndNoteSentDateBeforeAndNoteReceiverStatus(Pageable pageable, Long memberCode, LocalDateTime noteSentDate, NoteStatus noteStatus);
+    /* 5. 전체 조회 */
+    Page<Note> findByNoteReceiverMemberCodeAndNoteSentDateBeforeAndNoteReceiverStatus(
+            Pageable pageable, Long memberCode, LocalDateTime noteSentDate, NoteStatusType noteStatusType);
 
-    //검색 - 보낸 사람
-    Page<Note> findByNoteReceiverMemberInfoInfoNameContainsAndNoteReceiverStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
+    /* 6. 검색 - 보낸 사람 */
+    Page<Note> findByNoteReceiverMemberInfoInfoNameContainsAndNoteReceiverStatus(
+            Pageable pageable, String searchValue, NoteStatusType noteStatusType);
 
-    //검색 - 내용
-    Page<Note> findByNoteBodyContainsAndNoteReceiverStatus(Pageable pageable, String searchValue, NoteStatus noteStatus);
+    /* 7. 검색 - 내용 */
+    Page<Note> findByNoteBodyContainsAndNoteReceiverStatus(Pageable pageable, String searchValue, NoteStatusType noteStatusType);
 
-    //검색 - 전체
+    /* 8. 검색 - 전체 */
     @EntityGraph(attributePaths = { "noteSender", "noteSender.memberInfo", "noteReceiver", "noteReceiver.memberInfo" })
     @Query(value = "select n from Note n " +
             "where (n.noteBody like %:noteBody% or n.noteSender.memberInfo.infoName like %:noteReceiver%) " +
@@ -57,12 +61,12 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     Page<Note> findByNoteReceivedSearchAll(Pageable pageable,
                                            @Param(value = "noteBody") String noteBody,
                                            @Param(value = "noteReceiver") String noteReceiver,
-                                           @Param(value = "noteReceiverStatus") NoteStatus noteStatus);
+                                           @Param(value = "noteReceiverStatus") NoteStatusType noteStatusType);
 
 
     /********************************************* 중요 쪽지함 *********************************************/
 
-    //전체 조회
+    /* 9. 전체 조회 */
     @Query(value = "select n from Note n " +
             "where (n.noteReceiver.memberCode = :memberCode " +
             "or n.noteSender.memberCode = :memberCode) " +
@@ -73,18 +77,18 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
             Pageable pageable,
             @Param("memberCode") Long memberCode,
             @Param("noteSentDate") LocalDateTime noteSentDate,
-            @Param("noteStatus") NoteStatus noteStatus);
+            @Param("noteStatus") NoteStatusType noteStatusType);
 
-    //검색 - 내용
+    /* 10. 검색 - 내용 */
     @Query(value = "select n from Note n " +
             "where (n.noteBody like %:searchValue% ) " +
             "and (n.noteReceiverStatus = :noteStatus " +
             "or n.noteSenderStatus = :noteStatus)")
     Page<Note> findByNoteBodyContainsAndNoteStatus(Pageable pageable,
                                                    @Param("searchValue") String searchValue,
-                                                   @Param("noteStatus") NoteStatus noteStatus);
+                                                   @Param("noteStatus") NoteStatusType noteStatusType);
 
-    //검색 - 전체
+    /* 11. 검색 - 전체 */
     @Query(value = "select n from Note n " +
             "where (n.noteBody like %:noteBody%) " +
             "or (n.noteSender.memberInfo.infoName like %:noteSender%) " +
@@ -95,7 +99,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
                                             @Param(value = "noteBody") String noteBody,
                                             @Param(value = "noteSender") String noteSender,
                                             @Param(value = "noteReceiver") String noteReceiver,
-                                            @Param(value = "noteSenderStatus") NoteStatus noteSenderStatus,
-                                            @Param(value = "noteReceiverStatus") NoteStatus noteReceiverStatus);
+                                            @Param(value = "noteSenderStatus") NoteStatusType noteSenderStatus,
+                                            @Param(value = "noteReceiverStatus") NoteStatusType noteReceiverStatus);
 
 }

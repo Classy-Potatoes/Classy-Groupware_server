@@ -1,10 +1,14 @@
 package com.potatoes.cg.note.service;
 
+import com.potatoes.cg.approval.domain.Reference;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.repository.MemberRepository;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.repository.NoteRepository;
-import com.potatoes.cg.note.domain.type.NoteStatus;
+import com.potatoes.cg.note.domain.type.NoteStatusType;
+import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
@@ -13,16 +17,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
-import static com.potatoes.cg.note.domain.type.NoteStatus.*;
+import static com.potatoes.cg.note.domain.type.NoteStatusType.*;
 
 
 @Service
@@ -31,8 +35,9 @@ import static com.potatoes.cg.note.domain.type.NoteStatus.*;
 public class NoteService {
 
     private final NoteRepository noteRepository;
+    private final MemberRepository memberRepository;
 
-    private Pageable getPageable(final Integer page) {
+    private Pageable getPageable(@RequestParam(defaultValue = "1") final Integer page) {
 
         return PageRequest.of(page -1, 10, Sort.by("noteCode").descending());
 
@@ -42,9 +47,12 @@ public class NoteService {
 
     /* 1. 전체 조회 */
     @Transactional(readOnly = true)
-    public Page<NotesResponse> getSentNotes(final int page, final CustomUser customUser, LocalDateTime noteSentDate) {
+    public Page<NotesResponse> getSentNotes(@RequestParam(defaultValue = "1") final int page,
+                                            final CustomUser customUser,
+                                            LocalDateTime search) {
 
-        Page<Note> notes = noteRepository.findByNoteSenderMemberCodeAndNoteSentDateBeforeAndNoteSenderStatus(getPageable(page), customUser.getMemberCode(), noteSentDate, DEFAULT);
+        Page<Note> notes = noteRepository.findByNoteSenderMemberCodeAndNoteSentDateBeforeAndNoteSenderStatus
+                (getPageable(page), customUser.getMemberCode(), search, DEFAULT);
 
         return notes.map(note -> NotesResponse.from(note));
 
@@ -70,7 +78,8 @@ public class NoteService {
 
     /* 4. 검색 조회 */
     @Transactional(readOnly = true)
-    public Page<NotesResponse> getSentNoteByNoteSenderOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
+    public Page<NotesResponse> getSentNoteByNoteSenderOrNoteBody(@RequestParam(defaultValue = "1") final Integer page,
+                                                                 final String searchCondition, final String searchValue) {
 
         Page<Note> notes = null;
 
@@ -94,10 +103,11 @@ public class NoteService {
 
     /* 5. 전체 조회 */
     @Transactional(readOnly = true)
-    public Page<NotesResponse> getReceivedNotes(final int page, final CustomUser customUser, LocalDateTime noteSentDate) {
+    public Page<NotesResponse> getReceivedNotes(@RequestParam(defaultValue = "1") final int page,
+                                                final CustomUser customUser, LocalDateTime search) {
 
         Page<Note> notes = noteRepository.findByNoteReceiverMemberCodeAndNoteSentDateBeforeAndNoteReceiverStatus(
-                getPageable(page), customUser.getMemberCode(), noteSentDate, DEFAULT);
+                getPageable(page), customUser.getMemberCode(), search, DEFAULT);
 
         return notes.map(note -> NotesResponse.from(note));
 
@@ -117,12 +127,18 @@ public class NoteService {
     /* 7. 삭제 */
     public void deleteReceivedNote(final Long noteCode) {
 
-        noteRepository.deleteById(noteCode);
+        Optional<Note> optionalNote = noteRepository.findById(noteCode);
+        if (optionalNote.isPresent()) {
+            Note note = optionalNote.get();
+            note.setNoteReceiverStatus(DELETED);
+            noteRepository.save(note);
+        }
 
     }
 
     /* 8. 검색 조회 */
-    public Page<NotesResponse> getReceivedNoteByNoteReceiverOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
+    public Page<NotesResponse> getReceivedNoteByNoteReceiverOrNoteBody(@RequestParam(defaultValue = "1") final Integer page,
+                                                                       final String searchCondition, final String searchValue) {
 
         Page<Note> notes = null;
 
@@ -146,10 +162,11 @@ public class NoteService {
 
     /* 9. 전체 조회 */
     @Transactional(readOnly = true)
-    public Page<NotesResponse> getImportantNotes(final int page, final CustomUser customUser, LocalDateTime noteSentDate) {
+    public Page<NotesResponse> getImportantNotes(@RequestParam(defaultValue = "1")final int page,
+                                                 final CustomUser customUser, LocalDateTime search) {
 
         Page<Note> notes = noteRepository.findByAllMemberCodeAndNoteDateAndAllNoteStatus(
-                getPageable(page), customUser.getMemberCode(), noteSentDate, IMPORTANT);
+                getPageable(page), customUser.getMemberCode(), search, IMPORTANT);
 
         return notes.map(note -> NotesResponse.from(note));
 
@@ -161,7 +178,6 @@ public class NoteService {
 
         Note note = noteRepository.findById(noteCode)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_NOTE_CODE));
-
 
         return NoteResponse.from(note);
 
@@ -175,7 +191,8 @@ public class NoteService {
     }
 
     /* 12. 검색 조회 */
-    public Page<NotesResponse> getImportantNoteByMemberOrNoteBody(final Integer page, final String searchCondition, final String searchValue) {
+    public Page<NotesResponse> getImportantNoteByMemberOrNoteBody(@RequestParam(defaultValue = "1")final Integer page,
+                                                                  final String searchCondition, final String searchValue) {
 
         Page<Note> notes = null;
 
@@ -208,9 +225,9 @@ public class NoteService {
         //받은 쪽지인지 보낸 쪽지인지 판단해서 분기하고 컬럼에 따른 수정 (스트림, forEach)
         notes.forEach(note -> {
             if (noteRequest.getNoteDivision().equals("sent")) {
-                moveSentNote(note, noteRequest.getNoteStatus());
+                moveSentNote(note, noteRequest.getNoteStatusType());
             } else if (noteRequest.getNoteDivision().equals("received")) {
-                moveReceivedNote(note, noteRequest.getNoteStatus());
+                moveReceivedNote(note, noteRequest.getNoteStatusType());
             }
         });
 
@@ -218,9 +235,9 @@ public class NoteService {
 
     }
 
-    private void moveSentNote(Note note, NoteStatus noteStatus) {
+    private void moveSentNote(Note note, NoteStatusType noteStatusType) {
 
-        switch (noteStatus) {
+        switch (noteStatusType) {
             case DEFAULT:
                 note.setNoteSenderStatus(DEFAULT);
                 break;
@@ -231,9 +248,9 @@ public class NoteService {
 
     }
 
-    private void moveReceivedNote(Note note, NoteStatus noteStatus) {
+    private void moveReceivedNote(Note note, NoteStatusType noteStatusType) {
 
-        switch (noteStatus) {
+        switch (noteStatusType) {
             case DEFAULT:
                 note.setNoteReceiverStatus(DEFAULT);
                 break;
@@ -245,5 +262,17 @@ public class NoteService {
     }
 
     /***************************************************************************************************************/
+
+    /* 14. 쓰기 */
+    public void postNote(final NoteCreateRequest noteRequest, CustomUser customUser) {
+
+       Member noteSender = memberRepository.getReferenceById(customUser.getMemberCode());
+       Member noteReceiver = memberRepository.getReferenceById(noteRequest.getNoteReceiver());
+
+       Note newNote = Note.of(noteSender, noteReceiver, noteRequest.getNoteBody());
+
+       noteRepository.save(newNote);
+
+    }
 
 }
