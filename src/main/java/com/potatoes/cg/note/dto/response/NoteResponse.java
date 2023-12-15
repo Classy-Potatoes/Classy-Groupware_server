@@ -5,7 +5,6 @@ import com.potatoes.cg.note.domain.Note;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter

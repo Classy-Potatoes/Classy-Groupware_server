@@ -1,5 +1,6 @@
 package com.potatoes.cg.note.domain.repository;
 
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.type.NoteStatusType;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface NoteRepository extends JpaRepository<Note, Long> {
 

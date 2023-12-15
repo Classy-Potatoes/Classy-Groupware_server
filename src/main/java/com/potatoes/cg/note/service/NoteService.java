@@ -1,10 +1,14 @@
 package com.potatoes.cg.note.service;
 
+import com.potatoes.cg.approval.domain.Reference;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.repository.MemberRepository;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.repository.NoteRepository;
 import com.potatoes.cg.note.domain.type.NoteStatusType;
+import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
@@ -17,10 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
 import static com.potatoes.cg.note.domain.type.NoteStatusType.*;
@@ -32,6 +35,7 @@ import static com.potatoes.cg.note.domain.type.NoteStatusType.*;
 public class NoteService {
 
     private final NoteRepository noteRepository;
+    private final MemberRepository memberRepository;
 
     private Pageable getPageable(@RequestParam(defaultValue = "1") final Integer page) {
 
@@ -175,7 +179,6 @@ public class NoteService {
         Note note = noteRepository.findById(noteCode)
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_NOTE_CODE));
 
-
         return NoteResponse.from(note);
 
     }
@@ -259,5 +262,17 @@ public class NoteService {
     }
 
     /***************************************************************************************************************/
+
+    /* 14. 쓰기 */
+    public void postNote(final NoteCreateRequest noteRequest, CustomUser customUser) {
+
+       Member noteSender = memberRepository.getReferenceById(customUser.getMemberCode());
+       Member noteReceiver = memberRepository.getReferenceById(noteRequest.getNoteReceiver());
+
+       Note newNote = Note.of(noteSender, noteReceiver, noteRequest.getNoteBody());
+
+       noteRepository.save(newNote);
+
+    }
 
 }

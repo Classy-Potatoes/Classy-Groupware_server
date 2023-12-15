@@ -4,6 +4,7 @@ import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
 import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
@@ -199,6 +200,18 @@ public class NoteController {
         noteService.moveNote(noteRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build(); //201 응답
+
+    }
+
+    /* 14. 쓰기 */
+    @PostMapping("/save")
+    public ResponseEntity<Void> postNote(
+            @RequestBody @Valid final NoteCreateRequest noteRequest,
+            @AuthenticationPrincipal CustomUser customUser) {
+
+        noteService.postNote(noteRequest, customUser);
+
+        return ResponseEntity.ok().build();
 
     }
 

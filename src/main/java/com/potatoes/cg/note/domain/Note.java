@@ -74,4 +74,20 @@ public class Note {
     public void setNoteStatusType(NoteStatusType noteStatusType) {
         this.noteReceiverStatus = noteStatusType;
     }
+
+    public Note(Member noteSender, Member noteReceiver, String noteBody) {
+        this.noteSender = noteSender;
+        this.noteReceiver = noteReceiver;
+        this.noteBody = noteBody;
+    }
+
+    public static Note of(Member noteSender, Member noteReceiver, String noteBody) {
+
+        return new Note(
+                noteSender,
+                noteReceiver,
+                noteBody
+        );
+
+    }
 }
