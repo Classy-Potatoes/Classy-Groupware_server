@@ -63,21 +63,24 @@ public class TaskService {
     public Long taskSave(final ProjectTaskCreateRequest projecttaskRequest, final CustomUser customUser,
                          final List<MultipartFile> attachment) {
 
-        /* 전달 된 파일을 서버의 지정 경로에 저장 */
-        List<String> replaceFileNames = MultipleFileUploadUtils.saveFiles(PROJECTTASK_DIR, (attachment));
-
-        /*파일 정보 저장 */
         List<ProjectFile> files = new ArrayList<>();
-        for (String replaceFileName : replaceFileNames) {
-            ProjectFile fileEntity = new ProjectFile(
-                    replaceFileName,
-                    PROJECTTASK_URL + replaceFileName,
-                    getRandomName(),
-                    getFileExtension(replaceFileName),
-                    ProjectFileType.TASK
 
-            );
-            files.add(fileEntity);
+        // 파일이 제공되었는지 확인
+        if (attachment != null && !attachment.isEmpty()) {
+            /* 전달된 파일을 서버의 지정 경로에 저장 */
+            List<String> replaceFileNames = MultipleFileUploadUtils.saveFiles(PROJECTTASK_DIR, attachment);
+
+            /* 파일 정보 저장 */
+            for (String replaceFileName : replaceFileNames) {
+                ProjectFile fileEntity = new ProjectFile(
+                        replaceFileName,
+                        PROJECTTASK_URL + replaceFileName,
+                        getRandomName(),
+                        getFileExtension(replaceFileName),
+                        ProjectFileType.TASK
+                );
+                files.add(fileEntity);
+            }
         }
 
         MemberInfo member = infoRepository.getReferenceById(customUser.getInfoCode());
@@ -149,7 +152,8 @@ public class TaskService {
         return tasks.map(task -> {
             List<ProjectReply> replies = task.getReplies(); // 댓글을 즉시 가져오기
             List<ProjectManager> managers = task.getProjectManagers();
-            return ProjectTaskResponse.from(task, replies, managers, customUser);
+            List<ProjectFile> files = task.getFileEntity();
+            return ProjectTaskResponse.from(task, replies, managers, files, customUser);
         });
     }
 
