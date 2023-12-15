@@ -24,7 +24,9 @@ public class ProfileResponse {
     private final String infoName;
 
     private final Long jobCode;
+    private final String jobName;
     private final Long deptCode;
+    private final String deptName;
     private final MemberInfoStatus infoStatus;
 
     private final Long infoZipcode;
@@ -48,7 +50,9 @@ public class ProfileResponse {
                 member.getMemberInfo().getInfoEmail(),
                 member.getMemberInfo().getInfoName(),
                 member.getMemberInfo().getJob().getJobCode(),
+                member.getMemberInfo().getJob().getJobName(),
                 member.getMemberInfo().getDept().getDeptCode(),
+                member.getMemberInfo().getDept().getDeptName(),
                 member.getMemberInfo().getInfoStatus(),
                 member.getMemberInfo().getInfoZipcode(),
                 member.getMemberInfo().getInfoAddress(),
