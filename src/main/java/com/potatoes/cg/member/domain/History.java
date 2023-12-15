@@ -43,7 +43,6 @@ public class History {
     private Long infoCode;
 
 
-
     @PrePersist
     public void onPrePersist() {
         this.historyDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
@@ -73,6 +72,17 @@ public class History {
                 historyNote
         );
 
+    }
+
+    public static History updateOf(String historyCategory, Dept dept, Job job, String historyNote, Long infoCode) {
+
+        return new History(
+                historyCategory,
+                dept,
+                job,
+                historyNote,
+                infoCode
+        );
     }
 
     public static History deleteOf( String historyCategory, Dept dept, Job job,

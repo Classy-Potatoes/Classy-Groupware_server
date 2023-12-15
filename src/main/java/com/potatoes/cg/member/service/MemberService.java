@@ -173,16 +173,27 @@ public class MemberService {
 
     /* 프로필 조회(회원상세조회) */
     @Transactional(readOnly = true)
-    public ProfileResponse getProfile( final Long memberCode ) {
+    public ProfileResponse getProfile( final CustomUser customUser ) {
 
-        final Member member = memberRepository.findById( memberCode )
+        // 회원 조회
+        final Member member = memberRepository.findById( customUser.getMemberCode() )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_CODE ));
 
-        final ProfileImage profileImage = profileImageRepository.findByMemberCode( memberCode )
+        // 이미지 조회
+        final ProfileImage profileImage = profileImageRepository.findByMemberCode( customUser.getMemberCode() )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_CODE ));
 
-        return ProfileResponse.from( member, profileImage );
+        // 부서, 직급 목록 조회
+        final List<Dept> deptList = deptRepository.findAll();
+        final List<Job> jobList = jobRepository.findAll();
+
+        // 이력 조회
+        final List<History> historys = historyRepository.findByInfoCode( customUser.getInfoCode() );
+
+
+        return ProfileResponse.from( member, profileImage, deptList, jobList, historys );
     }
+
 
 
     /* 회원상세 수정(마이페이지) */
@@ -209,14 +220,50 @@ public class MemberService {
             );
         }
 
-        // 회원정보 수정
+
+        final Dept dept = deptRepository.getReferenceById( memberUpdateRequest.getDeptCode() );
+        final Job job = jobRepository.getReferenceById( memberUpdateRequest.getJobCode() );
         final MemberInfo memberInfo = infoRepository.findById( customUser.getInfoCode() )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_INFO_CODE ));
+        final Member member = memberRepository.findById( customUser.getMemberCode() )
+                .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_CODE ) );
 
-        memberInfo.update(
-                REGIST,
+
+        if ( !memberInfo.getDept().getDeptCode().equals( memberUpdateRequest.getDeptCode() ) ) {
+
+            final History newHistory = History.updateOf(
+                    "부서변동",
+                    dept,
+                    job,
+                    "부서이동",
+                    memberUpdateRequest.getInfoCode()
+            );
+            historyRepository.save( newHistory );
+        }
+
+        if ( !memberInfo.getJob().getJobCode().equals( memberUpdateRequest.getJobCode() ) ) {
+
+            final History newHistory = History.updateOf(
+                    "직급변동",
+                    dept,
+                    job,
+                    "직급변동",
+                    memberUpdateRequest.getInfoCode()
+            );
+            historyRepository.save( newHistory );
+        }
+
+
+
+
+        member.updateStatus( memberUpdateRequest.getMemberStatus() );
+
+        memberInfo.update2(
                 memberUpdateRequest.getInfoEmail(),
                 memberUpdateRequest.getInfoPhone(),
+                memberUpdateRequest.getInfoName(),
+                dept,
+                job,
                 memberUpdateRequest.getInfoZipcode(),
                 memberUpdateRequest.getInfoAddress(),
                 memberUpdateRequest.getInfoAddressAdd()
@@ -224,17 +271,6 @@ public class MemberService {
 
     }
 
-
-    /* 회원이력 조회(마이페이지) */
-    @Transactional(readOnly = true)
-    public Page<HistoryResponse> myHistory( final Integer page, final CustomUser customUser ) {
-
-        Page<History> historys = historyRepository.findByInfoCode(
-                PageRequest.of(page - 1, 10, Sort.by("historyDate")),
-                customUser.getInfoCode() );
-
-        return historys.map( history -> HistoryResponse.from( history ) );
-    }
 
 
     /* 회원 목록 조회 */

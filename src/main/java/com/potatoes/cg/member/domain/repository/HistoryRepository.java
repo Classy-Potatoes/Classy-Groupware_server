@@ -6,12 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface HistoryRepository extends JpaRepository<History, Long> {
 
 
     /* 회원이력 조회(마이페이지) */
-    Page<History> findByInfoCode(Pageable pageable, Long infoCode);
+    List<History> findByInfoCode(Long infoCode);
 
 }

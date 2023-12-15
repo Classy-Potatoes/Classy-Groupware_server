@@ -1,6 +1,7 @@
 package com.potatoes.cg.member.dto.request;
 
 
+import com.potatoes.cg.member.domain.type.MemberStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -11,21 +12,17 @@ import javax.validation.constraints.NotBlank;
 @RequiredArgsConstructor
 public class MemberUpdateRequest {
 
-    @NotBlank
-    private final String infoName;
-    @Min(value = 1)
-    private final Long deptCode;
-    @Min(value = 1)
-    private final Long jobCode;
-    @NotBlank
-    private final String infoEmail;
-    @NotBlank
+    private final Long infoCode;
     private final String infoPhone;
+    private final String infoEmail;
+    private final String infoName;
+    private final Long deptCode;
+    private final Long jobCode;
 
     private final Long infoZipcode;
-    @NotBlank
     private final String infoAddress;
-    @NotBlank
     private final String infoAddressAdd;
+
+    private final MemberStatus memberStatus;
 
 }
