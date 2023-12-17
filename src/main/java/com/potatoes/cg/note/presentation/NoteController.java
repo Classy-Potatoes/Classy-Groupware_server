@@ -9,6 +9,7 @@ import com.potatoes.cg.note.dto.request.NoteMoveRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
 import com.potatoes.cg.note.service.NoteService;
+import com.potatoes.cg.project.dto.response.ProjectMemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -212,6 +213,19 @@ public class NoteController {
         noteService.postNote(noteRequest, customUser);
 
         return ResponseEntity.ok().build();
+
+    }
+
+    /* 15. 회원 조회 */
+    @GetMapping("/member/search")
+    public ResponseEntity<PagingResponse> getMemberSearch(@RequestParam(defaultValue = "1") final Integer page,
+                                                                @RequestParam final String infoName){
+
+        final Page<ProjectMemberResponse> members = noteService.getMemberSearch(page, infoName);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(members);
+        final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
 
     }
 

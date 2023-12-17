@@ -1,6 +1,8 @@
 package com.potatoes.cg.note.domain.repository;
 
 import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.type.MemberStatus;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.type.NoteStatusType;
 import org.springframework.data.domain.Page;
@@ -101,5 +103,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
                                             @Param(value = "noteReceiver") String noteReceiver,
                                             @Param(value = "noteSenderStatus") NoteStatusType noteSenderStatus,
                                             @Param(value = "noteReceiverStatus") NoteStatusType noteReceiverStatus);
+
 
 }
