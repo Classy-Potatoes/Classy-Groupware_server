@@ -1,6 +1,5 @@
 package com.potatoes.cg.note.service;
 
-import com.potatoes.cg.approval.domain.Reference;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Member;
@@ -12,6 +11,8 @@ import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
+import com.potatoes.cg.project.domain.repository.ProjectMemberRepository;
+import com.potatoes.cg.project.dto.response.ProjectMemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,9 +24,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
+import static com.potatoes.cg.member.domain.type.MemberStatus.ACTIVE;
 import static com.potatoes.cg.note.domain.type.NoteStatusType.*;
 
 
@@ -36,10 +37,11 @@ public class NoteService {
 
     private final NoteRepository noteRepository;
     private final MemberRepository memberRepository;
+    private final ProjectMemberRepository projectMemberRepository;
 
     private Pageable getPageable(@RequestParam(defaultValue = "1") final Integer page) {
 
-        return PageRequest.of(page -1, 10, Sort.by("noteCode").descending());
+        return PageRequest.of(page -1, 10);
 
     }
 
@@ -272,6 +274,16 @@ public class NoteService {
        Note newNote = Note.of(noteSender, noteReceiver, noteRequest.getNoteBody());
 
        noteRepository.save(newNote);
+
+    }
+
+    /* 15. 회원 조회 */
+    @Transactional(readOnly = true)
+    public Page<ProjectMemberResponse> getMemberSearch(Integer page, String infoName) {
+
+        Page<Member> members = projectMemberRepository.findByMemberInfoInfoNameContainsAndMemberStatus(getPageable(page), infoName, ACTIVE);
+
+        return members.map(Member -> ProjectMemberResponse.fromMember(Member));
 
     }
 
