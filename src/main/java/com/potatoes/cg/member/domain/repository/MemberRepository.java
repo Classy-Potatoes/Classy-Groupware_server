@@ -30,8 +30,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /* DB에서 refreshToken 조회 */
     Optional<Member> findByMemberToken( String refreshToken );
 
-    /* 회원 목록 조회 */
-    Page<Member> findByMemberStatus(PageRequest memberJoinDate, MemberStatus memberStatus);
+    /* 회원 목록 조회(연락망) */
+    Page<Member> findByMemberStatus( Pageable pageable, MemberStatus memberStatus );
+
+    /* 회원 목록 조회(연락망, search) */
+    Page<Member> findByMemberInfoInfoNameContainsAndMemberStatus(Pageable pageable, String infoName, MemberStatus memberStatus);
 
     /* 미분류 회원 목록 조회(search) */
     Page<Member> findByMemberInfoInfoNameContains(Pageable pageable, String infoName);

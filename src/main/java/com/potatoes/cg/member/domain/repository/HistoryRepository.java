@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface HistoryRepository extends JpaRepository<History, Long> {
 
 
-    /* 회원이력 조회(마이페이지) */
+    /* 회원이력 조회 */
     List<History> findByInfoCode(Long infoCode);
 
 }

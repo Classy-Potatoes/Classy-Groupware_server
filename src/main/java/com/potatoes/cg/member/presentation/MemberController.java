@@ -95,6 +95,7 @@ public class MemberController {
         return ResponseEntity.created( URI.create("/") ).build();
     }
 
+
     /* 회원상세 조회(마이페이지) */
     @GetMapping("/member/myProfile")
     public ResponseEntity<ProfileResponse> profile( @AuthenticationPrincipal CustomUser customUser ) {
@@ -103,7 +104,6 @@ public class MemberController {
 
         return ResponseEntity.ok( profileResponse );
     }
-
 
 
     /* 회원상세 수정(마이페이지) */
@@ -118,16 +118,38 @@ public class MemberController {
     }
 
 
-    /* 회원 목록 조회 */
-    @GetMapping("/member/list")
+    /* 회원 목록 조회(연락망) */
+    @GetMapping("/members/list")
     public ResponseEntity<PagingResponse> memberList( @RequestParam(defaultValue = "1") final Integer page ) {
 
-        final Page<MemberResponse> memberList = memberService.memberList( page );
+        final Page<MembersResponse> memberList = memberService.memberList( page );
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( memberList );
         final PagingResponse pagingResponse = PagingResponse.of( memberList.getContent(), pagingButtonInfo );
 
         return ResponseEntity.ok( pagingResponse );
     }
+
+    /* 회원 목록 조회(연락망, search) */
+    @GetMapping("/members/list/search")
+    public ResponseEntity<PagingResponse> memberListByInfoName(@RequestParam final String infoName,
+                                                               @RequestParam(defaultValue = "1") final Integer page ) {
+
+        final Page<MembersResponse> memberList = memberService.memberListByInfoName( page, infoName);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo( memberList );
+        final PagingResponse pagingResponse = PagingResponse.of( memberList.getContent(), pagingButtonInfo );
+
+        return ResponseEntity.ok( pagingResponse );
+    }
+
+    /* 회원 상세 조회(연락망) */
+    @GetMapping("/members/list/{memberCode}")
+    public ResponseEntity<ProfileResponse> getCustomNetworkMember(@PathVariable final Long memberCode ) {
+
+        final ProfileResponse profileResponse = memberService.getCustomNetworkMember( memberCode );
+
+        return ResponseEntity.ok( profileResponse );
+    }
+
 
 
     /* ----------------------- 부서, 직급 조회 -------------------------- */
