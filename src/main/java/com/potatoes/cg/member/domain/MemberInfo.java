@@ -3,6 +3,7 @@ package com.potatoes.cg.member.domain;
 import com.potatoes.cg.member.domain.type.MemberInfoStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -17,6 +18,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name="tbl_member_info")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
+@ToString
 public class MemberInfo {
 
     @Id
@@ -84,7 +86,6 @@ public class MemberInfo {
         );
 
     }
-
 
     public void update(MemberInfoStatus infoStatus, String infoEmail, String infoPhone, Long infoZipcode,
                        String infoAddress, String infoAddressAdd) {

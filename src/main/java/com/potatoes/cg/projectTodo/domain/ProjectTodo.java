@@ -3,6 +3,7 @@ package com.potatoes.cg.projectTodo.domain;
 import com.potatoes.cg.calendar.domain.type.StatusType;
 import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.project.domain.Project;
+import com.potatoes.cg.project.domain.ProjectReply;
 import com.potatoes.cg.projectTodolist.domain.ProjectTodolist;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,10 +57,13 @@ public class ProjectTodo {
     @Column(nullable = false)
     private StatusType todoStatus = PROGRESS;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "todoCode")
     private List<ProjectTodolist> projectTodolist;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "todoListCode")
+    private List<ProjectReply> replies;
 
     public ProjectTodo(String todoTitle, Member member, Project project, List<ProjectTodolist> projectTodolist) {
         this.todoTitle = todoTitle;

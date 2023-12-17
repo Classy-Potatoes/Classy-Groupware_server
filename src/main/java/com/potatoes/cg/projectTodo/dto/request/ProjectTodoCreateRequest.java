@@ -1,7 +1,5 @@
 package com.potatoes.cg.projectTodo.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.potatoes.cg.projectTodolist.domain.ProjectTodolist;
 import com.potatoes.cg.projectTodolist.dto.request.ProjectTodolistCreateRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

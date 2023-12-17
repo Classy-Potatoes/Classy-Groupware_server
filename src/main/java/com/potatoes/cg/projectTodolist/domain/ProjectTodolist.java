@@ -45,13 +45,9 @@ public class ProjectTodolist {
     @Column(nullable = false)
     private StatusType tofoStatus = UNFINISHED;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "todoList")
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY, mappedBy = "todoList")
     @PrimaryKeyJoinColumn
     private ProjectManagersTodo projectManager;
-
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "todoListCode")
-    private List<ProjectReply> replies;
 
     public ProjectTodolist(String todoBody, LocalDate todoEndDate, ProjectManagersTodo projectManagersTodo) {
         this.todoBody = todoBody;
@@ -59,8 +55,24 @@ public class ProjectTodolist {
         this.projectManager = projectManagersTodo;
     }
 
+    public ProjectTodolist(Long a, String todoBody, LocalDate todoEndDate, ProjectManagersTodo projectManagersTodo) {
+        this.todoListCode = a;
+        this.todoBody = todoBody;
+        this.todoEndDate = todoEndDate;
+        this.projectManager = projectManagersTodo;
+    }
+
     public static ProjectTodolist of(String todoBody, LocalDate endDates, ProjectManagersTodo projectManagersTodo) {
         return new ProjectTodolist(
+                todoBody,
+                endDates,
+                projectManagersTodo
+        );
+    }
+
+    public static ProjectTodolist ofs(Long a, String todoBody, LocalDate endDates, ProjectManagersTodo projectManagersTodo) {
+        return new ProjectTodolist(
+                a,
                 todoBody,
                 endDates,
                 projectManagersTodo
