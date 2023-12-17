@@ -272,20 +272,52 @@ public class MemberService {
 
 
 
-    /* 회원 목록 조회 */
+    /* 회원 목록 조회(연락망) */
     @Transactional(readOnly = true)
-    public Page<MemberResponse> memberList( final Integer page ) {
+    public Page<MembersResponse> memberList( final Integer page ) {
 
-        Page<Member> memberList = memberRepository.findByMemberStatus(
-                PageRequest.of(page - 1, 10, Sort.by("memberJoinDate")),
-                ACTIVE );
+        Page<Member> memberList = memberRepository.findByMemberStatus( getPageable( page ), ACTIVE );
 
-        return memberList.map( member -> MemberResponse.from( member ) );
+        return memberList.map( member -> MembersResponse.from( member ) );
+    }
+
+    /* 회원 목록 조회(연락망, search) */
+    @Transactional(readOnly = true)
+    public Page<MembersResponse> memberListByInfoName( final Integer page, final String infoName ) {
+
+        Page<Member> memberList = memberRepository.findByMemberInfoInfoNameContainsAndMemberStatus( getPageable( page ), infoName, ACTIVE );
+
+        return memberList.map( member -> MembersResponse.from( member ) );
     }
 
 
+    private Pageable getPageable(final Integer page) {
+        return PageRequest.of(page - 1, 8, Sort.by("memberInfo.infoName"));
+    }
 
 
+    /* 회원 상세 조회(연락망) */
+    @Transactional(readOnly = true)
+    public ProfileResponse getCustomNetworkMember( Long memberCode ) {
+
+        // 회원 조회
+        Member member = memberRepository.findById( memberCode )
+                .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBERCODE ) );
+
+        // 이미지 조회
+        final ProfileImage profileImage = profileImageRepository.findByMemberCode( memberCode )
+                .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_CODE ));
+
+        // 부서, 직급 목록 조회
+        final List<Dept> deptList = deptRepository.findAll();
+        final List<Job> jobList = jobRepository.findAll();
+
+        // 이력 조회
+        final List<History> historys = historyRepository.findByInfoCode( member.getMemberInfo().getInfoCode() );
+
+
+        return ProfileResponse.from( member, profileImage, deptList, jobList, historys );
+    }
 
     /* ----------------------- 부서, 직급 조회 -------------------------- */
 
