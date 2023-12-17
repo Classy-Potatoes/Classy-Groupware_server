@@ -95,6 +95,7 @@ public class MemberController {
         return ResponseEntity.created( URI.create("/") ).build();
     }
 
+
     /* 회원상세 조회(마이페이지) */
     @GetMapping("/member/myProfile")
     public ResponseEntity<ProfileResponse> profile( @AuthenticationPrincipal CustomUser customUser ) {
@@ -103,7 +104,6 @@ public class MemberController {
 
         return ResponseEntity.ok( profileResponse );
     }
-
 
 
     /* 회원상세 수정(마이페이지) */

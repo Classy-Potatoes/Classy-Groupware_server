@@ -5,6 +5,7 @@ import com.potatoes.cg.member.domain.type.MemberInfoStatus;
 import com.potatoes.cg.member.domain.type.MemberStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;

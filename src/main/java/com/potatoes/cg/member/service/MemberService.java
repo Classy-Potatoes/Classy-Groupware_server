@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -171,6 +172,7 @@ public class MemberService {
     }
 
 
+
     /* 프로필 조회(회원상세조회) */
     @Transactional(readOnly = true)
     public ProfileResponse getProfile( final CustomUser customUser ) {
@@ -193,7 +195,6 @@ public class MemberService {
 
         return ProfileResponse.from( member, profileImage, deptList, jobList, historys );
     }
-
 
 
     /* 회원상세 수정(마이페이지) */
@@ -252,8 +253,6 @@ public class MemberService {
             );
             historyRepository.save( newHistory );
         }
-
-
 
 
         member.updateStatus( memberUpdateRequest.getMemberStatus() );

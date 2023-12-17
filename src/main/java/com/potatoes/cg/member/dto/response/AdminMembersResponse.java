@@ -20,6 +20,7 @@ public class AdminMembersResponse {
     private final String deptName;
     private final String infoPhone;
     private final String infoEmail;
+    private final Long memberCode;
     private final MemberStatus memberStatus;
 
 
@@ -33,6 +34,7 @@ public class AdminMembersResponse {
                 member.getMemberInfo().getDept().getDeptName(),
                 member.getMemberInfo().getInfoPhone(),
                 member.getMemberInfo().getInfoEmail(),
+                member.getMemberCode(),
                 member.getMemberStatus()
         );
 
