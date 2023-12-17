@@ -4,11 +4,11 @@ import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
 import com.potatoes.cg.jwt.CustomUser;
-import com.potatoes.cg.project.domain.Project;
 import com.potatoes.cg.project.domain.ProjectParticipantId;
 import com.potatoes.cg.project.dto.request.*;
 import com.potatoes.cg.project.dto.response.*;
 import com.potatoes.cg.project.service.*;
+import com.potatoes.cg.projectTodo.service.ProjectTodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +19,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,6 +41,8 @@ public class ProjectController {
     private final ReplyService replyService;
 
     private final TaskService taskService;
+
+    private final ProjectTodoService todoService;
 
     /* 프로젝트 생성 - 부장이상 */
     @PostMapping("/projects")
@@ -429,6 +429,20 @@ public class ProjectController {
         return ResponseEntity.ok(pagingResponse);
     }
 
+    /* 내 할일 조회 */
+    @GetMapping("/todolist/myTodo")
+    public ResponseEntity<PagingResponse> getMyTodo (
+            @RequestParam(defaultValue = "1") final Integer page,
+            @AuthenticationPrincipal final CustomUser customUser) {
+
+        final Page<MyTodoResponse> todos = todoService.getMyTodo(page, customUser);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(todos);
+        final PagingResponse pagingResponse = PagingResponse.of(todos.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
+    }
+
+
     /* 업무 조회 */
     @GetMapping("/projects/{projectCode}/task")
     public ResponseEntity<PagingResponse> getTask(
@@ -448,8 +462,14 @@ public class ProjectController {
         return ResponseEntity.ok(pagingResponse);
     }
 
-//    /* 업무 요청 확인하기 */
-//    @PutMapping("/")
+    /* 업무 요청 확인하기 */
+    @PutMapping("/task/{taskCode}/check")
+    public ResponseEntity<Void> taskCheck(@PathVariable final Long taskCode,
+                                          @RequestBody @Valid final TaskCheckRequest taskCheckRequest) {
 
+        taskService.taskCheck(taskCode, taskCheckRequest);
+
+        return ResponseEntity.created(URI.create("/task/" + taskCode)).build();
+    }
 
 }

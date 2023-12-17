@@ -12,6 +12,7 @@ import com.potatoes.cg.project.domain.repository.ProjectRepository;
 import com.potatoes.cg.project.domain.repository.ProjectTaskRepository;
 import com.potatoes.cg.project.domain.type.ProjectFileType;
 import com.potatoes.cg.project.dto.request.ProjectTaskCreateRequest;
+import com.potatoes.cg.project.dto.request.TaskCheckRequest;
 import com.potatoes.cg.project.dto.request.TaskUpdateRequest;
 import com.potatoes.cg.project.dto.response.MyTaskResponse;
 import com.potatoes.cg.project.dto.response.ProjectPostResponse;
@@ -157,4 +158,13 @@ public class TaskService {
         });
     }
 
+    /* 요청 확인하기 */
+    public void taskCheck(Long taskCode, TaskCheckRequest taskCheckRequest) {
+
+        ProjectTask task = projectTaskRepository.getReferenceById(taskCode);
+
+        task.updateCheck(
+                taskCheckRequest.getTaskStatus()
+        );
+    }
 }
