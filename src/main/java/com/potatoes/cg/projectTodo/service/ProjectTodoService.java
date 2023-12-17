@@ -13,6 +13,7 @@ import com.potatoes.cg.project.domain.repository.ProjectParticipantRepository;
 import com.potatoes.cg.project.domain.repository.ProjectReplyRepository;
 import com.potatoes.cg.project.domain.repository.ProjectRepository;
 import com.potatoes.cg.project.domain.type.ProjectStatusType;
+import com.potatoes.cg.project.dto.response.MyTodoResponse;
 import com.potatoes.cg.project.service.ProjectMemberService;
 import com.potatoes.cg.project.service.ProjectService;
 import com.potatoes.cg.projectManagers.domain.ProjectManagersSchedule;
@@ -309,5 +310,14 @@ public class ProjectTodoService {
         ).collect(Collectors.toList());
 
         return projectTodolists;
+    }
+
+    /* 내 할일 조회 */
+    @Transactional(readOnly = true)
+    public Page<MyTodoResponse> getMyTodo(final Integer page, final CustomUser customUser) {
+
+        Page<ProjectTodolist> todos = projectTodolistRepository.findByMyTodo(getPageable(page), customUser.getMemberCode());
+
+        return todos.map(projectTodolist -> MyTodoResponse.from(projectTodolist));
     }
 }

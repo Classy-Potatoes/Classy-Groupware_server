@@ -129,4 +129,8 @@ public class ProjectTask {
         this.taskEndDate = taskEndDate;
         this.taskPriority = taskPriority;
     }
+
+    public void updateCheck(String taskStatus) {
+        this.taskStatus = taskStatus;
+    }
 }
