@@ -21,6 +21,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Setter
 @Getter
+@ToString
 public class ProjectManagersSchedule {
 
     @Id
@@ -52,5 +53,4 @@ public class ProjectManagersSchedule {
 
         this.scheduleCode = scheduleCode;
     }
-
 }

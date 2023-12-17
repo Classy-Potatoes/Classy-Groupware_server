@@ -24,6 +24,7 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 public class ProjectManagersTodo {
 
     @Id

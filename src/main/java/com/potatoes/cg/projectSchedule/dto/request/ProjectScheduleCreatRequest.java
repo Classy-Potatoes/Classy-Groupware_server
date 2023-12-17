@@ -3,6 +3,7 @@ package com.potatoes.cg.projectSchedule.dto.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
+@ToString
 public class ProjectScheduleCreatRequest {
 
     @NotBlank

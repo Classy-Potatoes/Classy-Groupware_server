@@ -4,6 +4,7 @@ import com.potatoes.cg.member.domain.type.MemberRole;
 import com.potatoes.cg.member.domain.type.MemberStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -23,6 +24,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
+@ToString
 public class Member {
 
     @Id
@@ -104,6 +106,5 @@ public class Member {
         this.memberStatus = memberStatus;
         this.memberToken = memberToken;
     }
-
 
 }

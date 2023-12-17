@@ -1,6 +1,7 @@
 package com.potatoes.cg.projectTodo.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.potatoes.cg.calendar.domain.type.StatusType;
 import com.potatoes.cg.project.domain.ProjectReply;
 import com.potatoes.cg.projectTodolist.domain.ProjectTodolist;
 import lombok.Getter;
@@ -22,25 +23,17 @@ public class ProjectTodoListResponse {
     private final LocalDate todoListEndDate;
 
     private final String managerName;
+    private final StatusType todoStatus;
 
-    private final List<Map<String, Object>> replies;
 
-    public static ProjectTodoListResponse from(ProjectTodolist projectTodolist, List<ProjectReply> replies) {
-
-        List<Map<String, Object>> repliesMap = replies.stream().map(reply -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("memberName", reply.getMember().getInfoName());
-            map.put("replyBody", reply.getReplyBody());
-            map.put("replyCreatedDate", reply.getReplyCreatedDate());
-            return map;
-        }).collect(Collectors.toList());
+    public static ProjectTodoListResponse from(ProjectTodolist projectTodolist) {
 
         return new ProjectTodoListResponse(
                 projectTodolist.getTodoListCode(),
                 projectTodolist.getTodoBody(),
                 projectTodolist.getTodoEndDate(),
                 projectTodolist.getProjectManager().getMember().getMemberInfo().getInfoName(),
-                repliesMap
+                projectTodolist.getTofoStatus()
         );
     }
 

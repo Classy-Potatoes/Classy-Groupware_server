@@ -12,6 +12,7 @@ import com.potatoes.cg.projectSchedule.dto.request.ProjectScheduleUpdateRequest;
 import com.potatoes.cg.projectSchedule.dto.response.ProjectScheduleResponse;
 import com.potatoes.cg.projectSchedule.service.ProjectScheduleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import java.nio.charset.Charset;
 @RestController
 @RequestMapping("/cg-api/v1/projects")
 @RequiredArgsConstructor
+@Slf4j
 public class ProjectScheduleController {
 
     private final ProjectScheduleService projectScheduleService;
@@ -46,6 +48,7 @@ public class ProjectScheduleController {
                                      @RequestBody @Valid final ProjectScheduleCreatRequest scheduleRequest,
                                      @AuthenticationPrincipal final CustomUser customUser) {
 
+        log.info("sddsdsd : {}", scheduleRequest);
         final Long scheduleCode = projectScheduleService.save(projectCode, scheduleRequest, customUser);
 
         return ResponseEntity.created(URI.create("/schedule-management" + scheduleCode)).build();

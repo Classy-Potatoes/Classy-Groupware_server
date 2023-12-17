@@ -90,6 +90,7 @@ public class ProjectTodoController {
                                         @PathVariable final Long todoCode,
                                         @PathVariable final Long todoListCode,
                                         @AuthenticationPrincipal CustomUser customUser) {
+        log.info("abcd : {}", todoListCode);
 
         projectTodoService.checked(projectCode, todoCode, todoListCode, customUser);
         return ResponseEntity.created(URI.create("/todoList-management" + todoListCode)).build();
@@ -100,6 +101,15 @@ public class ProjectTodoController {
     public ResponseEntity<List<TodoListResponse>> getTodoList(@AuthenticationPrincipal final CustomUser customUser) {
         log.info("cxvsdvsdvs : {}", customUser);
         List<TodoListResponse> todoListResponses = projectTodoService.getTodoList(customUser);;
+
+        return ResponseEntity.status(HttpStatus.OK).body(todoListResponses);
+    }
+
+    /* 내 할일리스트 조회 {프로젝트 상관 x}*/
+    @GetMapping("/myTodoList")
+    public ResponseEntity<List<TodoListResponse>> getAllTodoList(@AuthenticationPrincipal final CustomUser customUser) {
+        log.info("cxvsdvsdvs : {}", customUser);
+        List<TodoListResponse> todoListResponses = projectTodoService.getAllTodoList(customUser);;
 
         return ResponseEntity.status(HttpStatus.OK).body(todoListResponses);
     }

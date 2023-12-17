@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import static com.potatoes.cg.calendar.domain.type.StatusType.DELETED;
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
 import static com.potatoes.cg.project.domain.type.ProjectOptionType.SCHEDULE;
+import static com.potatoes.cg.project.domain.type.ProjectStatusType.USABLE;
 
 @Service
 @Transactional
@@ -78,13 +79,24 @@ public class ProjectScheduleService {
     /* 일정글 등록 */
     public Long save(Long projectCode, ProjectScheduleCreatRequest scheduleRequest, CustomUser customUser) {
 
-        final List<ProjectManagersSchedule> projectManagerList = memberRepository
-                .findAllById(scheduleRequest.getAttendants()).stream().map(
-                        member -> ProjectManagersSchedule.of(member)
-                ).collect(Collectors.toList());
+//        final List<ProjectManagersSchedule> projectManagerList = memberRepository
+//                .findAllById(scheduleRequest.getAttendants()).stream().map(
+//                        member -> ProjectManagersSchedule.of(member)
+//                ).collect(Collectors.toList());
 
         Member member = memberRepository.findById(customUser.getMemberCode())
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER_CODE));
+
+        List<MemberInfo> members = infoRepository.findAllById(scheduleRequest.getAttendants());
+
+        List<Member> memberList = memberRepository.findAllByMemberInfoIn(members);
+        log.info("aaaaaa : {}", memberList);
+
+        List<ProjectManagersSchedule> projectManagersScheduleList = memberList.stream().map(
+                newMem -> ProjectManagersSchedule.of(newMem)
+        ).collect(Collectors.toList());
+
+        log.info("sdfdf : {}", projectManagersScheduleList);
 
         LocalDate setStartDate = scheduleRequest.getScheduleStartedDate();
         LocalTime setStartTime = scheduleRequest.getScheduleStartedTime();
@@ -129,13 +141,12 @@ public class ProjectScheduleService {
                 scheduleEndDate,
                 member,
                 project,
-                projectManagerList
+                projectManagersScheduleList
         );
 
         final ProjectSchedule projectSchedule = projectScheduleRepository.save(newProjectSchedule);
 
         return projectSchedule.getScheduleCode();
-
 
     }
 
@@ -147,10 +158,19 @@ public class ProjectScheduleService {
 
         projectManagersScheduleRepository.deleteAllByScheduleCode(projectSchedule.getScheduleCode());
 
-        final List<ProjectManagersSchedule> projectManagerList = memberRepository
-                .findAllById(scheduleRequest.getAttendants()).stream().map(
-                        member -> ProjectManagersSchedule.of(member)
-                ).collect(Collectors.toList());
+//        final List<ProjectManagersSchedule> projectManagerList = memberRepository
+//                .findAllById(scheduleRequest.getAttendants()).stream().map(
+//                        member -> ProjectManagersSchedule.of(member)
+//                ).collect(Collectors.toList());
+
+        List<MemberInfo> members = infoRepository.findAllById(scheduleRequest.getAttendants());
+
+        List<Member> memberList = memberRepository.findAllByMemberInfoIn(members);
+        log.info("aaaaaa : {}", memberList);
+
+        List<ProjectManagersSchedule> projectManagersScheduleList = memberList.stream().map(
+                newMem -> ProjectManagersSchedule.of(newMem)
+        ).collect(Collectors.toList());
 
 //        Member member = memberRepository.findById(customUser.getMemberCode())
 //                .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER_CODE));
@@ -197,7 +217,7 @@ public class ProjectScheduleService {
                 scheduleStartedDate,
                 scheduleEndDate,
                 project,
-                projectManagerList
+                projectManagersScheduleList
         );
     }
 
@@ -226,7 +246,7 @@ public class ProjectScheduleService {
         log.info("xvsvsds : {}", projectSchedules);
         return projectSchedules.map(projectSchedule -> {
             List<ProjectReply> replies = projectSchedule.getReplies()
-                    .stream().filter(projectReply -> projectReply.getReplyOption() == SCHEDULE).collect(Collectors.toList());
+                    .stream().filter(projectReply -> projectReply.getReplyOption() == SCHEDULE && projectReply.getReplyState() == USABLE).collect(Collectors.toList());
             log.info("sdfsfsdfsfsfsf : {}", projectSchedule.getProjectManagerList());
             List<ProjectManagersSchedule> managers = projectSchedule.getProjectManagerList();
             log.info("afsdfa : {}", managers);
