@@ -240,12 +240,18 @@ public class AdminService {
         return nonMemberList.map( nonMember -> NonMembersResponse.from( nonMember ) );
     }
 
-    /* 미등록 회원 상세 조회(관리자) */
+    /* 미등록 회원 삭제(관리자) */
     public void delete( final Long infoCode ) {
 
         infoRepository.deleteById( infoCode );
     }
 
+
+    /* 히스토리 삭제(관리자) */
+    public void deleteHistory( final Long historyCode ) {
+
+        historyRepository.deleteById( historyCode );
+    }
 
 
 }

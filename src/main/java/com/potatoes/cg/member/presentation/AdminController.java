@@ -115,5 +115,14 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    /* 히스토리 삭제(관리자) */
+    @DeleteMapping("/history/delete")
+    public ResponseEntity<Void> deleteHistory( @RequestParam final Long historyCode ) {
+
+        adminService.deleteHistory( historyCode );
+
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
