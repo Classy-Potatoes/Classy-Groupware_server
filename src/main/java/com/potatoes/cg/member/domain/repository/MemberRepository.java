@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -37,4 +39,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /* 미분류 회원 목록 조회(search) */
     Page<Member> findByMemberInfoInfoNameContains(Pageable pageable, String infoName);
 
+    /* 프로젝트 참석자 전달 */
+    List<Member> findAllByMemberInfoIn(List<MemberInfo> infos);
+
+    Member findByMemberInfoInfoCode(Long code);
 }

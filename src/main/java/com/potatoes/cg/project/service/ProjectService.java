@@ -8,18 +8,15 @@ import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Dept;
 import com.potatoes.cg.member.domain.MemberInfo;
 import com.potatoes.cg.member.domain.repository.InfoRepository;
-import com.potatoes.cg.project.domain.Project;
-import com.potatoes.cg.project.domain.ProjectParticipant;
-import com.potatoes.cg.project.domain.ProjectParticipantId;
-import com.potatoes.cg.project.domain.ProjectPost;
+import com.potatoes.cg.project.domain.*;
 import com.potatoes.cg.project.domain.repository.*;
 import com.potatoes.cg.project.dto.request.ProjectCreateRequest;
 import com.potatoes.cg.project.dto.request.ProjectInviteMemberRequest;
 import com.potatoes.cg.project.dto.request.ProjectPostCreateRequest;
 import com.potatoes.cg.project.dto.request.ProjectUpdateRequest;
-import com.potatoes.cg.project.dto.response.MemberDeptResponse;
-import com.potatoes.cg.project.dto.response.ProjectResponse;
-import com.potatoes.cg.project.dto.response.ProjectsResponse;
+import com.potatoes.cg.project.dto.response.*;
+import com.potatoes.cg.projectTodolist.domain.ProjectTodolist;
+import com.potatoes.cg.projectTodolist.domain.repository.ProjectTodolistRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +47,7 @@ public class ProjectService {
     private final ProjectDeptRepository projectDeptRepository;
     private final ProjectParticipantRepository projectParticipantRepository;
     private final InfoRepository infoRepository;
+//    private final ProjectTodolistRepository projectTodolistRepository;
 
 
     /* 뉴 프로젝트 생성 */
@@ -170,6 +168,7 @@ public class ProjectService {
 
         projectRepository.deleteById(projectCode);
     }
+
 
 }
 

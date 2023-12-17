@@ -4,10 +4,12 @@ import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
 import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
 import com.potatoes.cg.note.service.NoteService;
+import com.potatoes.cg.project.dto.response.ProjectMemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -16,7 +18,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/cg-api/v1/note/")
@@ -35,9 +39,10 @@ public class NoteController {
             @AuthenticationPrincipal CustomUser customUser
     ) {
 
-        LocalDateTime noteSentDate = LocalDateTime.now();
+        LocalDate noteSentDate = LocalDate.now();
+        LocalDateTime search = LocalDateTime.of(noteSentDate, LocalTime.MAX); //조회기준 : 현재 날짜의 23:59:59
 
-        final Page<NotesResponse> notes = noteService.getSentNotes(page, customUser, noteSentDate);
+        final Page<NotesResponse> notes = noteService.getSentNotes(page, customUser, search);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -88,9 +93,10 @@ public class NoteController {
             @AuthenticationPrincipal CustomUser customUser
             ) {
 
-        LocalDateTime noteSentDate = LocalDateTime.now();
+        LocalDate noteSentDate = LocalDate.now();
+        LocalDateTime search = LocalDateTime.of(noteSentDate, LocalTime.MAX);
 
-        final Page<NotesResponse> notes = noteService.getReceivedNotes(page, customUser, noteSentDate);
+        final Page<NotesResponse> notes = noteService.getReceivedNotes(page, customUser, search);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -141,9 +147,10 @@ public class NoteController {
             @AuthenticationPrincipal CustomUser customUser
     ) {
 
-        LocalDateTime noteDate = LocalDateTime.now();
+        LocalDate noteSentDate = LocalDate.now();
+        LocalDateTime search = LocalDateTime.of(noteSentDate, LocalTime.MAX);
 
-        final Page<NotesResponse> notes = noteService.getImportantNotes(page, customUser, noteDate);
+        final Page<NotesResponse> notes = noteService.getImportantNotes(page, customUser, search);
         final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(notes);
         final PagingResponse pagingResponse = PagingResponse.of(notes.getContent(), pagingButtonInfo);
 
@@ -194,6 +201,31 @@ public class NoteController {
         noteService.moveNote(noteRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).build(); //201 응답
+
+    }
+
+    /* 14. 쓰기 */
+    @PostMapping("/save")
+    public ResponseEntity<Void> postNote(
+            @RequestBody @Valid final NoteCreateRequest noteRequest,
+            @AuthenticationPrincipal CustomUser customUser) {
+
+        noteService.postNote(noteRequest, customUser);
+
+        return ResponseEntity.ok().build();
+
+    }
+
+    /* 15. 회원 조회 */
+    @GetMapping("/member/search")
+    public ResponseEntity<PagingResponse> getMemberSearch(@RequestParam(defaultValue = "1") final Integer page,
+                                                                @RequestParam final String infoName){
+
+        final Page<ProjectMemberResponse> members = noteService.getMemberSearch(page, infoName);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(members);
+        final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok(pagingResponse);
 
     }
 

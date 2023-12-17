@@ -1,11 +1,13 @@
 package com.potatoes.cg.project.dto.request;
 
+import com.potatoes.cg.member.domain.MemberInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
@@ -23,4 +25,7 @@ public class TaskUpdateRequest {
     private final Date taskEndDate;
 
     private final String taskPriority;
+
+    private final List<MemberInfo> projectManagers;
+
 }

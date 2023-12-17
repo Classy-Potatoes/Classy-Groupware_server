@@ -13,6 +13,7 @@ import com.potatoes.cg.project.domain.repository.ProjectParticipantRepository;
 import com.potatoes.cg.project.domain.repository.ProjectReplyRepository;
 import com.potatoes.cg.project.domain.repository.ProjectRepository;
 import com.potatoes.cg.project.domain.type.ProjectStatusType;
+import com.potatoes.cg.project.dto.response.MyTodoResponse;
 import com.potatoes.cg.project.service.ProjectMemberService;
 import com.potatoes.cg.project.service.ProjectService;
 import com.potatoes.cg.projectManagers.domain.ProjectManagersSchedule;
@@ -52,6 +53,7 @@ import static com.potatoes.cg.calendar.domain.type.StatusType.*;
 import static com.potatoes.cg.common.exception.type.ExceptionCode.*;
 import static com.potatoes.cg.project.domain.type.ProjectOptionType.SCHEDULE;
 import static com.potatoes.cg.project.domain.type.ProjectOptionType.TODO;
+import static com.potatoes.cg.project.domain.type.ProjectStatusType.USABLE;
 
 @Service
 @Transactional
@@ -73,17 +75,19 @@ public class ProjectTodoService {
 
     /* 할일 등록 */
     public void save(Long projectCode, ProjectTodoCreateRequest todoRequest, CustomUser customUser) {
-
+        log.info("customeuser : {}", customUser.getMemberCode());
+        log.info("rerrrr : {}", memberRepository.findByMemberInfoInfoCode(todoRequest.getProjectTodolistCreateRequestList().get(0).getAttendant()));
 
         List<ProjectTodolist> projectTodolists = todoRequest.getProjectTodolistCreateRequestList().stream().map(
                 todoReq -> ProjectTodolist.of(
                         todoReq.getTodoBody(),
                         todoReq.getEndDates(),
-                        ProjectManagersTodo.of(memberRepository.getReferenceById(todoReq.getAttendant()
+                        ProjectManagersTodo.of(memberRepository.findByMemberInfoInfoCode(todoReq.getAttendant()
                                 )
                         )
                 )).collect(Collectors.toList());
 
+        log.info("memeeeeee {}", projectTodolists);
         for (int i = 0; i < projectTodolists.size(); i++) {
             LocalDate setEndDate = projectTodolists.get(i).getTodoEndDate();
             if (setEndDate == null) {
@@ -98,9 +102,9 @@ public class ProjectTodoService {
 
         final Project project = projectRepository.getReferenceById(projectCode);
 
-        Member member = memberRepository.findById(customUser.getMemberCode())
-                .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBER_CODE));
+        final Member member = memberRepository.getReferenceById(customUser.getMemberCode());
 
+        log.info("memberrr : {}", member);
         final ProjectTodo newProjectTodo = ProjectTodo.of(
                 todoRequest.getTodoTitle(),
                 member,
@@ -108,8 +112,9 @@ public class ProjectTodoService {
                 projectTodolists
         );
 
-        projectTodoRepository.save(newProjectTodo);
-
+        log.info("sssssssssss {}", newProjectTodo);
+        ProjectTodo projectTodo = projectTodoRepository.save(newProjectTodo);
+        log.info("bbbbbbbbbbbbbbb {}", projectTodo);
 //        log.info("adfsfsd : {}", projectTodolists.get(0).getProjectManager());
         for (int i = 0; i < projectTodolists.size(); i++) {
             projectTodolists.get(i).getProjectManager().setTodoList(projectTodolists.get(i));
@@ -146,8 +151,9 @@ public class ProjectTodoService {
                 todoReq -> ProjectTodolist.of(
                         todoReq.getTodoBody(),
                         todoReq.getEndDates(),
-                        ProjectManagersTodo.of(memberRepository.findById(todoReq.getAttendant())
-                                .orElseThrow(() -> new NotFoundException(NOT_FOUND_MEMBERCODE)))
+                        ProjectManagersTodo.of(memberRepository.findByMemberInfoInfoCode(todoReq.getAttendant()
+                                )
+                        )
                 )).collect(Collectors.toList());
 
         for (int i = 0; i < newProjectTodolists.size(); i++) {
@@ -206,14 +212,15 @@ public class ProjectTodoService {
             List<ProjectTodoListResponse> projectTodolists = projectTodo.getProjectTodolist()
                     .stream().map(projectTodolist -> {
 //                        log.info("sdfsefhseuif : {}", projectTodolist);
-                        List<ProjectReply> replies = projectTodolist.getReplies()
-                                .stream().filter(projectReply -> projectReply.getReplyOption() == TODO).collect(Collectors.toList());
                         ;
 //                        log.info("abcdeddd : {}", projectTodolist.getProjectManager());
-                        return ProjectTodoListResponse.from(projectTodolist, replies);
+                        return ProjectTodoListResponse.from(projectTodolist);
                     }).collect(Collectors.toList());
-            log.info("sdfsdfsdf : {}", projectTodo.getMember().getMemberCode());
-            return ProjectTodoResponse.from(projectTodo, projectTodolists);
+
+//            log.info("sdfsdfsdf : {}", projectTodo.getMember().getMemberCode());
+            List<ProjectReply> replies = projectTodo.getReplies()
+                    .stream().filter(projectReply -> projectReply.getReplyOption() == TODO && projectReply.getReplyState() == USABLE).collect(Collectors.toList());
+            return ProjectTodoResponse.from(projectTodo, projectTodolists, replies);
         });
     }
 
@@ -223,14 +230,13 @@ public class ProjectTodoService {
                 .orElseThrow(() -> new NotFoundException(NOT_FOUND_TODO_CODE));
 
         StatusType curStatus = projectTodolist.getTofoStatus();
+        log.info("aaaaaa : {}", curStatus);
 
-        if (customUser.getMemberCode() == projectTodolist.getProjectManager().getMember().getMemberCode()) {
-            StatusType newStatus = (curStatus == UNFINISHED) ? FINISHED : UNFINISHED;
-            projectTodolist.checked(
-                    newStatus
-            );
-        }
-
+        StatusType newStatus = (curStatus == UNFINISHED) ? FINISHED : UNFINISHED;
+        log.info("bbbbb : {}", newStatus);
+        projectTodolist.checked(
+                newStatus
+        );
     }
 
     /* 내 할일리스트 조회 */
@@ -286,5 +292,32 @@ public class ProjectTodoService {
         reply.update(
                 replyRequest.getReplyBody()
         );
+    }
+
+    /* 내 할일리스트 조회 {프로젝트 상관 x}*/
+    public List<TodoListResponse> getAllTodoList(CustomUser customUser) {
+
+        log.info("sfsdfsdfsf : {}", customUser);
+        List<ProjectTodolist> todoListResponses = projectTodolistRepository.findAllByTofoStatusAndProjectManagerMemberMemberCodeOrderByTodoListCodeDesc(UNFINISHED, customUser.getMemberCode());
+
+        log.info("sfsdfsdf : {}", todoListResponses);
+        List<TodoListResponse> projectTodolists = todoListResponses.stream().map(
+                todoList -> TodoListResponse.from(
+                        todoList.getTodoListCode(),
+                        todoList.getTodoBody(),
+                        todoList.getTodoEndDate()
+                )
+        ).collect(Collectors.toList());
+
+        return projectTodolists;
+    }
+
+    /* 내 할일 조회 */
+    @Transactional(readOnly = true)
+    public Page<MyTodoResponse> getMyTodo(final Integer page, final CustomUser customUser) {
+
+        Page<ProjectTodolist> todos = projectTodolistRepository.findByMyTodo(getPageable(page), customUser.getMemberCode());
+
+        return todos.map(projectTodolist -> MyTodoResponse.from(projectTodolist));
     }
 }
