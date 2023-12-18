@@ -4,11 +4,13 @@ import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Member;
 import com.potatoes.cg.member.domain.repository.MemberRepository;
+import com.potatoes.cg.member.dto.response.AdminMembersResponse;
 import com.potatoes.cg.note.domain.Note;
 import com.potatoes.cg.note.domain.repository.NoteRepository;
 import com.potatoes.cg.note.domain.type.NoteStatusType;
 import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
+import com.potatoes.cg.note.dto.response.NoteMemberListResponse;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
 import com.potatoes.cg.project.domain.repository.ProjectMemberRepository;
@@ -285,6 +287,15 @@ public class NoteService {
 
         return members.map(Member -> ProjectMemberResponse.fromMember(Member));
 
+    }
+
+    /* 회원 목록 조회 */
+    @Transactional(readOnly = true)
+    public Page<NoteMemberListResponse> getNoteListMembers(Integer page) {
+
+        Page<Member> memberList = memberRepository.findAll(getPageable(page));
+
+        return memberList.map( member -> NoteMemberListResponse.from(member));
     }
 
 }
