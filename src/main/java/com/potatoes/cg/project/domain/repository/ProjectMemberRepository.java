@@ -18,4 +18,6 @@ public interface ProjectMemberRepository extends JpaRepository<Member, Long> {
     /* 부서별 회원 조회 */
     List<Member> findByMemberInfoDeptDeptCodeAndMemberStatus(Long deptCode, MemberStatus memberStatus);
 
+    /* 로그인한 사람 정보 조회 */
+    Member findByMemberInfoInfoCode(Long infoCode);
 }
