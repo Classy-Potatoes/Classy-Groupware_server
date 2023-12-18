@@ -2,6 +2,7 @@ package com.potatoes.cg.note.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.potatoes.cg.note.domain.Note;
+import com.potatoes.cg.note.domain.type.NoteReceiptStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -22,13 +23,16 @@ public class NotesResponse {
 
     private final String noteBody;
 
+    private final NoteReceiptStatus noteReceiptStatus;
+
     public static NotesResponse from(Note note) {
 
         return new NotesResponse(
                 note.getNoteCode(),
                 note.getNoteSender().getMemberInfo().getInfoName(), note.getNoteReceiver().getMemberInfo().getInfoName(),
                 note.getNoteSentDate(),
-                note.getNoteBody()
+                note.getNoteBody(),
+                note.getNoteReceiptStatus()
         );
 
     }

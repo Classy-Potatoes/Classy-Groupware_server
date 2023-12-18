@@ -17,6 +17,7 @@ public class MemberDeptResponse {
     private final Long deptCode;
     private final String deptName;
 
+
     public static MemberDeptResponse from(MemberInfo memberInfo, String infoName, Long deptCode, String deptName) {
         return new MemberDeptResponse(
                 memberInfo.getInfoCode(),
