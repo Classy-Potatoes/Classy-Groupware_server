@@ -22,4 +22,6 @@ public interface ProjectScheduleRepository extends JpaRepository<ProjectSchedule
 
     /* 4. 프로젝트 일정 조회 */
     Page<ProjectSchedule> findByProjectProjectCodeAndScheduleStatusNotAndMemberMemberCode(Long projectCode, Pageable pageable, StatusType statusType, Long customUser);
+
+    Page<ProjectSchedule> findByProjectProjectCodeAndScheduleStatusNot(Long projectCode, Pageable pageable, StatusType statusType);
 }

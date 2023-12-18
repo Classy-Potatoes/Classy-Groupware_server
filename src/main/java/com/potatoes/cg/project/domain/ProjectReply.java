@@ -87,8 +87,8 @@ public class ProjectReply {
     }
 
 
-    public static ProjectReply of(final Long fkCode, final MemberInfo member,
-                                  final String replyBody, final ProjectOptionType replyOption) {
+    public static ProjectReply of(final Long fkCode,
+                                  final MemberInfo member, final String replyBody, final ProjectOptionType replyOption) {
         return new ProjectReply(
                 replyBody,
                 member,
