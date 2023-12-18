@@ -19,6 +19,8 @@ public interface ProjectTodoRepository extends JpaRepository<ProjectTodo, Long> 
     /* 할일 조회 */
     Page<ProjectTodo> findByProjectProjectCodeAndTodoStatusNotAndMemberMemberCode(Long projectCode, Pageable pageable, StatusType statusType, Long memberCode);
 
+    Page<ProjectTodo> findByProjectProjectCodeAndTodoStatusNot(Long projectCode, Pageable pageable, StatusType statusType);
+
 
 //    List<ProjectTodolist> findAllByTodoCode(List<Long> projectTodolist);
 //    List<ProjectTodolist> findAllByTodoCodeIn(List<Long> projectTodolist);

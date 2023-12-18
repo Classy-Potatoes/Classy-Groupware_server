@@ -1,14 +1,12 @@
 package com.potatoes.cg.projectTodo.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.potatoes.cg.calendar.domain.type.StatusType;
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.project.domain.ProjectReply;
 import com.potatoes.cg.projectTodo.domain.ProjectTodo;
-import com.potatoes.cg.projectTodolist.domain.ProjectTodolist;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +25,9 @@ public class ProjectTodoResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private final LocalDateTime createdDate;
     private final List<Map<String, Object>> replies;
+    private final Long infoCode;
 
-    public static ProjectTodoResponse from(ProjectTodo projectTodo, List<ProjectTodoListResponse> projectTodolists, List<ProjectReply> replies) {
+    public static ProjectTodoResponse from(ProjectTodo projectTodo, List<ProjectTodoListResponse> projectTodolists, List<ProjectReply> replies, CustomUser customUser) {
 
         List<Map<String, Object>> repliesMap = replies.stream().map(reply -> {
             Map<String, Object> map = new HashMap<>();
@@ -37,6 +36,7 @@ public class ProjectTodoResponse {
             map.put("replyCreatedDate", reply.getReplyCreatedDate());
             map.put("replyCode", reply.getReplyCode());
             map.put("replyModifyDate", reply.getReplyModifyDate());
+            map.put("infoCode", reply.getMember().getInfoCode());
             return map;
         }).collect(Collectors.toList());
 
@@ -47,7 +47,8 @@ public class ProjectTodoResponse {
                 projectTodolists,
                 projectTodo.getMember().getMemberId(),
                 projectTodo.getTodoModifyDate(),
-                repliesMap
+                repliesMap,
+                customUser.getInfoCode()
         );
     }
 }

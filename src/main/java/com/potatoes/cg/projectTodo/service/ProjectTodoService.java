@@ -99,7 +99,6 @@ public class ProjectTodoService {
             throw new NotFoundException(NOT_FOUND_VALID_TITLE);
         }
 
-
         final Project project = projectRepository.getReferenceById(projectCode);
 
         final Member member = memberRepository.getReferenceById(customUser.getMemberCode());
@@ -205,7 +204,7 @@ public class ProjectTodoService {
     @Transactional(readOnly = true)
     public Page<ProjectTodoResponse> getTodo(Integer page, Long projectCode, CustomUser customUser) {
 
-        Page<ProjectTodo> projectTodos = projectTodoRepository.findByProjectProjectCodeAndTodoStatusNotAndMemberMemberCode(projectCode, getPageable(page), DELETED, customUser.getMemberCode());
+        Page<ProjectTodo> projectTodos = projectTodoRepository.findByProjectProjectCodeAndTodoStatusNot(projectCode, getPageable(page), DELETED);
 
         return projectTodos.map(projectTodo -> {
 
@@ -220,7 +219,7 @@ public class ProjectTodoService {
 //            log.info("sdfsdfsdf : {}", projectTodo.getMember().getMemberCode());
             List<ProjectReply> replies = projectTodo.getReplies()
                     .stream().filter(projectReply -> projectReply.getReplyOption() == TODO && projectReply.getReplyState() == USABLE).collect(Collectors.toList());
-            return ProjectTodoResponse.from(projectTodo, projectTodolists, replies);
+            return ProjectTodoResponse.from(projectTodo, projectTodolists, replies, customUser);
         });
     }
 
