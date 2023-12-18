@@ -30,9 +30,9 @@ public class ApprovalLine_GET {
     @Column(nullable = false)
     private String turn;
 
-    @Enumerated(value = STRING)
+//    @Enumerated(value = STRING)
     @Column(nullable = true)
-    private ApprovalLineResultType approvalLineResult;
+    private String approvalLineResult;
 
     @Enumerated(value = STRING)
     @Column(nullable = false)

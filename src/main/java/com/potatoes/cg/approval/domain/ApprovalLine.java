@@ -1,11 +1,9 @@
 package com.potatoes.cg.approval.domain;
 
-import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineResultType;
-import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineTurnType;
 import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineWaitingStatusType;
-import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,6 +15,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Table(name = "tbl_approval_line")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
+//@DynamicUpdate
 public class ApprovalLine {
 
     @Id
@@ -30,16 +29,19 @@ public class ApprovalLine {
     @Column(nullable = false)
     private String turn;
 
-    @Enumerated(value = STRING)
+
     @Column(nullable = true)
-    private ApprovalLineResultType approvalLineResult;
+    private String approvalLineResult;
 
     @Enumerated(value = STRING)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private ApprovalLineWaitingStatusType approvalLineWaitingStatus;
 
     @Column(nullable = true)
     private LocalDateTime approvalLineDate;
+
+
+    private Long approvalCode;
 
 
     public ApprovalLine(Long memberCode, String turn) {
@@ -65,6 +67,20 @@ public class ApprovalLine {
                 turn
         );
 
+    }
+
+
+    public void setApprovalLineWaitingStatus(ApprovalLineWaitingStatusType approvalLineWaitingStatusType) {
+        this.approvalLineWaitingStatus = approvalLineWaitingStatusType;
+    }
+
+    public void setApprovalLineDate(LocalDateTime now) {
+        this.approvalLineDate = now;
+    }
+
+
+    public void setApprovalLineResult(String approvalLineResultType) {
+        this.approvalLineResult = approvalLineResultType;
     }
 
 

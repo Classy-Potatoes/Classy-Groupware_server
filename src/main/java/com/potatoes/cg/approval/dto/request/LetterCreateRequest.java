@@ -1,6 +1,5 @@
 package com.potatoes.cg.approval.dto.request;
 
-import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineTurnType;
 import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
