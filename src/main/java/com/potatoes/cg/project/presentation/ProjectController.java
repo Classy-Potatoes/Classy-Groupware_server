@@ -206,6 +206,8 @@ public class ProjectController {
 
     }
 
+
+
     /* 프로젝트 회원 초대하기 */
 //    @PostMapping("/invite")
 //    public ResponseEntity<Void> inviteMember(
@@ -230,8 +232,6 @@ public class ProjectController {
 
         return ResponseEntity.ok(pagingResponse);
     }
-
-
 
     /* 프로젝트 인원 조회(이름) */
     @GetMapping("/projects/{projectCode}/searchMember")
@@ -470,6 +470,17 @@ public class ProjectController {
         taskService.taskCheck(taskCode, taskCheckRequest);
 
         return ResponseEntity.created(URI.create("/task/" + taskCode)).build();
+    }
+
+    /* =============================================================================================== */
+
+    /* 로그인한 사람 정보 조회 */
+    @GetMapping("/loginInfo")
+    public ResponseEntity<LoginJobInfoResponse> loginInfo(@AuthenticationPrincipal final CustomUser customUser) {
+
+        final LoginJobInfoResponse loginInfo = projectMemberService.loginInfo(customUser);
+
+        return ResponseEntity.ok(loginInfo);
     }
 
 }
