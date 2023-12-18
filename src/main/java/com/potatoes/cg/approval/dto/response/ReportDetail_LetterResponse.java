@@ -2,6 +2,7 @@ package com.potatoes.cg.approval.dto.response;
 
 import com.potatoes.cg.approval.domain.*;
 import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
+import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -31,7 +32,9 @@ public class ReportDetail_LetterResponse {
     /*품의서 정보*/
     private final String letterBody;
 
-    public static ReportDetail_LetterResponse from(Letter approvalLetter) {
+    /* 로그인 유저 정보 */
+    private final Long loginMember;
+    public static ReportDetail_LetterResponse from(Letter approvalLetter, Member loginMember) {
         /* 결재선에 필요한 정보만 가져오기 */
         List<ApprovalLine_GET> approvalLines = approvalLetter.getApproval().getApprovalLine_GET();
 
@@ -89,7 +92,9 @@ public class ReportDetail_LetterResponse {
                 approvalLetter.getApproval().getApprovalTurnbackReason(),
                 transformedFiles,
                 approvalLetter.getApproval().getDocumentType(),
-                approvalLetter.getLetterBody()
+                approvalLetter.getLetterBody(),
+                loginMember.getMemberCode()
+
 
         );
     }

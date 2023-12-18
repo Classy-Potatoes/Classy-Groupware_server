@@ -1,14 +1,12 @@
-
 package com.potatoes.cg.approval.service;
 
 import com.potatoes.cg.approval.domain.*;
 import com.potatoes.cg.approval.domain.repository.*;
+import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineResultType;
+import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineWaitingStatusType;
 import com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType;
 import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
-import com.potatoes.cg.approval.dto.request.ExpenseCreateRequest;
-import com.potatoes.cg.approval.dto.request.LetterCreateRequest;
-import com.potatoes.cg.approval.dto.request.ReportApprovalStatusUpdateRequest;
-import com.potatoes.cg.approval.dto.request.VacationCreateRequest;
+import com.potatoes.cg.approval.dto.request.*;
 import com.potatoes.cg.approval.dto.response.*;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.common.exception.type.ExceptionCode;
@@ -27,6 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -44,6 +45,7 @@ public class ApprovalService {
     private final ExpenseRepository expenseRepository;
     private final VacationRepository vacationRepository;
     private final ApprovalRepository approvalRepository;
+    private final ApprovalLineRepository approvalLineRepository;
 
 
     @Value("${file.approval-dir}")
@@ -275,7 +277,7 @@ public class ApprovalService {
     }
 
     /* 1. 로그인 유저 찾아서 품의서, 지출결의서, 휴가신청서에 생성 */
-    /* 2. 멤버 전체조회*/
+    /* 2. 멤버 전체조회 */
     @Transactional(readOnly = true)
     public AllMemberAndLoginMemberResponse getApprovalProfile(CustomUser customUser) {
 
@@ -351,88 +353,101 @@ public class ApprovalService {
 
     /* 상신함 상세페이지 - 품의서 */
     @Transactional(readOnly = true)
-    public ReportDetail_LetterResponse getLetterDetail(Long approvalCode) {
+    public ReportDetail_LetterResponse getLetterDetail(Long approvalCode, CustomUser customUser) {
 
 
         Letter approvalLetter = letterRepository.findByApprovalApprovalCodeAndApprovalDocumentType(approvalCode, DocumentType.LETTER);
 
-        return ReportDetail_LetterResponse.from(approvalLetter);
+        Member loginMember = memberRepository.findById(customUser.getMemberCode())
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
+
+        return ReportDetail_LetterResponse.from(approvalLetter, loginMember);
     }
 
     /* 상신함 상세페이지 - 휴가신청서*/
     @Transactional(readOnly = true)
-    public ReportDetail_VacationResponse getVacationDetail(Long approvalCode) {
+    public ReportDetail_VacationResponse getVacationDetail(Long approvalCode, CustomUser customUser) {
 
         Vacation approvalVacation = vacationRepository.findByApprovalApprovalCodeAndApprovalDocumentType(approvalCode, DocumentType.VACATION);
 
+        Member loginMember = memberRepository.findById(customUser.getMemberCode())
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
 
-        return ReportDetail_VacationResponse.from(approvalVacation);
+        return ReportDetail_VacationResponse.from(approvalVacation, loginMember);
 
 
     }
 
     /* 상신함 상세페이지 - 지출결의서*/
     @Transactional(readOnly = true)
-    public ReportDetail_ExpenseResponse getExpenseDetail(Long approvalCode) {
+    public ReportDetail_ExpenseResponse getExpenseDetail(Long approvalCode, CustomUser customUser) {
 
         Expense approvalExpense = expenseRepository.findByApprovalApprovalCodeAndApprovalDocumentType(approvalCode, DocumentType.EXPENSE);
 
+        Member loginMember = memberRepository.findById(customUser.getMemberCode())
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_MEMBER_ID));
 
-        return ReportDetail_ExpenseResponse.from(approvalExpense);
+        return ReportDetail_ExpenseResponse.from(approvalExpense, loginMember);
+
     }
+
     /* 상신함 - 결재대기 검색 */
     @Transactional(readOnly = true)
-    public Page<ReportResponse> getSearchReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
+    public Page<ReportResponse> getSearchReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
 
         LocalDateTime startOfDay = startDate.atStartOfDay();
         LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
 
-        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.WAITING);
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndMemberMemberCodeAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, customUser.getMemberCode(), ApprovalStatusType.WAITING);
 
         return approvals.map(approval -> ReportResponse.from(approval));
 
     }
+
     /* 상신함 - 결재중 검색 */
     @Transactional(readOnly = true)
-    public Page<ReportResponse> getSearchPayingReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
+    public Page<ReportResponse> getSearchPayingReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
 
         LocalDateTime startOfDay = startDate.atStartOfDay();
         LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
 
-        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.PAYING);
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndMemberMemberCodeAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, customUser.getMemberCode(), ApprovalStatusType.PAYING);
 
         return approvals.map(approval -> ReportResponse.from(approval));
     }
+
     /* 상신함 - 승인 검색 */
-    public Page<ReportResponse> getSearchApproveReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> getSearchApproveReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
         LocalDateTime startOfDay = startDate.atStartOfDay();
         LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
 
-        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.APPROVE);
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndMemberMemberCodeAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, customUser.getMemberCode(), ApprovalStatusType.APPROVE);
 
         return approvals.map(approval -> ReportResponse.from(approval));
     }
 
     /* 상신함 - 반려 검색 */
-    public Page<ReportResponse> getSearchTurnbackReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> getSearchTurnbackReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
         LocalDateTime startOfDay = startDate.atStartOfDay();
         LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
 
-        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.TURNBACK);
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndMemberMemberCodeAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, customUser.getMemberCode(), ApprovalStatusType.TURNBACK);
 
         return approvals.map(approval -> ReportResponse.from(approval));
     }
 
     /* 상신함 - 회수 검색 */
-    public Page<ReportResponse> getSearchRecallReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate) {
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> getSearchRecallReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
         LocalDateTime startOfDay = startDate.atStartOfDay();
         LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
 
-        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, ApprovalStatusType.RECALL);
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndMemberMemberCodeAndApprovalStatus(getPageable(page), documentTitle, startOfDay, endOfDay, customUser.getMemberCode(), ApprovalStatusType.RECALL);
 
         return approvals.map(approval -> ReportResponse.from(approval));
     }
-
 
 
     /* 회수 처리 */
@@ -444,9 +459,214 @@ public class ApprovalService {
         approvalRepository.updateApprovalStatusByApprovalCodeIn(approvalCodes, ApprovalStatusType.RECALL);
 
 
-
-
     }
 
-}
+    /* 결재함 게시판 - 결재 대기 */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> getSign_Waiting(Integer page, CustomUser customUser) {
 
+        Page<Approval> approvalSign = approvalRepository.findByApprovalLineMemberCodeAndApprovalLineApprovalLineWaitingStatus(
+                getPageable(page),
+                customUser.getMemberCode(),
+                ApprovalLineWaitingStatusType.REQUEST);
+
+        return approvalSign.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 결재함 게시판 - 결재중 */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> getSign_Paying(Integer page, CustomUser customUser) {
+        Page<Approval> approvalSign = approvalRepository.findByApprovalLineMemberCodeAndApprovalStatus(
+                getPageable(page),
+                customUser.getMemberCode(),
+                ApprovalStatusType.PAYING);
+
+        return approvalSign.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 결재함 게시판 - 승인 */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> getSign_Approve(Integer page, CustomUser customUser) {
+        Page<Approval> approvalSign = approvalRepository.findByApprovalLineMemberCodeAndApprovalStatus(
+                getPageable(page),
+                customUser.getMemberCode(),
+                ApprovalStatusType.APPROVE);
+
+        return approvalSign.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 결재함 게시판 - 반려 */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> getSign_Turnback(Integer page, CustomUser customUser) {
+        Page<Approval> approvalSign = approvalRepository.findByApprovalLineMemberCodeAndApprovalStatus(
+                getPageable(page),
+                customUser.getMemberCode(),
+                ApprovalStatusType.TURNBACK);
+
+        return approvalSign.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 결재함 검색 - 결재대기 - 내게 참조되고 결재요청이 내 차례일때 결재만 검색 */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> searchSign_Waiting(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
+
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+
+        Page<Approval> approvals = approvalRepository.findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalLineMemberCodeAndApprovalStatusAndApprovalLineApprovalLineWaitingStatus(
+                getPageable(page),
+                documentTitle,
+                startOfDay,
+                endOfDay,
+                customUser.getMemberCode(),
+                ApprovalStatusType.WAITING,
+                ApprovalLineWaitingStatusType.REQUEST);
+
+        return approvals.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 결재함 검색 - 결재중 - 내게 참조 된 결재만 검색 */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> searchSign_paying(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+
+        Page<Approval> approvals = approvalRepository
+                .findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalLineMemberCodeAndApprovalStatus(
+                        getPageable(page),
+                        documentTitle,
+                        startOfDay,
+                        endOfDay,
+                        customUser.getMemberCode(),
+                        ApprovalStatusType.PAYING);
+
+        return approvals.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 결재함 검색 - 승인 - 내게 참조 된 결재만 검색 */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> searchSign_approve(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+
+        Page<Approval> approvals = approvalRepository
+                .findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalLineMemberCodeAndApprovalStatus(
+                        getPageable(page),
+                        documentTitle,
+                        startOfDay,
+                        endOfDay,
+                        customUser.getMemberCode(),
+                        ApprovalStatusType.APPROVE);
+
+        return approvals.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 결재함 검색 - 반려 - 내게 참조 된 결재만 검색 */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> searchSign_turnback(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+
+        Page<Approval> approvals = approvalRepository
+                .findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalLineMemberCodeAndApprovalStatus(
+                        getPageable(page),
+                        documentTitle,
+                        startOfDay,
+                        endOfDay,
+                        customUser.getMemberCode(),
+                        ApprovalStatusType.TURNBACK);
+
+        return approvals.map(approval -> ReportResponse.from(approval));
+    }
+
+
+    /* 결재자 결재 처리 */
+    @Transactional
+    public void signUp(SignRequest signRequest, Long approvalCode, CustomUser customUser) {
+
+        Approval existingApproval = approvalRepository
+                .findById(approvalCode)
+                .orElseThrow(() -> new NotFoundException(ExceptionCode.NOT_FOUND_APPROVAL_CODE));
+
+
+        List<ApprovalLine> approvalLines = existingApproval.getApprovalLine();
+
+        ApprovalLine existingApprovalLine = null;
+        ApprovalLine nextApprovalLine = null;
+        for (int i = 0; i < approvalLines.size(); i++) {
+            if (approvalLines.get(i).getMemberCode().equals(customUser.getMemberCode())) {
+                existingApprovalLine = approvalLines.get(i);
+                if (i + 1 < approvalLines.size()) {
+                    nextApprovalLine = approvalLines.get(i + 1);
+                }
+                break;
+            }
+        }
+
+        existingApproval.setApprovalTurnbackReason(signRequest.getApprovalTurnbackReson());
+
+        existingApprovalLine.setApprovalLineResult(signRequest.getApprovalLineResult());
+
+        if ("TURNBACK".equals(existingApprovalLine.getApprovalLineResult())) {
+            existingApproval.setApprovalStatus(ApprovalStatusType.TURNBACK);
+            existingApproval.setApprovalTurnbackDate(LocalDateTime.now());
+        }
+
+        existingApprovalLine.setApprovalLineWaitingStatus(ApprovalLineWaitingStatusType.COMPLETE);
+        existingApprovalLine.setApprovalLineDate(LocalDateTime.now());
+
+
+        if ("1".equals(existingApprovalLine.getTurn())) {
+            // 문서 진행중으로 변경
+                existingApproval.setApprovalStatus(ApprovalStatusType.PAYING);
+            }
+
+
+            if (nextApprovalLine == null) {
+                // 전체 문서 완료
+                if ("TURNBACK".equals(existingApprovalLine.getApprovalLineResult())) {
+                    existingApproval.setApprovalStatus(ApprovalStatusType.TURNBACK);
+                    existingApproval.setApprovalTurnbackDate(LocalDateTime.now());
+                    existingApproval.setApprovalTurnbackReason(signRequest.getApprovalTurnbackReson());
+                } else if ("APPROVE".equals(existingApprovalLine.getApprovalLineResult())) {
+                    existingApproval.setApprovalStatus(ApprovalStatusType.APPROVE);
+                    existingApproval.setApprovalApproveDate(LocalDateTime.now());
+                }
+            } else {
+                // nextline 처리
+                    nextApprovalLine.setApprovalLineWaitingStatus(ApprovalLineWaitingStatusType.REQUEST);
+            }
+
+
+            approvalLineRepository.save(existingApprovalLine);
+            approvalRepository.save(existingApproval);
+
+        }
+
+
+        /* 참조 보관함 검색 조회  */
+    @Transactional(readOnly = true)
+    public Page<ReportResponse> searchReferenceReport(Integer page, String documentTitle, LocalDate startDate, LocalDate endDate, CustomUser customUser) {
+
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.atTime(23, 59, 59);
+
+        Page<Approval> approvals = approvalRepository
+                .findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndReferenceLineMemberCode(
+                        getPageable(page),
+                        documentTitle,
+                        startOfDay,
+                        endOfDay,
+                        customUser.getMemberCode()
+                        );
+
+        return approvals.map(approval -> ReportResponse.from(approval));
+    }
+
+    /* 참조 보관함 조회 */
+    public Page<ReportResponse> getReferenceReport(Integer page, CustomUser customUser) {
+        Page<Approval> approvalReport = approvalRepository.findByReferenceLineMemberCode(getPageable(page), customUser.getMemberCode());
+
+        return approvalReport.map(approval -> ReportResponse.from(approval));
+    }
+}

@@ -17,6 +17,7 @@ public enum ApprovalLineResultType {
     @JsonCreator
     public static ApprovalLineResultType from(String value) {
         for (ApprovalLineResultType status : ApprovalLineResultType.values()) {
+            System.out.println("Comparing with: " + status.getValue());
             if (status.getValue().equals(value)) {
                 return status;
             }

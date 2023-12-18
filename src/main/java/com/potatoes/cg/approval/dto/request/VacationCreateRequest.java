@@ -17,7 +17,7 @@ public class VacationCreateRequest {
 
     private final String documentTitle; // 문서 제목
 
-    private final List<Map<String,String>> approvalLine; // 결재자 맴버코드
+    private final List<Map<String,String>> approvalLine; // 결재자 멤버코드
 
     private final List<Long> referenceLine; // 참조자
 

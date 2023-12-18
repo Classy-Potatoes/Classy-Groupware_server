@@ -11,6 +11,7 @@ public enum ApprovalLineWaitingStatusType {
 
 
 
+
     private final String value;
 
     ApprovalLineWaitingStatusType(String value) {
