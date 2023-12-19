@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.config.Task;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @RequiredArgsConstructor
@@ -16,12 +17,17 @@ public class MyTaskResponse {
     private final String taskTitle;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private final LocalDateTime taskRequestDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private final Date taskEndDate;
+    private final Long projectCode;
 
     public static MyTaskResponse from(ProjectTask projectTask) {
         return new MyTaskResponse(
                 projectTask.getTaskCode(),
                 projectTask.getTaskTitle(),
-                projectTask.getTaskRequestDate()
+                projectTask.getTaskRequestDate(),
+                projectTask.getTaskEndDate(),
+                projectTask.getProjectCode()
         );
     }
 }

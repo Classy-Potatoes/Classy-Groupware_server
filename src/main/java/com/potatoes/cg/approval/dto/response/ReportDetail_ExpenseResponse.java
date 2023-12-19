@@ -3,6 +3,8 @@ package com.potatoes.cg.approval.dto.response;
 import com.potatoes.cg.approval.domain.*;
 import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 import com.potatoes.cg.approval.domain.type.expenseType.ExpenseStatusType;
+import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +36,11 @@ public class ReportDetail_ExpenseResponse {
     private final ExpenseStatusType expenseStatus;
     private final List<Map<String,Object>> expenseDetails;
 
+    /* 로그인 유저 정보 */
+    private final Long loginMember;
 
-    public static ReportDetail_ExpenseResponse from(Expense approvalExpense) {
+
+    public static ReportDetail_ExpenseResponse from(Expense approvalExpense, Member loginMember) {
         /* 결재선에 필요한 정보만 가져오기 */
         List<ApprovalLine_GET> approvalExpenseLines = approvalExpense.getApproval().getApprovalLine_GET();
 
@@ -109,7 +114,8 @@ public class ReportDetail_ExpenseResponse {
                 approvalExpense.getApproval().getDocumentType(),
                 approvalExpense.getExpenseNote(),
                 approvalExpense.getExpenseStatus(),
-                transformedExpenseDetail
+                transformedExpenseDetail,
+                loginMember.getMemberCode()
         );
     }
 }

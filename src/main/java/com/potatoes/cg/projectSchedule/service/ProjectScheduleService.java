@@ -33,7 +33,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -241,17 +240,18 @@ public class ProjectScheduleService {
     @Transactional(readOnly = true)
     public Page<ProjectScheduleResponse> getSchedule(Integer page, Long projectCode, CustomUser customUser) {
 
-        Page<ProjectSchedule> projectSchedules = projectScheduleRepository.findByProjectProjectCodeAndScheduleStatusNotAndMemberMemberCode(projectCode, getPageable(page), DELETED, customUser.getMemberCode());
+        Page<ProjectSchedule> projectSchedules = projectScheduleRepository.findByProjectProjectCodeAndScheduleStatusNot(projectCode, getPageable(page), DELETED);
 
-        log.info("xvsvsds : {}", projectSchedules);
+        log.info("xvsvsds : {}", customUser);
         return projectSchedules.map(projectSchedule -> {
             List<ProjectReply> replies = projectSchedule.getReplies()
                     .stream().filter(projectReply -> projectReply.getReplyOption() == SCHEDULE && projectReply.getReplyState() == USABLE).collect(Collectors.toList());
             log.info("sdfsfsdfsfsfsf : {}", projectSchedule.getProjectManagerList());
             List<ProjectManagersSchedule> managers = projectSchedule.getProjectManagerList();
-            log.info("afsdfa : {}", managers);
-            return ProjectScheduleResponse.from(projectSchedule, replies, managers);
+
+            return ProjectScheduleResponse.from(projectSchedule, replies, managers, customUser);
         });
+
     }
 
     /* 일정 댓글 작성 */

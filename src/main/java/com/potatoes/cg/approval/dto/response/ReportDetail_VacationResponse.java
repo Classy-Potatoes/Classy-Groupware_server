@@ -3,6 +3,8 @@ package com.potatoes.cg.approval.dto.response;
 import com.potatoes.cg.approval.domain.*;
 import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 import com.potatoes.cg.approval.domain.type.vacationType.VacationType;
+import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -37,8 +39,10 @@ public class ReportDetail_VacationResponse {
     private final String vacationBody;
     private final String vacationEmergencyPhone;
 
+    /*로그인 유저 정보*/
+    private final Long loginMember;
 
-    public static ReportDetail_VacationResponse from(Vacation approvalVacation) {
+    public static ReportDetail_VacationResponse from(Vacation approvalVacation, Member loginUser) {
         /* 결재선에 필요한 정보만 가져오기 */
         List<ApprovalLine_GET> approvalLines = approvalVacation.getApproval().getApprovalLine_GET();
 
@@ -87,7 +91,8 @@ public class ReportDetail_VacationResponse {
                 approvalVacation.getVacationStartDate(),
                 approvalVacation.getVacationEndDate(),
                 approvalVacation.getVacationBody(),
-                approvalVacation.getVacationEmergencyPhone()
+                approvalVacation.getVacationEmergencyPhone(),
+                loginUser.getMemberCode()
         );
     }
 }

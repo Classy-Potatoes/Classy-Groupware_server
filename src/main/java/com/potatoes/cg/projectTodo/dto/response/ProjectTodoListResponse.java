@@ -24,6 +24,7 @@ public class ProjectTodoListResponse {
 
     private final String managerName;
     private final StatusType todoStatus;
+    private final Long infoCode;
 
 
     public static ProjectTodoListResponse from(ProjectTodolist projectTodolist) {
@@ -33,7 +34,8 @@ public class ProjectTodoListResponse {
                 projectTodolist.getTodoBody(),
                 projectTodolist.getTodoEndDate(),
                 projectTodolist.getProjectManager().getMember().getMemberInfo().getInfoName(),
-                projectTodolist.getTofoStatus()
+                projectTodolist.getTofoStatus(),
+                projectTodolist.getProjectManager().getMember().getMemberInfo().getInfoCode()
         );
     }
 

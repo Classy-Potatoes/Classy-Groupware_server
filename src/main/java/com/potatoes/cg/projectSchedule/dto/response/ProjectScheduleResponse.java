@@ -1,7 +1,7 @@
 package com.potatoes.cg.projectSchedule.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.potatoes.cg.calendar.domain.type.StatusType;
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.project.domain.ProjectReply;
 import com.potatoes.cg.projectManagers.domain.ProjectManagersSchedule;
 import com.potatoes.cg.projectSchedule.domain.ProjectSchedule;
@@ -35,8 +35,9 @@ public class ProjectScheduleResponse {
     private final List<Map<String, Object>> replies;
 
     private final String memberId;
+    private final Long infoCode;
 
-    public static ProjectScheduleResponse from(ProjectSchedule projectSchedule, List<ProjectReply> replies, List<ProjectManagersSchedule> managers) {
+    public static ProjectScheduleResponse from(ProjectSchedule projectSchedule, List<ProjectReply> replies, List<ProjectManagersSchedule> managers, CustomUser customUser) {
 
         List<Map<String, Object>> repliesMap = replies.stream().map(reply -> {
             Map<String, Object> map = new HashMap<>();
@@ -45,12 +46,14 @@ public class ProjectScheduleResponse {
             map.put("replyCreatedDate", reply.getReplyCreatedDate());
             map.put("replyCode", reply.getReplyCode());
             map.put("replyModifyDate", reply.getReplyModifyDate());
+            map.put("infoCode", reply.getMember().getInfoCode());
             return map;
         }).collect(Collectors.toList());
 
         List<Map<String, Object>> managersMap = managers.stream().map(manager -> {
             Map<String, Object> map = new HashMap<>();
             map.put("memberName", manager.getMember().getMemberInfo().getInfoName());
+            map.put("infoCode", manager.getMember().getMemberInfo().getInfoCode());
             return map;
         }).collect(Collectors.toList());
 
@@ -65,7 +68,8 @@ public class ProjectScheduleResponse {
                 projectSchedule.getScheduleModifyDate(),
                 managersMap,
                 repliesMap,
-                projectSchedule.getMember().getMemberId()
+                projectSchedule.getMember().getMemberId(),
+                customUser.getInfoCode()
         );
     }
 

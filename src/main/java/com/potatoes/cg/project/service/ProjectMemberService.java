@@ -1,5 +1,6 @@
 package com.potatoes.cg.project.service;
 
+import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Member;
 
 import com.potatoes.cg.member.domain.MemberInfo;
@@ -11,6 +12,7 @@ import com.potatoes.cg.project.domain.repository.ProjectMemberRepository;
 import com.potatoes.cg.project.domain.repository.ProjectParticipantRepository;
 import com.potatoes.cg.project.domain.repository.ProjectRepository;
 import com.potatoes.cg.project.dto.request.ProjectInviteMemberRequest;
+import com.potatoes.cg.project.dto.response.LoginJobInfoResponse;
 import com.potatoes.cg.project.dto.response.MemberDeptResponse;
 import com.potatoes.cg.project.dto.response.ProjectMemberResponse;
 import lombok.RequiredArgsConstructor;
@@ -174,4 +176,12 @@ public class ProjectMemberService {
 
     }
 
+    /* 로그인 정보 */
+    @Transactional(readOnly = true)
+    public LoginJobInfoResponse loginInfo(CustomUser customUser) {
+
+        Member member = projectMemberRepository.findByMemberInfoInfoCode(customUser.getInfoCode());
+
+        return LoginJobInfoResponse.from(member);
+    }
 }

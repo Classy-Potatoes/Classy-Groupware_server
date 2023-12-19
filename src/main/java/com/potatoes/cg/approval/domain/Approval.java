@@ -1,20 +1,18 @@
 package com.potatoes.cg.approval.domain;
 
-import com.potatoes.cg.approval.domain.type.approvalLineType.ApprovalLineTurnType;
 import com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType;
 import com.potatoes.cg.approval.domain.type.approvalType.DocumentType;
 import com.potatoes.cg.member.domain.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType.RECALL;
 import static com.potatoes.cg.approval.domain.type.approvalType.ApprovalStatusType.WAITING;
 import static com.potatoes.cg.approval.domain.type.approvalType.DocumentType.LETTER;
 import static javax.persistence.EnumType.STRING;
@@ -25,6 +23,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
+@DynamicUpdate
 public class Approval {
 
     @Id
@@ -86,9 +85,8 @@ public class Approval {
 
 
 
-
     public Approval(String documentTitle, List<ApprovalLine> approvalLine, List<Reference> referenceLine,
-                    DocumentType documentType, Member member, List<ApprovalFile> attachment ) {
+                    DocumentType documentType, Member member, List<ApprovalFile> attachment) {
 
         this.documentTitle = documentTitle;
         this.approvalLine = approvalLine;
@@ -114,7 +112,7 @@ public class Approval {
 
 
     public static Approval of(final String documentTitle, final List<Reference> referenceLine, final List<ApprovalLine> approvalLine
-                              ,final DocumentType documentType,final Member member, final List<ApprovalFile> attachment) {
+            , final DocumentType documentType, final Member member, final List<ApprovalFile> attachment) {
 
         return new Approval(
                 documentTitle,
@@ -126,7 +124,6 @@ public class Approval {
 
         );
     }
-
 
     public static Approval from(String documentTitle, List<Reference> referenceLine,
                                 List<ApprovalLine> approvalLine, DocumentType documentType,
@@ -140,6 +137,48 @@ public class Approval {
         );
     }
 
-
+    /* test */
+    public void signUpdate(String approvalTurnbackReason , List<ApprovalLine> approvalLine) {
+        this.approvalTurnbackReason = approvalTurnbackReason;
+        this.approvalLine = approvalLine;
     }
+
+
+
+    public void setApprovalApproveDate(LocalDateTime now) {
+        this.approvalApproveDate = now;
+    }
+
+
+    public void setApprovalStatus(ApprovalStatusType approvalStatusType) {
+        this.approvalStatus = approvalStatusType;
+    }
+
+    public void setApprovalTurnbackDate(LocalDateTime now) {
+        this.approvalTurnbackDate = now;
+    }
+
+
+    public void setApprovalTurnbackReason(String approvalTurnbackReason) {
+        this.approvalTurnbackReason = approvalTurnbackReason;
+    }
+
+
+    public void update(String approvalTurnbackReason, LocalDateTime approvalApproveDate,
+                       LocalDateTime approvalTurnbackDate, ApprovalStatusType approvalStatusType,
+                       List<ApprovalLine> approvalLine) {
+        this.approvalTurnbackReason = approvalTurnbackReason;
+        this.approvalApproveDate = approvalApproveDate;
+        this.approvalTurnbackDate = approvalTurnbackDate;
+        this.approvalStatus = approvalStatusType;
+        this.approvalLine = approvalLine;
+    };
+
+
+
+
+
+}
+
+
 
