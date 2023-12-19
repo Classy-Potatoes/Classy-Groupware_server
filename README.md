@@ -6,12 +6,12 @@
 - 기업메일, 기업메신저, 전자결재 등 여러 협업 기능을 제공하는 업무협업 툴 제작
       <br>
 - 개발기간 : 2023.11.13 ~ 2023.12.17 (약 4주)
-- 개발인원
-  강인선 (https://github.com/popipopipoi) - 대시보드 / 프로젝트 메인 / 프로젝트 게시글 / 프로젝트 업무
-  김형수 (https://github.com/brorsoo) - 회원가입 / 로그인 / 마이페이지 / 연락망 / 관리기능
-  박우석 (https://github.com/woose0k) - 프로젝트 일정 / 프로젝트 할일 / 캘린더
-  박준홍 (https://github.com/tinypig705) - 전자결재
-  황주희 (https://github.com/ctmeou) - 쪽지함
+- 개발인원 <br>
+  강인선 (https://github.com/popipopipoi) - 대시보드 / 프로젝트 메인 / 프로젝트 게시글 / 프로젝트 업무 <br>
+  김형수 (https://github.com/brorsoo) - 회원가입 / 로그인 / 마이페이지 / 연락망 / 관리기능 <br>
+  박우석 (https://github.com/woose0k) - 프로젝트 일정 / 프로젝트 할일 / 캘린더 <br>
+  박준홍 (https://github.com/tinypig705) - 전자결재 <br>
+  황주희 (https://github.com/ctmeou) - 쪽지함 <br>
 <br>
 <br>
 
