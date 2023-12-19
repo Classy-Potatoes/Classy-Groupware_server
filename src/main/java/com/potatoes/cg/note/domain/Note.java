@@ -5,6 +5,7 @@ import com.potatoes.cg.note.domain.type.NoteReceiptStatus;
 import com.potatoes.cg.note.domain.type.NoteStatusType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -18,6 +19,7 @@ import static com.potatoes.cg.note.domain.type.NoteStatusType.DEFAULT;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Entity
 @Table(name = "TBL_NOTE")

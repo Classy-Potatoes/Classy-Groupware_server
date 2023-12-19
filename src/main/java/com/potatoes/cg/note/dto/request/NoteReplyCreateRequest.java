@@ -9,10 +9,11 @@ import javax.validation.constraints.NotNull;
 
 @RequiredArgsConstructor
 @Getter
-public class NoteCreateRequest {
+@ToString
+public class NoteReplyCreateRequest {
 
     @NotNull
-    private final Long noteReceiver;
+    private final String noteReceiver;
 
     @NotBlank
     private final String noteBody;

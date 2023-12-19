@@ -7,6 +7,7 @@ import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.dto.response.AdminMembersResponse;
 import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
+import com.potatoes.cg.note.dto.request.NoteReplyCreateRequest;
 import com.potatoes.cg.note.dto.response.NoteMemberListResponse;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
@@ -197,10 +198,10 @@ public class NoteController {
     /***************************************************************************************************************/
 
     /* 13. 이동 */
-    @PutMapping("/move")
-    public ResponseEntity<Void> moveNote(@RequestBody @Valid final NoteMoveRequest noteRequest) {
+    @PutMapping("/move/{noteCode}")
+    public ResponseEntity<Void> moveNote(@PathVariable Long noteCode) {
 
-        noteService.moveNote(noteRequest);
+        noteService.moveNote(noteCode);
 
         return ResponseEntity.status(HttpStatus.CREATED).build(); //201 응답
 
@@ -214,7 +215,7 @@ public class NoteController {
 
         noteService.postNote(noteRequest, customUser);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 
@@ -240,6 +241,19 @@ public class NoteController {
         final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
 
         return ResponseEntity.ok( pagingResponse );
+
+    }
+
+    /* 답장 */
+    @PostMapping("/replySend")
+    public ResponseEntity<Void> postReplyNote(
+            @RequestBody @Valid final NoteReplyCreateRequest noteRequest,
+            @AuthenticationPrincipal CustomUser customUser) {
+
+        System.out.println(noteRequest + "noteRequest");
+        noteService.postReplyNote(noteRequest, customUser);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 

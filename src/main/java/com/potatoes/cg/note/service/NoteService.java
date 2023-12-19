@@ -3,6 +3,8 @@ package com.potatoes.cg.note.service;
 import com.potatoes.cg.common.exception.NotFoundException;
 import com.potatoes.cg.jwt.CustomUser;
 import com.potatoes.cg.member.domain.Member;
+import com.potatoes.cg.member.domain.MemberInfo;
+import com.potatoes.cg.member.domain.repository.InfoRepository;
 import com.potatoes.cg.member.domain.repository.MemberRepository;
 import com.potatoes.cg.member.dto.response.AdminMembersResponse;
 import com.potatoes.cg.note.domain.Note;
@@ -10,6 +12,7 @@ import com.potatoes.cg.note.domain.repository.NoteRepository;
 import com.potatoes.cg.note.domain.type.NoteStatusType;
 import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
+import com.potatoes.cg.note.dto.request.NoteReplyCreateRequest;
 import com.potatoes.cg.note.dto.response.NoteMemberListResponse;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
@@ -22,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
@@ -39,14 +43,20 @@ public class NoteService {
 
     private final NoteRepository noteRepository;
     private final MemberRepository memberRepository;
+    private final InfoRepository infoRepository;
     private final ProjectMemberRepository projectMemberRepository;
 
-    private Pageable getPageable(@RequestParam(defaultValue = "1") final Integer page) {
+    private Pageable getPageable(final Integer page) {
 
-        return PageRequest.of(page -1, 10);
+        return PageRequest.of(page -1, 6, Sort.by("noteCode").descending());
 
     }
 
+    private Pageable getPage(final Integer page) {
+
+        return PageRequest.of(page -1, 7, Sort.by("memberCode").descending());
+
+    }
     /********************************************* 보낸 쪽지함 *********************************************/
 
     /* 1. 전체 조회 */
@@ -222,46 +232,17 @@ public class NoteService {
 
     /* 13. 이동 */
     @Transactional
-    public void moveNote(NoteMoveRequest noteRequest) {
+    public void moveNote(Long noteCode) {
 
-        List<Note> notes = noteRepository.findAllById(noteRequest.getNoteCodes());
+        Note note = noteRepository.findById(noteCode).orElseThrow();
 
-        //받은 쪽지인지 보낸 쪽지인지 판단해서 분기하고 컬럼에 따른 수정 (스트림, forEach)
-        notes.forEach(note -> {
-            if (noteRequest.getNoteDivision().equals("sent")) {
-                moveSentNote(note, noteRequest.getNoteStatusType());
-            } else if (noteRequest.getNoteDivision().equals("received")) {
-                moveReceivedNote(note, noteRequest.getNoteStatusType());
-            }
-        });
-
-        noteRepository.saveAll(notes);
-
-    }
-
-    private void moveSentNote(Note note, NoteStatusType noteStatusType) {
-
-        switch (noteStatusType) {
-            case DEFAULT:
-                note.setNoteSenderStatus(DEFAULT);
-                break;
-            case IMPORTANT:
-                note.setNoteSenderStatus(IMPORTANT);
-                break;
+        if(note.getNoteReceiverStatus() == DEFAULT) {
+            note.setNoteReceiverStatus(IMPORTANT);
+        } else if(note.getNoteReceiverStatus() == IMPORTANT) {
+            note.setNoteReceiverStatus(DEFAULT);
         }
 
-    }
-
-    private void moveReceivedNote(Note note, NoteStatusType noteStatusType) {
-
-        switch (noteStatusType) {
-            case DEFAULT:
-                note.setNoteReceiverStatus(DEFAULT);
-                break;
-            case IMPORTANT:
-                note.setNoteReceiverStatus(IMPORTANT);
-                break;
-        }
+        noteRepository.save(note);
 
     }
 
@@ -283,7 +264,7 @@ public class NoteService {
     @Transactional(readOnly = true)
     public Page<ProjectMemberResponse> getMemberSearch(Integer page, String infoName) {
 
-        Page<Member> members = projectMemberRepository.findByMemberInfoInfoNameContainsAndMemberStatus(getPageable(page), infoName, ACTIVE);
+        Page<Member> members = projectMemberRepository.findByMemberInfoInfoNameContainsAndMemberStatus(getPage(page), infoName, ACTIVE);
 
         return members.map(Member -> ProjectMemberResponse.fromMember(Member));
 
@@ -293,9 +274,21 @@ public class NoteService {
     @Transactional(readOnly = true)
     public Page<NoteMemberListResponse> getNoteListMembers(Integer page) {
 
-        Page<Member> memberList = memberRepository.findAll(getPageable(page));
+        Page<Member> memberList = memberRepository.findAll(getPage(page));
 
         return memberList.map( member -> NoteMemberListResponse.from(member));
+    }
+
+    /* 답장 */
+    public void postReplyNote(NoteReplyCreateRequest noteRequest, CustomUser customUser) {
+        Member noteSender = memberRepository.getReferenceById(customUser.getMemberCode());
+        MemberInfo info = infoRepository.findByInfoName(noteRequest.getNoteReceiver());
+        Member noteReceiver = memberRepository.findByMemberInfo(info);
+
+        System.out.println(noteReceiver + "noteReceiver");
+        Note newNote = Note.of(noteSender, noteReceiver, noteRequest.getNoteBody());
+
+        noteRepository.save(newNote);
     }
 
 }
