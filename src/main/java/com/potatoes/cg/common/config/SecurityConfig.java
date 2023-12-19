@@ -112,6 +112,8 @@ public class SecurityConfig {
         // 이런식으로 추가해서 사용할수 있도록 list로 만들었다.
 //        corsConfiguration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "", ""));
         corsConfiguration.setAllowedOrigins( Arrays.asList("http://localhost:3000") );
+        // 배포용으로 작성
+//        corsConfiguration.setAllowedOrigins( Arrays.asList("http://classy-groupware.s3-website.ap-northeast-2.amazonaws.com") );
         corsConfiguration.setAllowedMethods( Arrays.asList("GET", "PUT", "POST", "DELETE") );
         corsConfiguration.setAllowedHeaders( Arrays.asList(
                 "Access-Control-Allow-Origin", "Access-Control-Allow-Headers",
