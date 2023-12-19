@@ -90,7 +90,7 @@ public class NoteController {
     /********************************************* 받은 쪽지함 *********************************************/
 
     /* 5. 전체 조회 */
-    @GetMapping("/received")
+    @GetMapping("/")
     public ResponseEntity<PagingResponse> getReceivedNotes(
             @RequestParam(defaultValue = "1") final Integer page,
             @AuthenticationPrincipal CustomUser customUser
