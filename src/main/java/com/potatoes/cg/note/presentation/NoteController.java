@@ -4,8 +4,11 @@ import com.potatoes.cg.common.paging.Pagenation;
 import com.potatoes.cg.common.paging.PagingButtonInfo;
 import com.potatoes.cg.common.paging.PagingResponse;
 import com.potatoes.cg.jwt.CustomUser;
+import com.potatoes.cg.member.dto.response.AdminMembersResponse;
 import com.potatoes.cg.note.dto.request.NoteCreateRequest;
 import com.potatoes.cg.note.dto.request.NoteMoveRequest;
+import com.potatoes.cg.note.dto.request.NoteReplyCreateRequest;
+import com.potatoes.cg.note.dto.response.NoteMemberListResponse;
 import com.potatoes.cg.note.dto.response.NoteResponse;
 import com.potatoes.cg.note.dto.response.NotesResponse;
 import com.potatoes.cg.note.service.NoteService;
@@ -195,24 +198,24 @@ public class NoteController {
     /***************************************************************************************************************/
 
     /* 13. 이동 */
-    @PutMapping("/move")
-    public ResponseEntity<Void> moveNote(@RequestBody @Valid final NoteMoveRequest noteRequest) {
+    @PutMapping("/move/{noteCode}")
+    public ResponseEntity<Void> moveNote(@PathVariable Long noteCode) {
 
-        noteService.moveNote(noteRequest);
+        noteService.moveNote(noteCode);
 
         return ResponseEntity.status(HttpStatus.CREATED).build(); //201 응답
 
     }
 
     /* 14. 쓰기 */
-    @PostMapping("/save")
+    @PostMapping("/send")
     public ResponseEntity<Void> postNote(
             @RequestBody @Valid final NoteCreateRequest noteRequest,
             @AuthenticationPrincipal CustomUser customUser) {
 
         noteService.postNote(noteRequest, customUser);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 
@@ -226,6 +229,31 @@ public class NoteController {
         final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
 
         return ResponseEntity.ok(pagingResponse);
+
+    }
+
+    /* 회원 목록 조회 */
+    @GetMapping("/member/list")
+    public ResponseEntity<PagingResponse> getNoteListMembers(@RequestParam(defaultValue = "1") final Integer page ) {
+
+        final Page<NoteMemberListResponse> members = noteService.getNoteListMembers(page);
+        final PagingButtonInfo pagingButtonInfo = Pagenation.getPagingButtonInfo(members);
+        final PagingResponse pagingResponse = PagingResponse.of(members.getContent(), pagingButtonInfo);
+
+        return ResponseEntity.ok( pagingResponse );
+
+    }
+
+    /* 답장 */
+    @PostMapping("/replySend")
+    public ResponseEntity<Void> postReplyNote(
+            @RequestBody @Valid final NoteReplyCreateRequest noteRequest,
+            @AuthenticationPrincipal CustomUser customUser) {
+
+        System.out.println(noteRequest + "noteRequest");
+        noteService.postReplyNote(noteRequest, customUser);
+
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
     }
 

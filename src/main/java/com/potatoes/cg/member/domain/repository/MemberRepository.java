@@ -43,4 +43,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findAllByMemberInfoIn(List<MemberInfo> infos);
 
     Member findByMemberInfoInfoCode(Long code);
+
+    Member findByMemberInfo(MemberInfo info);
 }

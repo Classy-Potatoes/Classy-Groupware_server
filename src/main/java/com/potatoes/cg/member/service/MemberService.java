@@ -184,7 +184,6 @@ public class MemberService {
         // 이미지 조회
         final ProfileImage profileImage = profileImageRepository.findByMemberCode( customUser.getMemberCode() )
                 .orElseThrow( () -> new NotFoundException( NOT_FOUND_MEMBER_CODE ));
-
         // 부서, 직급 목록 조회
         final List<Dept> deptList = deptRepository.findAll();
         final List<Job> jobList = jobRepository.findAll();

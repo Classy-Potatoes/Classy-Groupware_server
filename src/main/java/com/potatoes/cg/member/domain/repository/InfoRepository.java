@@ -22,4 +22,6 @@ public interface InfoRepository extends JpaRepository<MemberInfo, Long> {
     /* 미분류 회원 목록 조회(search) */
     Page<MemberInfo> findByInfoNameContainsAndInfoStatus(Pageable pageable, String infoName, MemberInfoStatus infoStatus);
 
+    /* 쪽지 답장 시 이름 받아오기 위해 */
+    MemberInfo findByInfoName(String name);
 }
