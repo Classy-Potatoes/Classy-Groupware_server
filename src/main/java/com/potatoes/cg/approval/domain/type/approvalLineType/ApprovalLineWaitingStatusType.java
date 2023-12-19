@@ -7,6 +7,8 @@ public enum ApprovalLineWaitingStatusType {
 
     REQUEST("결재요청"),
     WAIT("결재대기"),
+
+    CANCEL("취소"),
     COMPLETE ("결재완료");
 
 

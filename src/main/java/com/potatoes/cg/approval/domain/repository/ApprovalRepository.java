@@ -47,7 +47,7 @@ public interface ApprovalRepository extends JpaRepository<Approval, Long> {
     Page<Approval> findByDocumentTitleIgnoreCaseContainingAndApprovalRegistDateBetweenAndApprovalLineMemberCodeAndApprovalStatusAndApprovalLineApprovalLineWaitingStatus(Pageable pageable, String documentTitle, LocalDateTime startOfDay, LocalDateTime endOfDay, Long memberCode, ApprovalStatusType approvalStatusType, ApprovalLineWaitingStatusType approvalLineWaitingStatusType);
 
     /* 내가 결재 할 차례가 왔을때 조회 */
-    Page<Approval> findByApprovalLineMemberCodeAndApprovalLineApprovalLineWaitingStatus(Pageable pageable, Long memberCode, ApprovalLineWaitingStatusType approvalLineWaitingStatusType);
+    Page<Approval> findByApprovalLineMemberCodeAndApprovalLineApprovalLineWaitingStatusAndApprovalStatusNot(Pageable pageable, Long memberCode, ApprovalLineWaitingStatusType approvalLineWaitingStatusType, ApprovalStatusType approvalStatus);
 
     /* 결재 상태에 따라 조회*/
     Page<Approval> findByApprovalLineMemberCodeAndApprovalStatus(Pageable pageable, Long memberCode, ApprovalStatusType approvalStatusType);
