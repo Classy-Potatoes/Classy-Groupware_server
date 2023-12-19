@@ -465,10 +465,11 @@ public class ApprovalService {
     @Transactional(readOnly = true)
     public Page<ReportResponse> getSign_Waiting(Integer page, CustomUser customUser) {
 
-        Page<Approval> approvalSign = approvalRepository.findByApprovalLineMemberCodeAndApprovalLineApprovalLineWaitingStatus(
+        Page<Approval> approvalSign = approvalRepository.findByApprovalLineMemberCodeAndApprovalLineApprovalLineWaitingStatusAndApprovalStatusNot(
                 getPageable(page),
                 customUser.getMemberCode(),
-                ApprovalLineWaitingStatusType.REQUEST);
+                ApprovalLineWaitingStatusType.REQUEST,
+                ApprovalStatusType.RECALL);
 
         return approvalSign.map(approval -> ReportResponse.from(approval));
     }
@@ -634,7 +635,12 @@ public class ApprovalService {
                 }
             } else {
                 // nextline 처리
+                if ("TURNBACK".equals(existingApprovalLine.getApprovalLineResult())){
+                    existingApproval.setApprovalStatus(ApprovalStatusType.TURNBACK);
+                    nextApprovalLine.setApprovalLineWaitingStatus(ApprovalLineWaitingStatusType.CANCEL);
+                } else if ("APPROVE".equals(existingApprovalLine.getApprovalLineResult())) {
                     nextApprovalLine.setApprovalLineWaitingStatus(ApprovalLineWaitingStatusType.REQUEST);
+                }
             }
 
 
