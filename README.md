@@ -158,8 +158,9 @@
       * 쪽지 전송, 수정, 삭제
 
 ## 🥔: ERD 설계
+ <div>
+  <img src="https://github.com/Classy-Potatoes/Server_Classy-Groupware/assets/138549170/93f9bb3a-3571-471e-834e-dabb512cfada" width="600" height="300">
+  <img src="https://github.com/Classy-Potatoes/Server_Classy-Groupware/assets/138549170/3a2fa573-cd8c-4b62-838a-d138cbe92c73" width="600" height="180"> 
+ </div>
+  
 
-<div>
-  <img src="https://github.com/Classy-Potatoes/Server_Classy-Groupware/assets/138549170/3a2fa573-cd8c-4b62-838a-d138cbe92c73">
-  <img src="https://github.com/Classy-Potatoes/Server_Classy-Groupware/assets/138549170/93f9bb3a-3571-471e-834e-dabb512cfada">
-</div>
